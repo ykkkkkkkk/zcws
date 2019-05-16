@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="ykk.cb.com.zcws">
+
+    <!-- 权限录入 -->
+    <uses-permission android:name="android.permission.CAMERA" />
+    <uses-permission android:name="android.permission.VIBRATE" />
+    <uses-permission android:name="android.permission.FLASHLIGHT" />
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
+    <uses-permission android:name="android.permission.BLUETOOTH" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+
+    <application
+        android:name=".comm.MyApplication"
+        android:allowBackup="true"
+        android:icon="@mipmap/ic_launcher"
+        android:label="@string/app_name"
+        android:roundIcon="@mipmap/ic_launcher_round"
+        android:supportsRtl="true"
+        android:theme="@style/AppTheme">
+
+        <provider
+            android:name="android.support.v4.content.FileProvider"
+            android:authorities="${applicationId}.fileProvider"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/file_paths" />
+        </provider>
+
+        <service android:name=".util.DownloadService" />
+
+        <activity
+            android:name=".LoginActivity"
+            android:windowSoftInputMode="stateHidden|adjustPan">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+
+        <!-- 蓝牙模块 -->
+        <activity
+            android:name=".util.blueTooth.BluetoothDeviceListDialog"
+            android:configChanges="keyboardHidden|orientation|screenSize"
+            android:label="@string/bluetooth_device_list"
+            android:theme="@android:style/Theme.Dialog" />
+
+        <!-- 基础模块 -->
+        <activity
+            android:name=".basics.Dept_DialogActivity"
+            android:theme="@style/dialogStyle"
+            android:windowSoftInputMode="adjustResize|stateHidden" />
+        <activity
+            android:name=".basics.Stock_DialogActivity"
+            android:theme="@style/dialogStyle"
+            android:windowSoftInputMode="adjustResize|stateHidden" />
+        <activity
+            android:name=".basics.StockPos_DialogActivity"
+            android:theme="@style/dialogStyle"
+            android:windowSoftInputMode="adjustResize|stateHidden" />
+        <activity
+            android:name=".basics.PublicInputDialog"
+            android:theme="@style/dialogStyle"
+            android:windowSoftInputMode="stateHidden|adjustResize" />
+        <activity
+            android:name=".basics.PublicInputDialog2"
+            android:theme="@style/dialogStyle"
+            android:windowSoftInputMode="stateVisible|adjustResize" />
+
+        <!-- 仓库模块 -->
+        <!-- 设置页面用到的界面 -->
+        <activity
+            android:name=".entrance.page5.ServiceSetActivity"
+            android:windowSoftInputMode="adjustResize|stateVisible" />
+        <activity
+            android:name=".entrance.page5.PrintMainActivity"
+            android:windowSoftInputMode="stateHidden|adjustResize" />
+
+        <!-- 采购模块 -->
+
+        <!-- 生产模块 -->
+        <activity
+            android:name=".produce.Prod_ScInMainActivity"
+            android:windowSoftInputMode="adjustResize|stateHidden" />
+
+        <!-- 销售模块 -->
+        <activity
+            android:name=".sales.Sal_DsOutMainActivity"
+            android:windowSoftInputMode="adjustResize|stateHidden" />
+        <activity
+            android:name=".sales.Sal_ScOutMainActivity"
+            android:windowSoftInputMode="adjustResize|stateHidden" />
+        <activity
+            android:name=".sales.Sal_DsOutReturnMainActivity"
+            android:windowSoftInputMode="adjustResize|stateHidden" />
+
+
+        <!-- 扫一扫界面 -->
+        <activity
+            android:name=".util.zxing.android.CaptureActivity"
+            android:screenOrientation="portrait"
+            android:theme="@android:style/Theme.NoTitleBar" />
+
+        <activity android:name=".util.ImageLoadActivity" />
+        <activity android:name=".MainActivity" />
+        <activity android:name=".WebViewTestActivity" />
+        <activity android:name=".entrance.MainTabFragmentActivity" />
+        <activity android:name=".LoadMoreActivity" />
+        <activity android:name=".LoadMoreWrapperActivity" />
+    </application>
+
+</manifest>
