@@ -20,6 +20,7 @@ import ykk.cb.com.zcws.R;
 import ykk.cb.com.zcws.bean.User;
 import ykk.cb.com.zcws.comm.ActivityCollector;
 import ykk.cb.com.zcws.comm.BaseActivity;
+import ykk.cb.com.zcws.entrance.page5.PrintMainActivity;
 import ykk.cb.com.zcws.util.adapter.BaseFragmentAdapter;
 
 
@@ -156,7 +157,8 @@ public class MainTabFragmentActivity extends BaseActivity {
 
                 break;
             case R.id.btn_print: // 打印
-//                show(PrintMainActivity.class, null);
+                show(PrintMainActivity.class, null);
+
                 break;
             case R.id.relative1:
                 tabChange(relative1, tab1, radio1, 0);

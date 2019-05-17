@@ -81,6 +81,7 @@ public class Sal_DsOutFragment1 extends BaseFragment {
     private Activity mContext;
     private Sal_DsOutMainActivity parent;
     private boolean isTextChange; // 是否进入TextChange事件
+    private String strK3Number; // 保存k3返回的单号
 
     // 消息处理
     private Sal_DsOutFragment1.MyHandler mHandler = new Sal_DsOutFragment1.MyHandler(this);
@@ -100,13 +101,10 @@ public class Sal_DsOutFragment1 extends BaseFragment {
                 String msgObj = (String) msg.obj;
                 switch (msg.what) {
                     case SUCC1:
-                        m.resetSon();
-//
-//                        m.checkDatas.clear();
-//                        m.getBarCodeTableBefore(true);
-//                        m.mAdapter.notifyDataSetChanged();
-//                        m.btnSave.setVisibility(View.GONE);
-//                        m.mHandler.sendEmptyMessageDelayed(SETFOCUS,200);
+                        m.strK3Number = JsonUtil.strToString(msgObj);
+
+                        m.btnSave.setVisibility(View.GONE);
+                        m.btnPass.setVisibility(View.VISIBLE);
                         Comm.showWarnDialog(m.mContext,"保存成功，请点击“审核按钮”！");
 
                         break;
@@ -115,11 +113,7 @@ public class Sal_DsOutFragment1 extends BaseFragment {
 
                         break;
                     case PASS: // 审核成功 返回
-                        m.btnSave.setVisibility(View.VISIBLE);
-                        m.reset('0');
-
-                        m.checkDatas.clear();
-                        m.mAdapter.notifyDataSetChanged();
+                        m.reset();
                         Comm.showWarnDialog(m.mContext,"审核成功✔");
 
                         break;
@@ -230,6 +224,12 @@ public class Sal_DsOutFragment1 extends BaseFragment {
             @Override
             public void onClick_num(View v, ScanningRecord entity, int position) {
                 Log.e("num", "行：" + position);
+                ICItem icItem = entity.getIcItem();
+                // 是否赠品，990160=是
+                if(icItem.getIsComplimentary() == 990160) {
+                    Comm.showWarnDialog(mContext,"赠品不能修改数量！");
+                    return;
+                }
                 curPos = position;
                 showInputDialog("数量", String.valueOf(entity.getRealQty()), "0.0", RESULT_NUM);
             }
@@ -275,7 +275,11 @@ public class Sal_DsOutFragment1 extends BaseFragment {
 
                 break;
             case R.id.btn_pass: // 审核
-//                run_submitAndPass();
+                if(strK3Number == null) {
+                    Comm.showWarnDialog(mContext,"请先保存数据！");
+                    return;
+                }
+                run_passDS();
 
                 break;
             case R.id.btn_clone: // 重置
@@ -288,7 +292,7 @@ public class Sal_DsOutFragment1 extends BaseFragment {
                     build.setPositiveButton("是", new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
-                            resetSon();
+                            reset();
                         }
                     });
                     build.setNegativeButton("否", null);
@@ -296,7 +300,7 @@ public class Sal_DsOutFragment1 extends BaseFragment {
                     build.show();
                     return;
                 } else {
-                    resetSon();
+                    reset();
                 }
 
                 break;
@@ -382,21 +386,14 @@ public class Sal_DsOutFragment1 extends BaseFragment {
         });
     }
 
-    /**
-     * 0：重置全部，1：重置物料部分
-     *
-     * @param flag
-     */
-    private void reset(char flag) {
-        // 清空物料信息
+
+    private void reset() {
+        strK3Number = null;
         etExpressCode.setText(""); // 快递单号
         etMtlCode.setText(""); // 物料
-    }
-
-    private void resetSon() {
         btnSave.setVisibility(View.VISIBLE);
+        btnPass.setVisibility(View.GONE);
         checkDatas.clear();
-        reset('0');
         curViewFlag = '1';
         expressBarcode = null;
         mtlBarcode = null;
@@ -429,6 +426,10 @@ public class Sal_DsOutFragment1 extends BaseFragment {
      * 得到快递单号扫码的数据
      */
     private void getScanAfterData_1(List<SeOrderEntry> list) {
+        if(checkDatas.size() > 0) {
+            Comm.showWarnDialog(mContext,"请先保存当前行的数据！");
+            return;
+        }
         int size = list.size();
         for(int i=0; i<size; i++) {
             SeOrderEntry seOrderEntry = list.get(i);
@@ -444,6 +445,7 @@ public class Sal_DsOutFragment1 extends BaseFragment {
             sr.setIcItemId(icItem.getFitemid());
             sr.setIcItemNumber(icItem.getFnumber());
             sr.setIcItemName(icItem.getFname());
+            sr.setIcItem(icItem);
             Organization cust = seOrder.getCust();
             if(cust != null) {
                 sr.setCustNumber(cust.getfNumber());
@@ -460,7 +462,10 @@ public class Sal_DsOutFragment1 extends BaseFragment {
             sr.setStockPositionName("");
             sr.setDeliveryWay("");
             sr.setSourceQty(seOrderEntry.getFqty());
-            sr.setRealQty(0);
+            /* 是否赠品，990160=是 (不是k3自带的，是另外增加的) */
+            if(icItem.getIsComplimentary() == 990160) sr.setRealQty(seOrderEntry.getFqty());
+            else sr.setRealQty(0);
+
             sr.setCreateUserId(user.getId());
             sr.setCreateUserName(user.getUsername());
             sr.setSourceObj(JsonUtil.objectToString(seOrderEntry));
@@ -486,8 +491,8 @@ public class Sal_DsOutFragment1 extends BaseFragment {
             if (bt.getIcItemNumber().equals(sr.getIcItemNumber())) {
                 isFlag = true;
 
-                // 启用序列号，批次号；    990155：启用批次号，990156：启用序列号
-                if(tmpICItem.getSnManager() == 990156 || tmpICItem.getBatchManager() == 990155) {
+                // 不是赠品，并启用序列号，批次号；    990155：启用批次号，990156：启用序列号
+                if(tmpICItem.getIsComplimentary() != 990160 && tmpICItem.getSnManager() == 990156 || tmpICItem.getBatchManager() == 990155) {
                     if (srBarcode.indexOf(bt.getBarcode()) > -1) {
                         Comm.showWarnDialog(mContext, "条码已经使用！");
                         return;
@@ -595,7 +600,7 @@ public class Sal_DsOutFragment1 extends BaseFragment {
             case '2': // 物料查询
                 mUrl = getURL("barCodeTable/findBarcode_DS");
                 barcode = mtlBarcode;
-                strCaseId = "11";
+                strCaseId = "11,21";
                 break;
         }
         FormBody formBody = new FormBody.Builder()
@@ -686,16 +691,14 @@ public class Sal_DsOutFragment1 extends BaseFragment {
     }
 
     /**
-     * 提交并审核
+     * 电商账号审核
      */
-    private void run_submitAndPass() {
+    private void run_passDS() {
         showLoadDialog("正在审核...");
-        String mUrl = getURL("scanningRecord/submitAndPass");
+        String mUrl = getURL("scanningRecord/passDS");
         getUserInfo();
         FormBody formBody = new FormBody.Builder()
-                .add("type", "2")
-                .add("kdAccount", user.getKdAccount())
-                .add("kdAccountPassword", user.getKdAccountPassword())
+                .add("strK3Number", strK3Number)
                 .build();
 
         Request request = new Request.Builder()
@@ -721,7 +724,7 @@ public class Sal_DsOutFragment1 extends BaseFragment {
                     return;
                 }
                 Message msg = mHandler.obtainMessage(PASS, result);
-                Log.e("run_submitAndPass --> onResponse", result);
+                Log.e("run_passDS --> onResponse", result);
                 mHandler.sendMessage(msg);
             }
         });

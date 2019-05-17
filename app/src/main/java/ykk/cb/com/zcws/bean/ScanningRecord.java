@@ -2,6 +2,8 @@ package ykk.cb.com.zcws.bean;
 
 import java.io.Serializable;
 
+import ykk.cb.com.zcws.bean.k3Bean.ICItem;
+
 /**
  * 出入库扫描记录表
  *
@@ -9,7 +11,7 @@ import java.io.Serializable;
  */
 public class ScanningRecord implements Serializable {
     private int id; // 自增长id
-    private int type; // 1：电商销售出库，10：生产产品入库，11：发货通知单销售出库，12：电商销售退货
+    private int type; // 1：电商销售出库，10：生产产品入库，11：发货通知单销售出库，12：电商销售退货，13：电商外购入库
     private int sourceId; // 来源id
     private String sourceNumber; // 来源单号
     private int sourceEntryId; // 来源分录id
@@ -37,6 +39,7 @@ public class ScanningRecord implements Serializable {
     // 临时字段，不存表
     private Stock stock; // 仓库
     private StockPosition stockPos; // 库位
+    private ICItem icItem; // 物料
     private char isUniqueness; // 条码是否唯一：Y是，N否
     private String strBarcodes; // 用逗号拼接的条码号
     private String sourceObj; // 来源对象
@@ -302,6 +305,14 @@ public class ScanningRecord implements Serializable {
 
     public void setIcItemId(int icItemId) {
         this.icItemId = icItemId;
+    }
+
+    public ICItem getIcItem() {
+        return icItem;
+    }
+
+    public void setIcItem(ICItem icItem) {
+        this.icItem = icItem;
     }
 
 

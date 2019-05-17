@@ -85,6 +85,7 @@ public class Prod_ScInFragment1 extends BaseFragment {
     private Activity mContext;
     private Prod_ScInMainActivity parent;
     private boolean isTextChange; // 是否进入TextChange事件
+    private String strK3Number; // 保存k3返回的单号
 
     // 消息处理
     private Prod_ScInFragment1.MyHandler mHandler = new Prod_ScInFragment1.MyHandler(this);
@@ -104,13 +105,10 @@ public class Prod_ScInFragment1 extends BaseFragment {
                 String msgObj = (String) msg.obj;
                 switch (msg.what) {
                     case SUCC1:
-                        m.resetSon();
+                        m.strK3Number = JsonUtil.strToString(msgObj);
 //
-//                        m.checkDatas.clear();
-//                        m.getBarCodeTableBefore(true);
-//                        m.mAdapter.notifyDataSetChanged();
-//                        m.btnSave.setVisibility(View.GONE);
-//                        m.mHandler.sendEmptyMessageDelayed(SETFOCUS,200);
+                        m.btnSave.setVisibility(View.GONE);
+                        m.btnPass.setVisibility(View.VISIBLE);
                         Comm.showWarnDialog(m.mContext,"保存成功，请点击“审核按钮”！");
 
                         break;
@@ -119,11 +117,7 @@ public class Prod_ScInFragment1 extends BaseFragment {
 
                         break;
                     case PASS: // 审核成功 返回
-                        m.btnSave.setVisibility(View.VISIBLE);
-                        m.reset('0');
-
-                        m.checkDatas.clear();
-                        m.mAdapter.notifyDataSetChanged();
+                        m.reset();
                         Comm.showWarnDialog(m.mContext,"审核成功✔");
 
                         break;
@@ -278,7 +272,11 @@ public class Prod_ScInFragment1 extends BaseFragment {
 
                 break;
             case R.id.btn_pass: // 审核
-//                run_submitAndPass();
+                if(strK3Number == null) {
+                    Comm.showWarnDialog(mContext,"请先保存数据！");
+                    return;
+                }
+                run_passSC();
 
                 break;
             case R.id.btn_clone: // 重置
@@ -291,7 +289,7 @@ public class Prod_ScInFragment1 extends BaseFragment {
                     build.setPositiveButton("是", new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
-                            resetSon();
+                            reset();
                         }
                     });
                     build.setNegativeButton("否", null);
@@ -299,7 +297,7 @@ public class Prod_ScInFragment1 extends BaseFragment {
                     build.show();
                     return;
                 } else {
-                    resetSon();
+                    reset();
                 }
 
                 break;
@@ -368,20 +366,12 @@ public class Prod_ScInFragment1 extends BaseFragment {
         });
     }
 
-    /**
-     * 0：重置全部，1：重置物料部分
-     *
-     * @param flag
-     */
-    private void reset(char flag) {
-        // 清空物料信息
+    private void reset() {
+        strK3Number = null;
         etCode.setText(""); // 生产条码号
-    }
-
-    private void resetSon() {
         btnSave.setVisibility(View.VISIBLE);
+        btnPass.setVisibility(View.GONE);
         checkDatas.clear();
-        reset('0');
         curViewFlag = '1';
         barcode = null;
 
@@ -748,16 +738,14 @@ public class Prod_ScInFragment1 extends BaseFragment {
     }
 
     /**
-     * 提交并审核
+     * 生产账号审核
      */
-    private void run_submitAndPass() {
+    private void run_passSC() {
         showLoadDialog("正在审核...");
-        String mUrl = getURL("scanningRecord/submitAndPass");
+        String mUrl = getURL("scanningRecord/passSC");
         getUserInfo();
         FormBody formBody = new FormBody.Builder()
-                .add("type", "2")
-                .add("kdAccount", user.getKdAccount())
-                .add("kdAccountPassword", user.getKdAccountPassword())
+                .add("strK3Number", strK3Number)
                 .build();
 
         Request request = new Request.Builder()
@@ -783,7 +771,7 @@ public class Prod_ScInFragment1 extends BaseFragment {
                     return;
                 }
                 Message msg = mHandler.obtainMessage(PASS, result);
-                Log.e("run_submitAndPass --> onResponse", result);
+                Log.e("run_passSC --> onResponse", result);
                 mHandler.sendMessage(msg);
             }
         });

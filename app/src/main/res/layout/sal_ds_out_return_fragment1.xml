@@ -47,6 +47,17 @@
                 android:textColor="@color/black"
                 android:textSize="@dimen/_12sp" />
 
+            <Button
+                android:id="@+id/btn_findComplimentary"
+                android:layout_width="100dp"
+                android:layout_height="match_parent"
+                android:layout_marginLeft="@dimen/_10dp"
+                android:background="@drawable/btn_blue_selector"
+                android:gravity="center"
+                android:text="查询赠品"
+                android:textColor="@color/white"
+                android:textSize="16sp" />
+
         </LinearLayout>
 
     </LinearLayout>
@@ -88,6 +99,14 @@
             android:layout_height="match_parent"
             android:gravity="center"
             android:text="退货数"
+            android:textColor="#000000"
+            android:textSize="12sp" />
+
+        <TextView
+            android:layout_width="42dp"
+            android:layout_height="match_parent"
+            android:gravity="center"
+            android:text="删除"
             android:textColor="#000000"
             android:textSize="12sp" />
 
@@ -135,6 +154,7 @@
             android:background="@drawable/btn_purple2_selector"
             android:gravity="center"
             android:text="审核"
+            android:visibility="gone"
             android:textColor="@color/white"
             android:textSize="16sp" />
 
