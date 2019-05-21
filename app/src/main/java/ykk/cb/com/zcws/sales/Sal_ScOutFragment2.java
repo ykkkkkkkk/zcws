@@ -47,16 +47,15 @@ import ykk.cb.com.zcws.bean.k3Bean.SeoutStock;
 import ykk.cb.com.zcws.bean.k3Bean.SeoutStockEntry;
 import ykk.cb.com.zcws.comm.BaseFragment;
 import ykk.cb.com.zcws.comm.Comm;
-import ykk.cb.com.zcws.sales.adapter.Sal_ScOutFragment1Adapter;
+import ykk.cb.com.zcws.sales.adapter.Sal_ScOutFragment2Adapter;
 import ykk.cb.com.zcws.util.JsonUtil;
 import ykk.cb.com.zcws.util.LogUtil;
 import ykk.cb.com.zcws.util.zxing.android.CaptureActivity;
 
 /**
- * /**
- * 生产账号销售出库（根据发货通知单）
+ * 生产账号销售出库（根据快递单）
  */
-public class Sal_ScOutFragment1 extends BaseFragment {
+public class Sal_ScOutFragment2 extends BaseFragment {
 
     @BindView(R.id.et_getFocus)
     EditText etGetFocus;
@@ -71,10 +70,10 @@ public class Sal_ScOutFragment1 extends BaseFragment {
     @BindView(R.id.btn_pass)
     Button btnPass;
 
-    private Sal_ScOutFragment1 context = this;
+    private Sal_ScOutFragment2 context = this;
     private static final int SUCC1 = 200, UNSUCC1 = 500, SUCC2 = 201, UNSUCC2 = 501, SUCC3 = 202, UNSUCC3 = 502, PASS = 203, UNPASS = 503;
     private static final int SETFOCUS = 1, RESULT_NUM = 2, SAOMA = 3;
-    private Sal_ScOutFragment1Adapter mAdapter;
+    private Sal_ScOutFragment2Adapter mAdapter;
     private List<ScanningRecord> checkDatas = new ArrayList<>();
     private String deliBarcode, mtlBarcode; // 对应的条码号
     private char curViewFlag = '1'; // 1：仓库，2：库位， 3：车间， 4：物料 ，箱码
@@ -87,16 +86,16 @@ public class Sal_ScOutFragment1 extends BaseFragment {
     private String strK3Number; // 保存k3返回的单号
 
     // 消息处理
-    private Sal_ScOutFragment1.MyHandler mHandler = new Sal_ScOutFragment1.MyHandler(this);
+    private Sal_ScOutFragment2.MyHandler mHandler = new Sal_ScOutFragment2.MyHandler(this);
     private static class MyHandler extends Handler {
-        private final WeakReference<Sal_ScOutFragment1> mActivity;
+        private final WeakReference<Sal_ScOutFragment2> mActivity;
 
-        public MyHandler(Sal_ScOutFragment1 activity) {
-            mActivity = new WeakReference<Sal_ScOutFragment1>(activity);
+        public MyHandler(Sal_ScOutFragment2 activity) {
+            mActivity = new WeakReference<Sal_ScOutFragment2>(activity);
         }
 
         public void handleMessage(Message msg) {
-            Sal_ScOutFragment1 m = mActivity.get();
+            Sal_ScOutFragment2 m = mActivity.get();
             if (m != null) {
                 m.hideLoadDialog();
 
@@ -186,7 +185,7 @@ public class Sal_ScOutFragment1 extends BaseFragment {
                             case '2': // 物料
                                 if(m.checkDatas.size() == 0) {
                                     m.isTextChange = false;
-                                    Comm.showWarnDialog(m.mContext,"请扫描发货单号！");
+                                    Comm.showWarnDialog(m.mContext,"请扫描快递单号！");
                                     return;
                                 }
                                 etName = m.getValues(m.etMtlCode);
@@ -211,7 +210,7 @@ public class Sal_ScOutFragment1 extends BaseFragment {
 
     @Override
     public View setLayoutResID(LayoutInflater inflater, ViewGroup container) {
-        return inflater.inflate(R.layout.sal_sc_out_fragment1, container, false);
+        return inflater.inflate(R.layout.sal_sc_out_fragment2, container, false);
     }
 
     @Override
@@ -221,11 +220,11 @@ public class Sal_ScOutFragment1 extends BaseFragment {
 
         recyclerView.addItemDecoration(new DividerItemDecoration(mContext, DividerItemDecoration.VERTICAL));
         recyclerView.setLayoutManager(new LinearLayoutManager(mContext));
-        mAdapter = new Sal_ScOutFragment1Adapter(mContext, checkDatas);
+        mAdapter = new Sal_ScOutFragment2Adapter(mContext, checkDatas);
         recyclerView.setAdapter(mAdapter);
         // 设值listview空间失去焦点
         recyclerView.setFocusable(false);
-        mAdapter.setCallBack(new Sal_ScOutFragment1Adapter.MyCallBack() {
+        mAdapter.setCallBack(new Sal_ScOutFragment2Adapter.MyCallBack() {
             @Override
             public void onClick_num(View v, ScanningRecord entity, int position) {
                 Log.e("num", "行：" + position);
@@ -320,7 +319,7 @@ public class Sal_ScOutFragment1 extends BaseFragment {
      */
     private boolean saveBefore() {
         if (checkDatas == null || checkDatas.size() == 0) {
-            Comm.showWarnDialog(mContext,"请先扫描发货单号！");
+            Comm.showWarnDialog(mContext,"请先扫描快递单号！");
             return false;
         }
 
@@ -629,19 +628,23 @@ public class Sal_ScOutFragment1 extends BaseFragment {
         String mUrl = null;
         String barcode = null;
         String strCaseId = null;
+        String expressNo = null;
         switch (curViewFlag) {
-            case '1': // 发货单号查询
+            case '1': // 快递单号查询
                 mUrl = getURL("SEOutStock/findBarcode");
-                barcode = deliBarcode;
+                expressNo = deliBarcode;
+                barcode = "";
                 strCaseId = "";
                 break;
             case '2': // 物料查询
                 mUrl = getURL("barCodeTable/findBarcode_SC");
+                expressNo = "";
                 barcode = mtlBarcode;
                 strCaseId = "11,21";
                 break;
         }
         FormBody formBody = new FormBody.Builder()
+                .add("expressNo", expressNo)
                 .add("barcode", barcode)
                 .add("strCaseId", strCaseId)
                 .add("sourceType", "11") // 1：电商销售出库，10：生产产品入库，11：发货通知单销售出库

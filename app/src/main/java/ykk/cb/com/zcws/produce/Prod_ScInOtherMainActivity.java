@@ -1,4 +1,4 @@
-package ykk.cb.com.zcws.sales;
+package ykk.cb.com.zcws.produce;
 
 import android.annotation.SuppressLint;
 import android.bluetooth.BluetoothDevice;
@@ -47,12 +47,14 @@ import static android.hardware.usb.UsbManager.ACTION_USB_DEVICE_DETACHED;
 import static ykk.cb.com.zcws.util.blueTooth.Constant.MESSAGE_UPDATE_PARAMETER;
 import static ykk.cb.com.zcws.util.blueTooth.DeviceConnFactoryManager.CONN_STATE_FAILED;
 
-public class Sal_ScOutMainActivity extends BaseActivity {
+public class Prod_ScInOtherMainActivity extends BaseActivity {
 
     @BindView(R.id.viewRadio1)
     View viewRadio1;
     @BindView(R.id.viewRadio2)
     View viewRadio2;
+    @BindView(R.id.viewRadio3)
+    View viewRadio3;
     @BindView(R.id.btn_close)
     Button btnClose;
     @BindView(R.id.viewPager)
@@ -62,7 +64,7 @@ public class Sal_ScOutMainActivity extends BaseActivity {
     @BindView(R.id.tv_connState)
     TextView tvConnState;
 
-    private Sal_ScOutMainActivity context = this;
+    private Prod_ScInOtherMainActivity context = this;
     private static final String TAG = "Sal_OutMainActivity";
     private View curRadio;
     public boolean isChange; // 返回的时候是否需要判断数据是否保存了
@@ -82,7 +84,7 @@ public class Sal_ScOutMainActivity extends BaseActivity {
 
     @Override
     public int setLayoutResID() {
-        return R.layout.sal_sc_out_main;
+        return R.layout.prod_sc_in_other_main;
     }
 
     @Override
@@ -92,27 +94,24 @@ public class Sal_ScOutMainActivity extends BaseActivity {
 //            customer = (Customer) bundle.getSerializable("customer");
 //        }
 
-        curRadio = viewRadio1;
+        curRadio = viewRadio2;
         List<Fragment> listFragment = new ArrayList<Fragment>();
 //        Bundle bundle2 = new Bundle();
 //        bundle2.putSerializable("customer", customer);
 //        fragment1.setArguments(bundle2); // 传参数
 //        fragment2.setArguments(bundle2); // 传参数
-        Sal_ScOutFragment1 fragment1 = new Sal_ScOutFragment1();
-        Sal_ScOutFragment2 fragment2 = new Sal_ScOutFragment2();
+        Prod_ScInOtherFragment1 fragment1 = new Prod_ScInOtherFragment1();
 //        Sal_OutFragment2 fragment2 = new Sal_OutFragment2();
 //        Sal_OutFragment3 fragment3 = new Sal_OutFragment3();
 
         listFragment.add(fragment1);
-        listFragment.add(fragment2);
+//        listFragment.add(fragment2);
 //        listFragment.add(fragment3);
 //        viewPager.setScanScroll(false); // 禁止左右滑动
         //ViewPager设置适配器
         viewPager.setAdapter(new BaseFragmentAdapter(getSupportFragmentManager(), listFragment));
-        //设置ViewPage缓存界面数，默认为1
-        viewPager.setOffscreenPageLimit(2);
         //ViewPager显示第一个Fragment
-        viewPager.setCurrentItem(0);
+        viewPager.setCurrentItem(1);
 
         //ViewPager页面切换监听
         viewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
@@ -125,11 +124,15 @@ public class Sal_ScOutMainActivity extends BaseActivity {
             public void onPageSelected(int position) {
                 switch (position) {
                     case 0:
-                        tabChange(viewRadio1, "线下出库-自提", 0);
+                        tabChange(viewRadio1, "销售出库--销售订单", 0);
 
                         break;
                     case 1:
-                        tabChange(viewRadio2, "线下出库-快递单", 1);
+                        tabChange(viewRadio2, "销售出库--箱码", 1);
+
+                        break;
+                    case 2:
+                        tabChange(viewRadio3, "销售出库--拣货单", 2);
 
                         break;
                 }
@@ -149,7 +152,7 @@ public class Sal_ScOutMainActivity extends BaseActivity {
         }
     }
 
-    @OnClick({R.id.btn_close, R.id.btn_print, R.id.lin_tab1, R.id.lin_tab2})
+    @OnClick({R.id.btn_close, R.id.btn_print, R.id.lin_tab1, R.id.lin_tab2, R.id.lin_tab3})
     public void onViewClicked(View view) {
         // setCurrentItem第二个参数控制页面切换动画
         //  true:打开/false:关闭
@@ -181,11 +184,15 @@ public class Sal_ScOutMainActivity extends BaseActivity {
 
                 break;
             case R.id.lin_tab1:
-                tabChange(viewRadio1, "线下出库-自提", 0);
+                tabChange(viewRadio1, "销售出库--销售订单", 0);
 
                 break;
             case R.id.lin_tab2:
-                tabChange(viewRadio2, "线下出库-快递单", 1);
+                tabChange(viewRadio2, "销售出库--箱码", 1);
+
+                break;
+            case R.id.lin_tab3:
+                tabChange(viewRadio3, "销售出库--拣货单", 2);
 
                 break;
         }

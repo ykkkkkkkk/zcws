@@ -9,6 +9,7 @@ import butterknife.OnClick;
 import ykk.cb.com.zcws.R;
 import ykk.cb.com.zcws.comm.BaseFragment;
 import ykk.cb.com.zcws.produce.Prod_ScInMainActivity;
+import ykk.cb.com.zcws.produce.Prod_ScInOtherMainActivity;
 
 public class MainTabFragment2 extends BaseFragment {
 
@@ -28,7 +29,7 @@ public class MainTabFragment2 extends BaseFragment {
 
                 break;
             case R.id.relative2: // 生产入库
-//                show(Prod_InMainActivity.class,null);
+                show(Prod_ScInOtherMainActivity.class,null);
 
                 break;
             case R.id.relative3: // 工艺查看

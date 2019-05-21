@@ -196,8 +196,12 @@ public class PrintMainActivity extends BaseActivity {
         tabFlag = flag;
 
         if(isConnected) {
-            for(int i=0; i<prodOrderList.size(); i++) {
-                setFragment1Print(i);
+            int size = prodOrderList.size();
+            for(int i=0; i<size; i++) {
+                setFragment1Print_A(i);
+            }
+            for(int i=0; i<size; i++) {
+                setFragment1Print_B(i);
             }
 
         } else {
@@ -207,14 +211,13 @@ public class PrintMainActivity extends BaseActivity {
     }
 
     /**
-     * 打印
+     * 打印前标
      */
-    private void setFragment1Print(int pos) {
+    private void setFragment1Print_A(int pos) {
         ProdOrder prodOrder = prodOrderList.get(pos);
         ICItem icItem = prodOrder.getIcItem();
         String barcode = isNULLS(prodOrder.getStrBarcode());
         String[] arrs = barcode.split(",");
-        // 1：先打印前标
         for(int i=0; i<arrs.length; i++) {
             LabelCommand tsc = new LabelCommand();
             setTscBegin(tsc, 10);
@@ -236,6 +239,16 @@ public class PrintMainActivity extends BaseActivity {
             // --------------- 打印区-------------End
             setTscEnd(tsc);
         }
+    }
+
+    /**
+     * 打印侧标
+     */
+    private void setFragment1Print_B(int pos) {
+        ProdOrder prodOrder = prodOrderList.get(pos);
+        ICItem icItem = prodOrder.getIcItem();
+        String barcode = isNULLS(prodOrder.getStrBarcode());
+        String[] arrs = barcode.split(",");
         // 2：打印侧标
         for(int i=0; i<arrs.length; i++) {
             LabelCommand tsc = new LabelCommand();
@@ -381,8 +394,12 @@ public class PrintMainActivity extends BaseActivity {
 
                             switch (tabFlag) {
                                 case 1: // 生产条码
-                                    for(int i=0; i<prodOrderList.size(); i++) {
-                                        setFragment1Print(i);
+                                    int size = prodOrderList.size();
+                                    for(int i=0; i<size; i++) {
+                                        setFragment1Print_A(i);
+                                    }
+                                    for(int i=0; i<size; i++) {
+                                        setFragment1Print_B(i);
                                     }
 
                                     break;

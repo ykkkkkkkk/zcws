@@ -48,6 +48,7 @@ import ykk.cb.com.zcws.comm.Comm;
 import ykk.cb.com.zcws.sales.adapter.Sal_DsOutReturnFragment1Adapter;
 import ykk.cb.com.zcws.util.JsonUtil;
 import ykk.cb.com.zcws.util.LogUtil;
+import ykk.cb.com.zcws.util.zxing.android.CaptureActivity;
 
 /**
  * 销售订单出库
@@ -116,7 +117,7 @@ public class Sal_DsOutReturnFragment1 extends BaseFragment {
 
                         break;
                     case UNPASS: // 审核失败 返回
-                        errMsg = JsonUtil.strToString((String)msg.obj);
+                        errMsg = JsonUtil.strToString(msgObj);
                         Comm.showWarnDialog(m.mContext, errMsg);
 
                         break;
@@ -137,7 +138,7 @@ public class Sal_DsOutReturnFragment1 extends BaseFragment {
 
                         break;
                     case UNSUCC2:
-                        errMsg = JsonUtil.strToString((String)msg.obj);
+                        errMsg = JsonUtil.strToString(msgObj);
                         if(m.isNULLS(errMsg).length() == 0) errMsg = "很抱歉，没能找到数据！";
                         Comm.showWarnDialog(m.mContext, errMsg);
 
@@ -231,10 +232,15 @@ public class Sal_DsOutReturnFragment1 extends BaseFragment {
         }
     }
 
-    @OnClick({R.id.btn_save, R.id.btn_pass, R.id.btn_clone })
+    @OnClick({R.id.btn_scan, R.id.btn_save, R.id.btn_pass, R.id.btn_clone })
     public void onViewClicked(View view) {
         Bundle bundle = null;
         switch (view.getId()) {
+            case R.id.btn_scan: // 调用摄像头扫描（物料）
+                curViewFlag = '1';
+                showForResult(CaptureActivity.class, CAMERA_SCAN, null);
+
+                break;
             case R.id.btn_save: // 保存
                 hideKeyboard(mContext.getCurrentFocus());
                 if(!saveBefore()) {
@@ -365,7 +371,21 @@ public class Sal_DsOutReturnFragment1 extends BaseFragment {
                 }
 
                 break;
+            case CAMERA_SCAN: // 扫一扫成功  返回
+                if (resultCode == Activity.RESULT_OK) {
+                    Bundle bundle = data.getExtras();
+                    if (bundle != null) {
+                        String code = bundle.getString(DECODED_CONTENT_KEY, "");
+                        switch (curViewFlag) {
+                            case '1': // 物料
+                                setTexts(etMtlCode, code);
+                                break;
+                        }
+                    }
+                }
+                break;
         }
+        mHandler.sendEmptyMessageDelayed(SETFOCUS, 300);
     }
 
     /**
@@ -379,7 +399,7 @@ public class Sal_DsOutReturnFragment1 extends BaseFragment {
             ICItem icItem = stockBillEntry.getIcItem();
             ScanningRecord sr = new ScanningRecord();
 
-            sr.setType(12); // 1：电商销售出库，10：生产产品入库，11：生产销售出库，12：电商销售退货
+            sr.setType(12); // 1：电商销售出库，10：生产产品入库，11：发货通知单销售出库，12：电商销售退货，13：电商外购入库
             sr.setSourceId(stockBillEntry.getFinterid());
             sr.setSourceNumber(stockBillEntry.getFbillNo());
             sr.setSourceEntryId(stockBillEntry.getFentryid());

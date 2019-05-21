@@ -65,6 +65,7 @@ public class ProdOrder implements Serializable {
     private int isCheck; // 是否选中
     private String strBarcode; // 拼接的单号
     private double useableQty; // 可用数量
+    private String barcodeCreateDate; // 条码创建日期
 
     public ProdOrder() {
         super();
@@ -292,6 +293,14 @@ public class ProdOrder implements Serializable {
 
     public void setDepartment(Department department) {
         this.department = department;
+    }
+
+    public String getBarcodeCreateDate() {
+        return barcodeCreateDate;
+    }
+
+    public void setBarcodeCreateDate(String barcodeCreateDate) {
+        this.barcodeCreateDate = barcodeCreateDate;
     }
 
     @Override

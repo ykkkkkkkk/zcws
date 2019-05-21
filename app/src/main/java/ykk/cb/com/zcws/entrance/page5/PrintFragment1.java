@@ -42,6 +42,8 @@ import ykk.cb.com.zcws.util.LogUtil;
 import ykk.cb.com.zcws.util.basehelper.BaseRecyclerAdapter;
 import ykk.cb.com.zcws.util.xrecyclerview.XRecyclerView;
 
+import static android.app.Activity.RESULT_OK;
+
 public class PrintFragment1 extends BaseFragment implements XRecyclerView.LoadingListener {
 
     @BindView(R.id.tv_deptSel)
@@ -60,7 +62,8 @@ public class PrintFragment1 extends BaseFragment implements XRecyclerView.Loadin
     private PrintFragment1 context = this;
     private List<ProdOrder> listDatas = new ArrayList<>();
     private static final int SEL_DEPT = 10;
-    private static final int SUCC1 = 200, UNSUCC1 = 500, SUCC2 = 201, UNSUCC2 = 501, SUCC3 = 202, UNSUCC3 = 502;
+    private static final int SUCC1 = 200, UNSUCC1 = 500, SUCC2 = 201, UNSUCC2 = 501, UPDATE = 202, UNUPDATE = 502;
+    private static final int RESULT_NUM = 1;
     private PrintFragment1Adapter mAdapter;
     private Department department; // 部门
     private OkHttpClient okHttpClient = new OkHttpClient();
@@ -69,6 +72,8 @@ public class PrintFragment1 extends BaseFragment implements XRecyclerView.Loadin
     private int limit = 1;
     private boolean isRefresh, isLoadMore, isNextPage;
     private List<ProdOrder> prodOrderList = new ArrayList<>();
+    private int curPos = -1; // 当前行
+    private int prodId; // 生产订单id
 
     // 消息处理
     final PrintFragment1.MyHandler mHandler = new PrintFragment1.MyHandler(this);
@@ -89,8 +94,7 @@ public class PrintFragment1 extends BaseFragment implements XRecyclerView.Loadin
                 String msgObj = (String) msg.obj;
                 switch (msg.what) {
                     case SUCC1: // 成功
-                        String json = (String) msg.obj;
-                        List<ProdOrder> list = JsonUtil.strToList2(json, ProdOrder.class);
+                        List<ProdOrder> list = JsonUtil.strToList2(msgObj, ProdOrder.class);
                         m.listDatas.addAll(list);
                         m.mAdapter.notifyDataSetChanged();
 
@@ -105,6 +109,7 @@ public class PrintFragment1 extends BaseFragment implements XRecyclerView.Loadin
 
                         break;
                     case UNSUCC1: // 数据加载失败！
+                        m.mAdapter.notifyDataSetChanged();
                         m.toasts("抱歉，没有加载到数据！");
 
                         break;
@@ -117,7 +122,17 @@ public class PrintFragment1 extends BaseFragment implements XRecyclerView.Loadin
 
                         break;
                     case UNSUCC2: // 生码失败
-                        errMsg = JsonUtil.strToString((String)msg.obj);
+                        errMsg = JsonUtil.strToString(msgObj);
+                        if(m.isNULLS(errMsg).length() == 0) errMsg = "服务器繁忙，请稍候再试！";
+                        Comm.showWarnDialog(m.mContext, errMsg);
+
+                        break;
+                    case UPDATE: // 修改打印次数 成功
+                        m.parent.setFragment1Data(1, m.prodOrderList);
+
+                        break;
+                    case UNUPDATE: // 修改打印次数 失败
+                        errMsg = JsonUtil.strToString(msgObj);
                         if(m.isNULLS(errMsg).length() == 0) errMsg = "服务器繁忙，请稍候再试！";
                         Comm.showWarnDialog(m.mContext, errMsg);
 
@@ -163,7 +178,7 @@ public class PrintFragment1 extends BaseFragment implements XRecyclerView.Loadin
         // initLoadDatas();
     }
 
-    @OnClick({R.id.btn_search, R.id.tv_deptSel, R.id.tv_dateSel, R.id.btn_prodCode, R.id.btn_print})
+    @OnClick({R.id.btn_search, R.id.tv_deptSel, R.id.tv_dateSel, R.id.btn_singleProdCode, R.id.btn_batchProdCode, R.id.btn_print})
     public void onViewClicked(View v) {
         Bundle bundle = null;
         switch (v.getId()) {
@@ -181,15 +196,44 @@ public class PrintFragment1 extends BaseFragment implements XRecyclerView.Loadin
                 Comm.showDateDialog(mContext, v, 0);
 
                 break;
-            case R.id.btn_prodCode: // 生产条码
+            case R.id.btn_singleProdCode: // 单行生码
+                prodId = 0;
+                double createQty = 0;
+                int count = 0;
+                int size = listDatas.size();
+                for(int i=0; i<size; i++) {
+                    ProdOrder p = listDatas.get(i);
+                    if(p.getIsCheck() == 1) {
+                        count += 1;
+                        curPos = i;
+                        prodId = p.getProdId();
+                        createQty = p.getUseableQty();
+                    }
+                }
+                if(count == 0) {
+                    Comm.showWarnDialog(mContext, "请选中生码的行！");
+                    return;
+                }
+                if(count > 1) {
+                    Comm.showWarnDialog(mContext,"只能选择一行来生码！");
+                    return;
+                }
+
+                showInputDialog("生码数量", String.valueOf(createQty), "0.0", RESULT_NUM);
+//                createCodeBefore();
+
+                break;
+            case R.id.btn_batchProdCode: // 批量生码
                 createCodeBefore();
 
                 break;
             case R.id.btn_print: // 打印
                 if(prodOrderList != null && prodOrderList.size() > 0) {
-                    parent.setFragment1Data(1, prodOrderList);
+//                    parent.setFragment1Data(1, prodOrderList);
+                    String createDateTime = prodOrderList.get(0).getBarcodeCreateDate();
+                    run_modifyPrintNumberByBarcode(createDateTime);
                 } else {
-                    Comm.showWarnDialog(mContext, "请先生码，再打印！");
+                    Comm.showWarnDialog(mContext, "请生码，再打印！");
                 }
 
 
@@ -215,7 +259,7 @@ public class PrintFragment1 extends BaseFragment implements XRecyclerView.Loadin
             return;
         }
         strIds.delete(len-1, len);
-        run_prodOrderCreate_app(strIds.toString());
+        run_prodOrderCreate_app(strIds.toString(), 0); // 批量生码
     }
 
     @Override
@@ -247,6 +291,21 @@ public class PrintFragment1 extends BaseFragment implements XRecyclerView.Loadin
                 }
 
                 break;
+            case RESULT_NUM: // 数量
+                if (resultCode == RESULT_OK) {
+                    Bundle bundle = data.getExtras();
+                    if (bundle != null) {
+                        String value = bundle.getString("resultValue", "");
+                        double num = parseDouble(value);
+                        if(num <= 0) {
+                            Comm.showWarnDialog(mContext,"生码数量必须大于0！");
+                            return;
+                        }
+                        run_prodOrderCreate_app(String.valueOf(prodId), num); // 批量生码
+                    }
+                }
+
+                break;
         }
     }
 
@@ -270,7 +329,7 @@ public class PrintFragment1 extends BaseFragment implements XRecyclerView.Loadin
                 .add("deptNumber", department != null ? department.getDepartmentNumber() : "")
                 .add("prodFdateBeg", date) // 开始日期
                 .add("prodFdateEnd", date) // 结束日期
-                .add("createCodeStatus", "0") // 生码状态 0：未生码，1：已生码
+                .add("createCodeStatus", "1") // 生码状态 1：未生完，2：已生完
                 .add("limit", String.valueOf(limit))
                 .add("pageSize", "30")
                 .build();
@@ -311,11 +370,15 @@ public class PrintFragment1 extends BaseFragment implements XRecyclerView.Loadin
     /**
      * 生产任务单生码（app调用）
      */
-    private void run_prodOrderCreate_app(String strIds) {
+    private void run_prodOrderCreate_app(String strIds, double createCodeQty) {
         showLoadDialog("加载中...");
         String mUrl = getURL("barCodeCreate/prodOrderCreate_app");
+        if(createCodeQty > 0) {
+            mUrl = getURL("barCodeCreate/prodOrderPartCreate_app");
+        }
         FormBody formBody = new FormBody.Builder()
                 .add("fIds", strIds) // 生产id拼接
+                .add("createCodeQty", createCodeQty > 0 ? String.valueOf(createCodeQty) : "")
                 .build();
 
         Request request = new Request.Builder()
@@ -346,6 +409,49 @@ public class PrintFragment1 extends BaseFragment implements XRecyclerView.Loadin
                 }
 
                 Message msg = mHandler.obtainMessage(SUCC2, result);
+                mHandler.sendMessage(msg);
+            }
+        });
+    }
+
+    /**
+     * 修改打印次数
+     */
+    private void run_modifyPrintNumberByBarcode(String createDateTime) {
+        showLoadDialog("正在打印...");
+        String mUrl = getURL("barCodeTable/modifyPrintNumberByBarcode");
+        FormBody formBody = new FormBody.Builder()
+                .add("createDateTime", createDateTime)
+                .build();
+
+        Request request = new Request.Builder()
+                .addHeader("cookie", getSession())
+                .url(mUrl)
+                .post(formBody)
+                .build();
+
+        // step 3：创建 Call 对象
+        Call call = okHttpClient.newCall(request);
+
+        //step 4: 开始异步请求
+        call.enqueue(new Callback() {
+            @Override
+            public void onFailure(Call call, IOException e) {
+                mHandler.sendEmptyMessage(UNUPDATE);
+            }
+
+            @Override
+            public void onResponse(Call call, Response response) throws IOException {
+                ResponseBody body = response.body();
+                String result = body.string();
+                LogUtil.e("run_prodOrderCreate_app --> onResponse", result);
+                if (!JsonUtil.isSuccess(result)) {
+                    Message msg = mHandler.obtainMessage(UNUPDATE, result);
+                    mHandler.sendMessage(msg);
+                    return;
+                }
+
+                Message msg = mHandler.obtainMessage(UPDATE, result);
                 mHandler.sendMessage(msg);
             }
         });

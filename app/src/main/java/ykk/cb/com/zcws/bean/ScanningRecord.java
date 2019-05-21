@@ -11,7 +11,7 @@ import ykk.cb.com.zcws.bean.k3Bean.ICItem;
  */
 public class ScanningRecord implements Serializable {
     private int id; // 自增长id
-    private int type; // 1：电商销售出库，10：生产产品入库，11：发货通知单销售出库，12：电商销售退货，13：电商外购入库
+    private int type; // 1：电商销售出库，10：生产产品入库，11：发货通知单销售出库，12：电商销售退货，13：电商外购入库，14：生产产品入库(选单入库)
     private int sourceId; // 来源id
     private String sourceNumber; // 来源单号
     private int sourceEntryId; // 来源分录id

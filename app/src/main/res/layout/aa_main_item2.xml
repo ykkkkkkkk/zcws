@@ -62,8 +62,7 @@
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
-            android:gravity="center"
-            android:visibility="invisible">
+            android:gravity="center">
 
             <TextView
                 android:id="@+id/tvImg2"
@@ -79,7 +78,7 @@
                 android:layout_below="@+id/tvImg2"
                 android:layout_centerHorizontal="true"
                 android:layout_marginTop="@dimen/_3dp"
-                android:text="生产入库"
+                android:text="选单入库"
                 android:textColor="@color/black"
                 android:textSize="@dimen/_18sp" />
 

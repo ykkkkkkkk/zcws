@@ -44,7 +44,7 @@ public class PrintFragment1Adapter extends BaseArrayRecyclerAdapter<ProdOrder> {
         tv_prodNo.setText(entity.getProdNo());
         tv_mtlNumber.setText(entity.getIcItemNumber());
         tv_mtlName.setText(entity.getIcItemName());
-        tv_nums.setText(df.format(entity.getFqty())+""+entity.getUnitName());
+        tv_nums.setText(df.format(entity.getUseableQty())+""+entity.getUnitName());
 
         View view = (View) tv_row.getParent();
         if (entity.getIsCheck() == 1) {
