@@ -1,4 +1,4 @@
-package ykk.cb.com.zcws.produce.adapter;
+package ykk.cb.com.zcws.purchase.adapter;
 
 import android.app.Activity;
 import android.text.Html;
@@ -12,49 +12,50 @@ import ykk.cb.com.zcws.R;
 import ykk.cb.com.zcws.bean.ScanningRecord;
 import ykk.cb.com.zcws.bean.k3Bean.ICItem;
 import ykk.cb.com.zcws.bean.prod.ProdOrder;
+import ykk.cb.com.zcws.bean.pur.POOrderEntry;
 import ykk.cb.com.zcws.util.JsonUtil;
+import ykk.cb.com.zcws.util.LogUtil;
 import ykk.cb.com.zcws.util.basehelper.BaseArrayRecyclerAdapter;
 
-public class Prod_ScInOtherFragment1Adapter extends BaseArrayRecyclerAdapter<ScanningRecord> {
+public class Pur_ScInFragment1Adapter extends BaseArrayRecyclerAdapter<ScanningRecord> {
     private DecimalFormat df = new DecimalFormat("#.######");
     private Activity context;
     private MyCallBack callBack;
 
-    public Prod_ScInOtherFragment1Adapter(Activity context, List<ScanningRecord> datas) {
+    public Pur_ScInFragment1Adapter(Activity context, List<ScanningRecord> datas) {
         super(datas);
         this.context = context;
     }
 
     @Override
     public int bindView(int viewtype) {
-        return R.layout.prod_sc_in_other_fragment1_item;
+        return R.layout.pur_sc_in_fragment1_item;
     }
 
     @Override
     public void onBindHoder(RecyclerHolder holder, final ScanningRecord entity, final int pos) {
         // 初始化id
         TextView tv_row = holder.obtainView(R.id.tv_row);
-        TextView tv_check = holder.obtainView(R.id.tv_check);
         TextView tv_orderNo = holder.obtainView(R.id.tv_orderNo);
         TextView tv_mtlName = holder.obtainView(R.id.tv_mtlName);
         TextView tv_nums = holder.obtainView(R.id.tv_nums);
         TextView tv_stockAP = holder.obtainView(R.id.tv_stockAP);
 
         // 赋值
-        ProdOrder prodOrder = JsonUtil.stringToObject(entity.getSourceObj(), ProdOrder.class);
-        ICItem icItem = prodOrder.getIcItem();
+        POOrderEntry purEntry = JsonUtil.stringToObject(entity.getSourceObj(), POOrderEntry.class);
+        ICItem icItem = purEntry.getIcItem();
 
         tv_row.setText(String.valueOf(pos + 1));
-        tv_orderNo.setText(prodOrder.getProdNo());
-        tv_mtlName.setText(icItem.getFname());
+        tv_orderNo.setText(entity.getSourceNumber());
+        tv_mtlName.setText(entity.getIcItemName());
         // 990155：启用批次号，990156：启用序列号
-        if(icItem.getSnManager() == 990156 || icItem.getBatchManager() == 990155) {
-            tv_nums.setEnabled(false);
-            tv_nums.setBackgroundResource(R.drawable.back_style_gray3b);
-        } else {
-            tv_nums.setEnabled(true);
-            tv_nums.setBackgroundResource(R.drawable.back_style_blue2);
-        }
+//        if(icItem.getSnManager() == 990156 || icItem.getBatchManager() == 990155) {
+//            tv_nums.setEnabled(false);
+//            tv_nums.setBackgroundResource(R.drawable.back_style_gray3b);
+//        } else {
+//            tv_nums.setEnabled(true);
+//            tv_nums.setBackgroundResource(R.drawable.back_style_blue2);
+//        }
         tv_nums.setText(Html.fromHtml(df.format(entity.getUseableQty())+"<br><font color='#009900'>"+df.format(entity.getRealQty())+"</font>"));
         if(entity.getStockPos() != null) {
             tv_stockAP.setText(Html.fromHtml(entity.getStock().getFname()+"<br><font color='#6a5acd'>"+entity.getStockPos().getFname()+"</font>"));
@@ -62,15 +63,6 @@ public class Prod_ScInOtherFragment1Adapter extends BaseArrayRecyclerAdapter<Sca
             tv_stockAP.setText(entity.getStock().getFname());
         } else {
             tv_stockAP.setText("");
-        }
-
-        View view = (View) tv_row.getParent();
-        if (entity.getIsCheck() == 1) {
-            tv_check.setBackgroundResource(R.drawable.check_true);
-            view.setBackgroundResource(R.drawable.back_style_check1_true);
-        } else {
-            tv_check.setBackgroundResource(R.drawable.check_false);
-            view.setBackgroundResource(R.drawable.back_style_check1_false);
         }
 
         View.OnClickListener click = new View.OnClickListener() {

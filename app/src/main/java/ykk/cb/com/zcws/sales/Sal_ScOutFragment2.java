@@ -457,6 +457,7 @@ public class Sal_ScOutFragment2 extends BaseFragment {
         for(int i=0; i<size; i++) {
             SeoutStockEntry seoutStockEntry = list.get(i);
             SeoutStock seoutStock = seoutStockEntry.getSeOutStock();
+            seoutStock.setTempEmpId(user.getEmpId());
             ICItem icItem = seoutStockEntry.getIcItem();
             ScanningRecord sr = new ScanningRecord();
 

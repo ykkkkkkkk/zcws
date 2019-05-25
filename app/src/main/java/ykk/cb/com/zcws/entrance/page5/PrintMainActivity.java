@@ -29,7 +29,7 @@ import butterknife.BindView;
 import butterknife.OnClick;
 import ykk.cb.com.zcws.R;
 import ykk.cb.com.zcws.bean.k3Bean.ICItem;
-import ykk.cb.com.zcws.bean.pur.ProdOrder;
+import ykk.cb.com.zcws.bean.prod.ProdOrder;
 import ykk.cb.com.zcws.comm.BaseActivity;
 import ykk.cb.com.zcws.comm.Comm;
 import ykk.cb.com.zcws.util.MyViewPager;

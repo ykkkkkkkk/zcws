@@ -33,7 +33,7 @@ import okhttp3.ResponseBody;
 import ykk.cb.com.zcws.R;
 import ykk.cb.com.zcws.basics.Dept_DialogActivity;
 import ykk.cb.com.zcws.bean.Department;
-import ykk.cb.com.zcws.bean.pur.ProdOrder;
+import ykk.cb.com.zcws.bean.prod.ProdOrder;
 import ykk.cb.com.zcws.comm.BaseFragment;
 import ykk.cb.com.zcws.comm.Comm;
 import ykk.cb.com.zcws.entrance.page5.adapter.PrintFragment1Adapter;
@@ -73,6 +73,7 @@ public class PrintFragment1 extends BaseFragment implements XRecyclerView.Loadin
     private boolean isRefresh, isLoadMore, isNextPage;
     private List<ProdOrder> prodOrderList = new ArrayList<>();
     private int curPos = -1; // 当前行
+    private String strProdId; // 用，号拼接的生产订单id
     private int prodId; // 生产订单id
 
     // 消息处理
@@ -329,6 +330,7 @@ public class PrintFragment1 extends BaseFragment implements XRecyclerView.Loadin
                 .add("deptNumber", department != null ? department.getDepartmentNumber() : "")
                 .add("prodFdateBeg", date) // 开始日期
                 .add("prodFdateEnd", date) // 结束日期
+                .add("prodStatus", "1") // 0：计划，1：下达，3：结案
                 .add("createCodeStatus", "1") // 生码状态 1：未生完，2：已生完
                 .add("limit", String.valueOf(limit))
                 .add("pageSize", "30")
@@ -371,6 +373,7 @@ public class PrintFragment1 extends BaseFragment implements XRecyclerView.Loadin
      * 生产任务单生码（app调用）
      */
     private void run_prodOrderCreate_app(String strIds, double createCodeQty) {
+        strProdId = strIds;
         showLoadDialog("加载中...");
         String mUrl = getURL("barCodeCreate/prodOrderCreate_app");
         if(createCodeQty > 0) {
@@ -422,6 +425,7 @@ public class PrintFragment1 extends BaseFragment implements XRecyclerView.Loadin
         String mUrl = getURL("barCodeTable/modifyPrintNumberByBarcode");
         FormBody formBody = new FormBody.Builder()
                 .add("createDateTime", createDateTime)
+                .add("strProdId", strProdId)
                 .build();
 
         Request request = new Request.Builder()

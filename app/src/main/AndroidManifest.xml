@@ -54,6 +54,14 @@
 
         <!-- 基础模块 -->
         <activity
+            android:name=".basics.PublicInputDialog"
+            android:theme="@style/dialogStyle"
+            android:windowSoftInputMode="stateHidden|adjustResize" />
+        <activity
+            android:name=".basics.PublicInputDialog2"
+            android:theme="@style/dialogStyle"
+            android:windowSoftInputMode="stateVisible|adjustResize" />
+        <activity
             android:name=".basics.Dept_DialogActivity"
             android:theme="@style/dialogStyle"
             android:windowSoftInputMode="adjustResize|stateHidden" />
@@ -66,13 +74,10 @@
             android:theme="@style/dialogStyle"
             android:windowSoftInputMode="adjustResize|stateHidden" />
         <activity
-            android:name=".basics.PublicInputDialog"
+            android:name=".basics.Supplier_DialogActivity"
             android:theme="@style/dialogStyle"
-            android:windowSoftInputMode="stateHidden|adjustResize" />
-        <activity
-            android:name=".basics.PublicInputDialog2"
-            android:theme="@style/dialogStyle"
-            android:windowSoftInputMode="stateVisible|adjustResize" />
+            android:windowSoftInputMode="adjustResize|stateHidden" />
+
 
         <!-- 仓库模块 -->
         <!-- 设置页面用到的界面 -->
@@ -84,6 +89,9 @@
             android:windowSoftInputMode="stateHidden|adjustResize" />
 
         <!-- 采购模块 -->
+        <activity
+            android:name=".purchase.Pur_ScInMainActivity"
+            android:windowSoftInputMode="adjustResize|stateHidden" />
 
         <!-- 生产模块 -->
         <activity

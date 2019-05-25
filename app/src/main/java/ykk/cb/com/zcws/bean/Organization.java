@@ -14,6 +14,8 @@ public class Organization implements Serializable {
 	private String fName;
 
 	private String fNumber;
+	/* 客户所属账套 (电商：990163。内销：990164。外销：990165) */
+	private String belongAcc;
 
 	public Organization() {
 		super();
@@ -41,6 +43,14 @@ public class Organization implements Serializable {
 
 	public void setfNumber(String fNumber) {
 		this.fNumber = fNumber;
+	}
+
+	public String getBelongAcc() {
+		return belongAcc;
+	}
+
+	public void setBelongAcc(String belongAcc) {
+		this.belongAcc = belongAcc;
 	}
 
 	@Override

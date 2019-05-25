@@ -22,9 +22,6 @@ public class User implements Serializable {
     /* 真实姓名 */
     private String truename;
 
-    /* 部门id */
-    private Integer deptId;
-
     /* 创建时间 */
     private String createTime;
 
@@ -34,35 +31,9 @@ public class User implements Serializable {
     /* 创建者名字 */
     private String createrName;
 
-    /* 对应金蝶用户名 */
-    private String kdUserName;
-
-    /* 对应金蝶用户编码 */
-    private String kdUserNumber;
-
-    /* k3员工id */
-    private Integer staffId;
     /* 状态：1.启用，2.禁用 */
     private Integer status;
-    /* k3员工 */
-    private Staff staff;
     private List<Role> roles;
-
-    /* 部门 */
-    private Department department;
-    /* k3账号id */
-    private Integer kdAccountId;
-    /* k3账号名称 */
-    private String kdAccountName;
-    /* k3账号 */
-    private String kdAccount;
-    /* k3账号密码 */
-    private String kdAccountPassword;
-    /* 用户类型。1内部用户，2供应商 */
-    private int accountType;
-    /* 供应商id */
-    private Integer supplierId;
-    private Supplier supplier;
 
     /*所属账套名称*/
     private String kdAcctName;
@@ -119,14 +90,6 @@ public class User implements Serializable {
         this.truename = truename;
     }
 
-    public Integer getDeptId() {
-        return deptId;
-    }
-
-    public void setDeptId(Integer deptId) {
-        this.deptId = deptId;
-    }
-
     public String getCreateTime() {
         return createTime;
     }
@@ -151,46 +114,6 @@ public class User implements Serializable {
         this.createrName = createrName;
     }
 
-    public Department getDepartment() {
-        return department;
-    }
-
-    public void setDepartment(Department department) {
-        this.department = department;
-    }
-
-    public String getKdUserName() {
-        return kdUserName;
-    }
-
-    public void setKdUserName(String kdUserName) {
-        this.kdUserName = kdUserName;
-    }
-
-    public Integer getStaffId() {
-        return staffId;
-    }
-
-    public void setStaffId(Integer staffId) {
-        this.staffId = staffId;
-    }
-
-    public Staff getStaff() {
-        return staff;
-    }
-
-    public void setStaff(Staff staff) {
-        this.staff = staff;
-    }
-
-    public String getKdUserNumber() {
-        return kdUserNumber;
-    }
-
-    public void setKdUserNumber(String kdUserNumber) {
-        this.kdUserNumber = kdUserNumber;
-    }
-
     public Integer getStatus() {
         return status;
     }
@@ -205,62 +128,6 @@ public class User implements Serializable {
 
     public void setRoles(List<Role> roles) {
         this.roles = roles;
-    }
-
-    public Integer getKdAccountId() {
-        return kdAccountId;
-    }
-
-    public void setKdAccountId(Integer kdAccountId) {
-        this.kdAccountId = kdAccountId;
-    }
-
-    public String getKdAccountName() {
-        return kdAccountName;
-    }
-
-    public void setKdAccountName(String kdAccountName) {
-        this.kdAccountName = kdAccountName;
-    }
-
-    public String getKdAccount() {
-        return kdAccount;
-    }
-
-    public void setKdAccount(String kdAccount) {
-        this.kdAccount = kdAccount;
-    }
-
-    public String getKdAccountPassword() {
-        return kdAccountPassword;
-    }
-
-    public void setKdAccountPassword(String kdAccountPassword) {
-        this.kdAccountPassword = kdAccountPassword;
-    }
-
-    public int getAccountType() {
-        return accountType;
-    }
-
-    public void setAccountType(int accountType) {
-        this.accountType = accountType;
-    }
-
-    public Integer getSupplierId() {
-        return supplierId;
-    }
-
-    public void setSupplierId(Integer supplierId) {
-        this.supplierId = supplierId;
-    }
-
-    public Supplier getSupplier() {
-        return supplier;
-    }
-
-    public void setSupplier(Supplier supplier) {
-        this.supplier = supplier;
     }
 
     public String getKdAcctName() {
@@ -279,6 +146,14 @@ public class User implements Serializable {
         this.kdDBName = kdDBName;
     }
 
+    public int getEmpId() {
+        return empId;
+    }
+
+    public void setEmpId(int empId) {
+        this.empId = empId;
+    }
+
     public String getEmpName() {
         return empName;
     }
@@ -295,12 +170,12 @@ public class User implements Serializable {
         this.empNumber = empNumber;
     }
 
-    public int getEmpId() {
-        return empId;
-    }
-
-    public void setEmpId(int empId) {
-        this.empId = empId;
+    @Override
+    public String toString() {
+        return "User [id=" + id + ", username=" + username + ", password=" + password + ", sex=" + sex + ", truename="
+                + truename + ", createTime=" + createTime + ", createrId=" + createrId + ", createrName=" + createrName
+                + ", status=" + status + ", roles=" + roles + ", kdAcctName=" + kdAcctName + ", kdDBName=" + kdDBName
+                + ", empId=" + empId + ", empName=" + empName + ", empNumber=" + empNumber + "]";
     }
 
 }

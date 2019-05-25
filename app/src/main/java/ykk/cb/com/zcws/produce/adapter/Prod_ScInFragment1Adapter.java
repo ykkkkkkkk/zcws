@@ -11,7 +11,7 @@ import java.util.List;
 import ykk.cb.com.zcws.R;
 import ykk.cb.com.zcws.bean.ScanningRecord;
 import ykk.cb.com.zcws.bean.k3Bean.ICItem;
-import ykk.cb.com.zcws.bean.pur.ProdOrder;
+import ykk.cb.com.zcws.bean.prod.ProdOrder;
 import ykk.cb.com.zcws.util.JsonUtil;
 import ykk.cb.com.zcws.util.basehelper.BaseArrayRecyclerAdapter;
 

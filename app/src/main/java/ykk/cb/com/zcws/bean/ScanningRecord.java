@@ -11,7 +11,7 @@ import ykk.cb.com.zcws.bean.k3Bean.ICItem;
  */
 public class ScanningRecord implements Serializable {
     private int id; // 自增长id
-    private int type; // 1：电商销售出库，10：生产产品入库，11：发货通知单销售出库，12：电商销售退货，13：电商外购入库，14：生产产品入库(选单入库)
+    private int type; // 1：电商销售出库，10：生产产品入库，11：发货通知单销售出库，12：电商销售退货，13：电商外购入库，14：生产产品入库(选单入库)，15：采购订单入库
     private int sourceId; // 来源id
     private String sourceNumber; // 来源单号
     private int sourceEntryId; // 来源分录id
@@ -45,6 +45,8 @@ public class ScanningRecord implements Serializable {
     private String sourceObj; // 来源对象
     private double useableQty; // 可用数
     private int empId; // 所属职员id
+    private int unitId; // 单位id
+    private int isCheck; // 是否选中
 
 
     public ScanningRecord() {
@@ -315,5 +317,20 @@ public class ScanningRecord implements Serializable {
         this.icItem = icItem;
     }
 
+    public int getUnitId() {
+        return unitId;
+    }
+
+    public void setUnitId(int unitId) {
+        this.unitId = unitId;
+    }
+
+    public int getIsCheck() {
+        return isCheck;
+    }
+
+    public void setIsCheck(int isCheck) {
+        this.isCheck = isCheck;
+    }
 
 }

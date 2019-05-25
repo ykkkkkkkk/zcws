@@ -8,7 +8,7 @@ import java.text.DecimalFormat;
 import java.util.List;
 
 import ykk.cb.com.zcws.R;
-import ykk.cb.com.zcws.bean.pur.ProdOrder;
+import ykk.cb.com.zcws.bean.prod.ProdOrder;
 import ykk.cb.com.zcws.util.basehelper.BaseArrayRecyclerAdapter;
 
 /**

@@ -1,4 +1,4 @@
-package ykk.cb.com.zcws.bean.pur;
+package ykk.cb.com.zcws.bean.prod;
 
 import java.io.Serializable;
 
@@ -53,7 +53,7 @@ public class ProdOrder implements Serializable {
     private String custNumber;
     /*销售订单客户名称*/
     private String custName;
-    /*生产任务单单据状态*/
+    /*生产任务单单据状态（ 0：计划，1：下达，3：结案）*/
     private String prodStatus;
     /*生产任务单是否关闭标志*/
     private String prodClosed;

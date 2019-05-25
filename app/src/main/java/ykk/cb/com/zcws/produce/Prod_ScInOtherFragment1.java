@@ -1,8 +1,6 @@
 package ykk.cb.com.zcws.produce;
 
 import android.app.Activity;
-import android.app.AlertDialog;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
@@ -15,6 +13,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.TextView;
 
@@ -44,12 +44,13 @@ import ykk.cb.com.zcws.bean.Stock;
 import ykk.cb.com.zcws.bean.StockPosition;
 import ykk.cb.com.zcws.bean.User;
 import ykk.cb.com.zcws.bean.k3Bean.ICItem;
-import ykk.cb.com.zcws.bean.pur.ProdOrder;
+import ykk.cb.com.zcws.bean.prod.ProdOrder;
 import ykk.cb.com.zcws.comm.BaseFragment;
 import ykk.cb.com.zcws.comm.Comm;
 import ykk.cb.com.zcws.produce.adapter.Prod_ScInOtherFragment1Adapter;
 import ykk.cb.com.zcws.util.JsonUtil;
 import ykk.cb.com.zcws.util.LogUtil;
+import ykk.cb.com.zcws.util.basehelper.BaseRecyclerAdapter;
 
 /**
  * 销售订单出库
@@ -66,6 +67,8 @@ public class Prod_ScInOtherFragment1 extends BaseFragment {
     Button btnSearch;
     @BindView(R.id.recyclerView)
     RecyclerView recyclerView;
+    @BindView(R.id.cbAll)
+    CheckBox cbAll;
     @BindView(R.id.btn_save)
     Button btnSave;
     @BindView(R.id.btn_pass)
@@ -117,7 +120,8 @@ public class Prod_ScInOtherFragment1 extends BaseFragment {
 
                         break;
                     case PASS: // 审核成功 返回
-                        m.reset();
+                        m.reset(false);
+                        m.run_smGetDatas();
                         Comm.showWarnDialog(m.mContext,"审核成功✔");
 
                         break;
@@ -133,6 +137,7 @@ public class Prod_ScInOtherFragment1 extends BaseFragment {
 
                         break;
                     case UNSUCC2:
+                        m.mAdapter.notifyDataSetChanged();
                         errMsg = JsonUtil.strToString(msgObj);
                         if(m.isNULLS(errMsg).length() == 0) errMsg = "很抱歉，没能找到数据！";
                         Comm.showWarnDialog(m.mContext, errMsg);
@@ -182,6 +187,15 @@ public class Prod_ScInOtherFragment1 extends BaseFragment {
             }
 
         });
+
+        mAdapter.setOnItemClickListener(new BaseRecyclerAdapter.OnItemClickListener() {
+            @Override
+            public void onItemClick(BaseRecyclerAdapter adapter, BaseRecyclerAdapter.RecyclerHolder holder, View view, int pos) {
+                ScanningRecord sr = checkDatas.get(pos);
+                sr.setIsCheck(sr.getIsCheck() == 0 ? 1 : 0);
+                mAdapter.notifyDataSetChanged();
+            }
+        });
     }
 
     @Override
@@ -206,7 +220,7 @@ public class Prod_ScInOtherFragment1 extends BaseFragment {
         }
     }
 
-    @OnClick({R.id.btn_search, R.id.tv_deptSel, R.id.tv_dateSel, R.id.btn_save, R.id.btn_pass, R.id.btn_clone })
+    @OnClick({R.id.btn_search, R.id.tv_deptSel, R.id.tv_dateSel, R.id.btn_save, R.id.btn_pass })
     public void onViewClicked(View view) {
         Bundle bundle = null;
         switch (view.getId()) {
@@ -245,28 +259,6 @@ public class Prod_ScInOtherFragment1 extends BaseFragment {
                 run_passSC();
 
                 break;
-            case R.id.btn_clone: // 重置
-                hideKeyboard(mContext.getCurrentFocus());
-                if (checkDatas != null && checkDatas.size() > 0) {
-                    AlertDialog.Builder build = new AlertDialog.Builder(mContext);
-                    build.setIcon(R.drawable.caution);
-                    build.setTitle("系统提示");
-                    build.setMessage("您有未保存的数据，继续重置吗？");
-                    build.setPositiveButton("是", new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            reset();
-                        }
-                    });
-                    build.setNegativeButton("否", null);
-                    build.setCancelable(false);
-                    build.show();
-                    return;
-                } else {
-                    reset();
-                }
-
-                break;
         }
     }
 
@@ -282,11 +274,11 @@ public class Prod_ScInOtherFragment1 extends BaseFragment {
         // 检查数据
         for (int i = 0, size = checkDatas.size(); i < size; i++) {
             ScanningRecord sr = checkDatas.get(i);
-            if (isNULLS(sr.getStockName()).length() == 0) {
+            if (sr.getIsCheck() == 1 && isNULLS(sr.getStockName()).length() == 0) {
                 Comm.showWarnDialog(mContext,"第" + (i + 1) + "行，请选择（仓库）！");
                 return false;
             }
-            if (sr.getRealQty() > sr.getUseableQty()) {
+            if (sr.getIsCheck() == 1 && sr.getRealQty() > sr.getUseableQty()) {
                 Comm.showWarnDialog(mContext,"第" + (i + 1) + "行（入库数）不能大于（生产数）！");
                 return false;
             }
@@ -296,16 +288,28 @@ public class Prod_ScInOtherFragment1 extends BaseFragment {
 
     @Override
     public void setListener() {
-
+        cbAll.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                int dataSize = checkDatas.size();
+                if (dataSize > 0) {
+                    for (int i = 0; i < dataSize; i++) {
+                        checkDatas.get(i).setIsCheck(isChecked ? 1 : 0);
+                    }
+                    cbAll.setText(isChecked ? "反选" : "全选");
+                    mAdapter.notifyDataSetChanged();
+                }
+            }
+        });
     }
 
-    private void reset() {
+    private void reset(boolean isRefresh) {
         strK3Number = null;
         btnSave.setVisibility(View.VISIBLE);
         btnPass.setVisibility(View.GONE);
         checkDatas.clear();
 
-        mAdapter.notifyDataSetChanged();
+        if(isRefresh) mAdapter.notifyDataSetChanged();
     }
 
     @Override
@@ -341,6 +345,7 @@ public class Prod_ScInOtherFragment1 extends BaseFragment {
                         String value = bundle.getString("resultValue", "");
                         double num = parseDouble(value);
                         checkDatas.get(curPos).setRealQty(num);
+                        checkDatas.get(curPos).setIsCheck(1);
                         mAdapter.notifyDataSetChanged();
                     }
                 }
@@ -469,11 +474,18 @@ public class Prod_ScInOtherFragment1 extends BaseFragment {
      */
     private void run_save() {
         List<ScanningRecord> listRecord = new ArrayList<>();
+        boolean isUnChecked = true; // 是否全部未选中
         for(int i=0,size=checkDatas.size(); i<size; i++) {
             ScanningRecord sr = checkDatas.get(i);
-            if(sr.getRealQty() > 0) {
+            if(sr.getIsCheck() == 1) isUnChecked = false;
+
+            if(sr.getIsCheck() == 1 && sr.getRealQty() > 0) {
                 listRecord.add(sr);
             }
+        }
+        if(isUnChecked) {
+            Comm.showWarnDialog(mContext,"请选中要入库的行！");
+            return;
         }
         if(listRecord.size() == 0) {
             Comm.showWarnDialog(mContext,"请至少输入一行数量！");

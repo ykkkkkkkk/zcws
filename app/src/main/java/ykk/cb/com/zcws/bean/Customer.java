@@ -38,6 +38,11 @@ public class Customer implements Serializable {
 	/* 不存库，用于接收k3客户收件人姓名 */
 	private String customerName;
 
+	// 临时字段，不存表
+
+	/* 客户所属账套 (电商：990163。内销：990164。外销：990165) */
+	private String belongAcc;
+
 	public Customer() {
 		super();
 	}
@@ -154,5 +159,12 @@ public class Customer implements Serializable {
 		this.customerName = customerName;
 	}
 
+	public String getBelongAcc() {
+		return belongAcc;
+	}
+
+	public void setBelongAcc(String belongAcc) {
+		this.belongAcc = belongAcc;
+	}
 
 }

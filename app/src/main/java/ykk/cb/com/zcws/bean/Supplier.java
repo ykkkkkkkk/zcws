@@ -13,9 +13,9 @@ public class Supplier implements Serializable {
 	/* 供应商K3id */
 	private int supplierId;
 	/* 供应商编码 */
-	private String FNumber;
+	private String fnumber;
 	/* 供应商名称 */
-	private String FName;
+	private String fname;
 	/* 供应商来源账套Id */
 	private int sourceAcctId;
 	/* 供应商来源账套名称 */
@@ -38,88 +38,81 @@ public class Supplier implements Serializable {
 		return id;
 	}
 
-	public void setId(int id) {
-		this.id = id;
-	}
-
 	public int getSupplierId() {
 		return supplierId;
 	}
 
-	public void setSupplierId(int supplierId) {
-		this.supplierId = supplierId;
+	public String getFnumber() {
+		return fnumber;
 	}
 
-	public String getFNumber() {
-		return FNumber;
-	}
-
-	public void setFNumber(String fNumber) {
-		FNumber = fNumber;
-	}
-
-	public String getFName() {
-		return FName;
-	}
-
-	public void setFName(String fName) {
-		FName = fName;
-	}
-
-	public String getCreateDate() {
-		return createDate;
-	}
-
-	public void setCreateDate(String createDate) {
-		this.createDate = createDate;
-	}
-
-	public String getfModifyDate() {
-		return fModifyDate;
-	}
-
-	public void setfModifyDate(String fModifyDate) {
-		this.fModifyDate = fModifyDate;
+	public String getFname() {
+		return fname;
 	}
 
 	public int getSourceAcctId() {
 		return sourceAcctId;
 	}
 
-	public void setSourceAcctId(int sourceAcctId) {
-		this.sourceAcctId = sourceAcctId;
-	}
-
 	public String getSourceAcctName() {
 		return sourceAcctName;
-	}
-
-	public void setSourceAcctName(String sourceAcctName) {
-		this.sourceAcctName = sourceAcctName;
 	}
 
 	public int getCorrespondId() {
 		return correspondId;
 	}
 
-	public void setCorrespondId(int correspondId) {
-		this.correspondId = correspondId;
-	}
-
 	public String getCorrespondName() {
 		return correspondName;
+	}
+
+	public String getCreateDate() {
+		return createDate;
+	}
+
+	public String getfModifyDate() {
+		return fModifyDate;
+	}
+
+	public void setId(int id) {
+		this.id = id;
+	}
+
+	public void setSupplierId(int supplierId) {
+		this.supplierId = supplierId;
+	}
+
+	public void setFnumber(String fnumber) {
+		this.fnumber = fnumber;
+	}
+
+	public void setFname(String fname) {
+		this.fname = fname;
+	}
+
+	public void setSourceAcctId(int sourceAcctId) {
+		this.sourceAcctId = sourceAcctId;
+	}
+
+	public void setSourceAcctName(String sourceAcctName) {
+		this.sourceAcctName = sourceAcctName;
+	}
+
+	public void setCorrespondId(int correspondId) {
+		this.correspondId = correspondId;
 	}
 
 	public void setCorrespondName(String correspondName) {
 		this.correspondName = correspondName;
 	}
 
-	@Override
-	public String toString() {
-		return "Supplier [id=" + id + ", supplierId=" + supplierId + ", FNumber=" + FNumber + ", FName=" + FName
-				+ ", sourceAcctId=" + sourceAcctId + ", sourceAcctName=" + sourceAcctName + ", correspondId="
-				+ correspondId + ", correspondName=" + correspondName + ", createDate=" + createDate + ", fModifyDate="
-				+ fModifyDate + "]";
+	public void setCreateDate(String createDate) {
+		this.createDate = createDate;
 	}
+
+	public void setfModifyDate(String fModifyDate) {
+		this.fModifyDate = fModifyDate;
+	}
+
 
 }

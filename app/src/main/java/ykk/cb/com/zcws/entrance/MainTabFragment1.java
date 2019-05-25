@@ -8,6 +8,7 @@ import android.view.ViewGroup;
 import butterknife.OnClick;
 import ykk.cb.com.zcws.R;
 import ykk.cb.com.zcws.comm.BaseFragment;
+import ykk.cb.com.zcws.purchase.Pur_ScInMainActivity;
 
 public class MainTabFragment1 extends BaseFragment {
 
@@ -27,7 +28,7 @@ public class MainTabFragment1 extends BaseFragment {
 
                 break;
             case R.id.relative2: // 采购入库
-//                show(Pur_InMainActivity.class, null);
+                show(Pur_ScInMainActivity.class, null);
 
                 break;
             case R.id.relative3: // 生产入库
