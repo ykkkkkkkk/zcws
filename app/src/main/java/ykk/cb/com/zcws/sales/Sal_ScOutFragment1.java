@@ -64,6 +64,10 @@ public class Sal_ScOutFragment1 extends BaseFragment {
     EditText etExpressCode;
     @BindView(R.id.et_mtlCode)
     EditText etMtlCode;
+    @BindView(R.id.btn_scan)
+    Button btnScan;
+    @BindView(R.id.btn_scan2)
+    Button btnScan2;
     @BindView(R.id.recyclerView)
     RecyclerView recyclerView;
     @BindView(R.id.btn_save)
@@ -85,6 +89,7 @@ public class Sal_ScOutFragment1 extends BaseFragment {
     private Sal_ScOutMainActivity parent;
     private boolean isTextChange; // 是否进入TextChange事件
     private String strK3Number; // 保存k3返回的单号
+    private boolean isAutoSubmitDate; // 是否自动提交数据
 
     // 消息处理
     private Sal_ScOutFragment1.MyHandler mHandler = new Sal_ScOutFragment1.MyHandler(this);
@@ -105,10 +110,19 @@ public class Sal_ScOutFragment1 extends BaseFragment {
                 switch (msg.what) {
                     case SUCC1:
                         m.strK3Number = JsonUtil.strToString(msgObj);
-//
+
+                        m.setEnables(m.etExpressCode, R.drawable.back_style_gray3, false);
+                        m.setEnables(m.etMtlCode, R.drawable.back_style_gray3, false);
+                        m.btnScan.setVisibility(View.GONE);
+                        m.btnScan2.setVisibility(View.GONE);
                         m.btnSave.setVisibility(View.GONE);
                         m.btnPass.setVisibility(View.VISIBLE);
-                        Comm.showWarnDialog(m.mContext,"保存成功，请点击“审核按钮”！");
+
+                        if(m.isAutoSubmitDate) {
+                            m.run_passSC(true);
+                        } else {
+                            Comm.showWarnDialog(m.mContext, "保存成功，请点击“审核按钮”！");
+                        }
 
                         break;
                     case UNSUCC1:
@@ -117,7 +131,11 @@ public class Sal_ScOutFragment1 extends BaseFragment {
                         break;
                     case PASS: // 审核成功 返回
                         m.reset();
-                        Comm.showWarnDialog(m.mContext,"审核成功✔");
+                        if(m.isAutoSubmitDate) {
+                            m.toasts("自动提交数据成功✔");
+                        } else {
+                            Comm.showWarnDialog(m.mContext, "审核成功✔");
+                        }
 
                         break;
                     case UNPASS: // 审核失败 返回
@@ -148,11 +166,11 @@ public class Sal_ScOutFragment1 extends BaseFragment {
 
                         break;
                     case SUCC3: // 判断是否存在返回
-                        m.run_save();
+                        m.run_save(true);
 
                         break;
                     case UNSUCC3: // 判断是否存在返回
-                        m.run_save();
+                        m.run_save(true);
 
                         break;
                     case SETFOCUS: // 当弹出其他窗口会抢夺焦点，需要跳转下，才能正常得到值
@@ -180,7 +198,7 @@ public class Sal_ScOutFragment1 extends BaseFragment {
                                 } else m.deliBarcode = etName;
                                 m.setTexts(m.etExpressCode, m.deliBarcode);
                                 // 执行查询方法
-                                m.run_smGetDatas(m.deliBarcode);
+                                m.run_smGetDatas();
 
                                 break;
                             case '2': // 物料
@@ -198,7 +216,7 @@ public class Sal_ScOutFragment1 extends BaseFragment {
                                 } else m.mtlBarcode = etName;
                                 m.setTexts(m.etMtlCode, m.mtlBarcode);
                                 // 执行查询方法
-                                m.run_smGetDatas(m.mtlBarcode);
+                                m.run_smGetDatas();
 
                                 break;
                         }
@@ -275,11 +293,12 @@ public class Sal_ScOutFragment1 extends BaseFragment {
                 break;
             case R.id.btn_save: // 保存
                 hideKeyboard(mContext.getCurrentFocus());
-                if(!saveBefore()) {
+                if(!saveBefore(false)) {
                     return;
                 }
+                isAutoSubmitDate = false;
 //                run_findInStockSum();
-                run_save();
+                run_save(false);
 
                 break;
             case R.id.btn_pass: // 审核
@@ -287,7 +306,8 @@ public class Sal_ScOutFragment1 extends BaseFragment {
                     Comm.showWarnDialog(mContext,"请先保存数据！");
                     return;
                 }
-                run_passSC();
+                isAutoSubmitDate = false;
+                run_passSC(false);
 
                 break;
             case R.id.btn_clone: // 重置
@@ -318,20 +338,27 @@ public class Sal_ScOutFragment1 extends BaseFragment {
     /**
      * 选择保存之前的判断
      */
-    private boolean saveBefore() {
+    private boolean saveBefore(boolean isAutoCheck) {
         if (checkDatas == null || checkDatas.size() == 0) {
             Comm.showWarnDialog(mContext,"请先扫描发货单号！");
             return false;
         }
-
+        int count = 0;
         // 检查数据
-        for (int i = 0, size = checkDatas.size(); i < size; i++) {
+        int size = checkDatas.size();
+        for (int i = 0; i < size; i++) {
             ScanningRecord sr = checkDatas.get(i);
 //            if (sr.getSourceQty() > sr.getRealQty()) {
 //                Comm.showWarnDialog(mContext,"第" + (i + 1) + "行货还没捡完货！");
 //                return false;
 //            }
+            if(isAutoCheck && sr.getRealQty() >= sr.getUseableQty()) {
+                count += 1;
+            }
         }
+        // 自动检查数据，并且全部扫完了
+        if(isAutoCheck && count == size) return true;
+
         return true;
     }
 
@@ -395,6 +422,10 @@ public class Sal_ScOutFragment1 extends BaseFragment {
     }
 
     private void reset() {
+        setEnables(etExpressCode, R.drawable.back_style_blue, true);
+        setEnables(etMtlCode, R.drawable.back_style_blue, true);
+        btnScan.setVisibility(View.VISIBLE);
+        btnScan2.setVisibility(View.VISIBLE);
         strK3Number = null;
         etExpressCode.setText(""); // 快递单号
         etMtlCode.setText(""); // 物料
@@ -564,14 +595,17 @@ public class Sal_ScOutFragment1 extends BaseFragment {
 
         setFocusable(etMtlCode);
         mAdapter.notifyDataSetChanged();
+        // 自动检查数据是否可以保存
+        if(saveBefore(true)) {
+            isAutoSubmitDate = true;
+            run_save(true);
+        }
     }
 
     /**
      * 保存方法
      */
-    private void run_save() {
-        showLoadDialog("保存中...");
-
+    private void run_save(boolean isAutoSubmit) {
         List<ScanningRecord> listRecord = new ArrayList<>();
         for(int i=0,size=checkDatas.size(); i<size; i++) {
             ScanningRecord sr = checkDatas.get(i);
@@ -584,6 +618,8 @@ public class Sal_ScOutFragment1 extends BaseFragment {
             return;
         }
 
+        if(isAutoSubmit) showLoadDialog("自动保存中...", false);
+        else showLoadDialog("保存中...", false);
         String mJson = JsonUtil.objectToString(listRecord);
         FormBody formBody = new FormBody.Builder()
                 .add("strJson", mJson)
@@ -620,13 +656,9 @@ public class Sal_ScOutFragment1 extends BaseFragment {
     /**
      * 扫码查询对应的方法
      */
-    private void run_smGetDatas(String val) {
+    private void run_smGetDatas() {
         isTextChange = false;
-        if(val.length() == 0) {
-            Comm.showWarnDialog(mContext,"请对准条码！");
-            return;
-        }
-        showLoadDialog("加载中...");
+        showLoadDialog("加载中...", false);
         String mUrl = null;
         String barcode = null;
         String strCaseId = null;
@@ -732,8 +764,10 @@ public class Sal_ScOutFragment1 extends BaseFragment {
     /**
      * 生产账号审核
      */
-    private void run_passSC() {
-        showLoadDialog("正在审核...");
+    private void run_passSC(boolean isAutoSubmit) {
+        if(isAutoSubmit) showLoadDialog("自动审核中...", false);
+        else showLoadDialog("正在审核...", false);
+
         String mUrl = getURL("scanningRecord/passDS_SC");
         getUserInfo();
         FormBody formBody = new FormBody.Builder()

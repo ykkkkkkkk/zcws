@@ -539,6 +539,7 @@ public class Prod_ScInOtherFragment1 extends BaseFragment {
                 .add("deptNumber", department != null ? department.getDepartmentNumber() : "")
                 .add("prodFdateBeg", date) // 开始日期
                 .add("prodFdateEnd", date) // 结束日期
+                .add("prodStatus", "1") // 0：计划，1：下达，3：结案
                 .build();
 
         Request request = new Request.Builder()

@@ -267,6 +267,10 @@ public class Icstockbillentry implements Serializable {
 	private IcStockBill stockBill;
 	private ICItem icItem;
 
+	// 临时字段，不存表
+	private int scanningRecordId; // 扫码记录表id
+	private String salOrderNo; // 销售订单号
+
 
 	public Integer getFinterid() {
 		return finterid;
@@ -1054,6 +1058,22 @@ public class Icstockbillentry implements Serializable {
 	public void setIcItem(ICItem icItem) {
 		this.icItem = icItem;
 	}
+	public int getScanningRecordId() {
+		return scanningRecordId;
+	}
+
+	public void setScanningRecordId(int scanningRecordId) {
+		this.scanningRecordId = scanningRecordId;
+	}
+
+	public String getSalOrderNo() {
+		return salOrderNo;
+	}
+
+	public void setSalOrderNo(String salOrderNo) {
+		this.salOrderNo = salOrderNo;
+	}
+
 
 	@Override
 	public String toString() {

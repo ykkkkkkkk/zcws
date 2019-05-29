@@ -73,6 +73,8 @@ public class Pur_ScInFragment1 extends BaseFragment {
     TextView tvPurNo;
     @BindView(R.id.et_mtlCode)
     EditText etMtlCode;
+    @BindView(R.id.btn_scan)
+    Button btnScan;
     @BindView(R.id.recyclerView)
     RecyclerView recyclerView;
     @BindView(R.id.btn_save)
@@ -97,6 +99,8 @@ public class Pur_ScInFragment1 extends BaseFragment {
     private String strK3Number; // 保存k3返回的单号
     private String mtlBarcode; // 对应的条码号
     private boolean isTextChange; // 是否进入TextChange事件
+    private boolean isAutoSubmitDate; // 是否自动提交数据
+    private boolean isAllSM; // 是否全部扫完条码
 
     // 消息处理
     private Pur_ScInFragment1.MyHandler mHandler = new Pur_ScInFragment1.MyHandler(this);
@@ -117,10 +121,17 @@ public class Pur_ScInFragment1 extends BaseFragment {
                 switch (msg.what) {
                     case SUCC1:
                         m.strK3Number = JsonUtil.strToString(msgObj);
-//
+
+                        m.setEnables(m.etMtlCode, R.drawable.back_style_gray3, false);
+                        m.btnScan.setVisibility(View.GONE);
                         m.btnSave.setVisibility(View.GONE);
                         m.btnPass.setVisibility(View.VISIBLE);
-                        Comm.showWarnDialog(m.mContext,"保存成功，请点击“审核按钮”！");
+
+                        if(m.isAutoSubmitDate) {
+                            m.run_passSC(true);
+                        } else {
+                            Comm.showWarnDialog(m.mContext, "保存成功，请点击“审核按钮”！");
+                        }
 
                         break;
                     case UNSUCC1:
@@ -129,8 +140,14 @@ public class Pur_ScInFragment1 extends BaseFragment {
                         break;
                     case PASS: // 审核成功 返回
                         m.reset(false);
-                        m.run_findPurOrderInStock();
-                        Comm.showWarnDialog(m.mContext,"审核成功✔");
+                        // 如果没有全部扫完的，审核后继续查询
+                        if(!m.isAllSM) m.run_findPurOrderInStock();
+
+                        if(m.isAutoSubmitDate) {
+                            m.toasts("自动提交数据成功✔");
+                        } else {
+                            Comm.showWarnDialog(m.mContext, "审核成功✔");
+                        }
 
                         break;
                     case UNPASS: // 审核失败 返回
@@ -276,11 +293,12 @@ public class Pur_ScInFragment1 extends BaseFragment {
                 break;
             case R.id.btn_save: // 保存
                 hideKeyboard(mContext.getCurrentFocus());
-                if(!saveBefore()) {
+                if(!saveBefore(false)) {
                     return;
                 }
+                isAutoSubmitDate = false;
 //                run_findInStockSum();
-                run_save();
+                run_save(false);
 
                 break;
             case R.id.btn_pass: // 审核
@@ -288,7 +306,7 @@ public class Pur_ScInFragment1 extends BaseFragment {
                     Comm.showWarnDialog(mContext,"请先保存数据！");
                     return;
                 }
-                run_passSC();
+                run_passSC(false);
 
                 break;
             case R.id.btn_clone: // 重置
@@ -330,24 +348,27 @@ public class Pur_ScInFragment1 extends BaseFragment {
     /**
      * 选择保存之前的判断
      */
-    private boolean saveBefore() {
+    private boolean saveBefore(boolean isAutoCheck) {
         if (checkDatas == null || checkDatas.size() == 0) {
             Comm.showWarnDialog(mContext,"请先查询数据！");
             return false;
         }
-
+        int count = 0;
         // 检查数据
-        for (int i = 0, size = checkDatas.size(); i < size; i++) {
+        int size = checkDatas.size();
+        for (int i = 0; i < size; i++) {
             ScanningRecord sr = checkDatas.get(i);
             if (isNULLS(sr.getStockName()).length() == 0) {
                 Comm.showWarnDialog(mContext,"第" + (i + 1) + "行，请选择（仓库）！");
                 return false;
             }
-            if (sr.getRealQty() > sr.getUseableQty()) {
-                Comm.showWarnDialog(mContext,"第" + (i + 1) + "行（入库数）不能大于（生产数）！");
-                return false;
+            if(isAutoCheck && sr.getRealQty() >= sr.getUseableQty()) {
+                count += 1;
             }
         }
+        // 自动检查数据，并且全部扫完了
+        if(isAutoCheck && count == size) return true;
+
         return true;
     }
 
@@ -390,6 +411,8 @@ public class Pur_ScInFragment1 extends BaseFragment {
     }
 
     private void reset(boolean isRefresh) {
+        setEnables(etMtlCode, R.drawable.back_style_blue, true);
+        btnScan.setVisibility(View.VISIBLE);
         strK3Number = null;
         btnSave.setVisibility(View.VISIBLE);
         btnPass.setVisibility(View.GONE);
@@ -640,26 +663,37 @@ public class Pur_ScInFragment1 extends BaseFragment {
 
         setFocusable(etMtlCode);
         mAdapter.notifyDataSetChanged();
+        // 自动检查数据是否可以保存
+        if(saveBefore(true)) {
+            isAutoSubmitDate = true;
+            run_save(true);
+        }
     }
 
     /**
      * 保存方法
      */
-    private void run_save() {
+    private void run_save(boolean isAutoSubmit) {
         List<ScanningRecord> listRecord = new ArrayList<>();
-        for(int i=0,size=checkDatas.size(); i<size; i++) {
+        int size = checkDatas.size();
+        for(int i=0; i<size; i++) {
             ScanningRecord sr = checkDatas.get(i);
 
             if( sr.getRealQty() > 0) {
                 listRecord.add(sr);
             }
         }
-        if(listRecord.size() == 0) {
+        int size2 = listRecord.size();
+        if(size2 == 0) {
             Comm.showWarnDialog(mContext,"请至少输入一行数量！");
             return;
         }
+        // 判断是否全部扫完
+        if(size == size2) isAllSM = true;
+        else isAllSM = false;
 
-        showLoadDialog("保存中...");
+        if(isAutoSubmit) showLoadDialog("自动保存中...", false);
+        else showLoadDialog("保存中...", false);
         String mJson = JsonUtil.objectToString(listRecord);
         FormBody formBody = new FormBody.Builder()
                 .add("strJson", mJson)
@@ -706,6 +740,7 @@ public class Pur_ScInFragment1 extends BaseFragment {
                 .add("suppNumber", supplier != null ? supplier.getFnumber() : "")
                 .add("prodFdateBeg", date) // 开始日期
                 .add("prodFdateEnd", date) // 结束日期
+                .add("purStatus", "1") // 0：未审核，1：审核，3：结案
                 .build();
 
         Request request = new Request.Builder()
@@ -833,8 +868,10 @@ public class Pur_ScInFragment1 extends BaseFragment {
     /**
      * 生产账号审核
      */
-    private void run_passSC() {
-        showLoadDialog("正在审核...");
+    private void run_passSC(boolean isAutoSubmit) {
+        if(isAutoSubmit) showLoadDialog("自动审核中...", false);
+        else showLoadDialog("正在审核...", false);
+
         String mUrl = getURL("scanningRecord/passSC");
         getUserInfo();
         FormBody formBody = new FormBody.Builder()

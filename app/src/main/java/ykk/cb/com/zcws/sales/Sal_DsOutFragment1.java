@@ -62,12 +62,16 @@ public class Sal_DsOutFragment1 extends BaseFragment {
     EditText etExpressCode;
     @BindView(R.id.et_mtlCode)
     EditText etMtlCode;
+    @BindView(R.id.btn_scan)
+    Button btnScan;
+    @BindView(R.id.btn_scan2)
+    Button btnScan2;
     @BindView(R.id.recyclerView)
     RecyclerView recyclerView;
-    @BindView(R.id.btn_save)
-    Button btnSave;
-    @BindView(R.id.btn_pass)
-    Button btnPass;
+//    @BindView(R.id.btn_save)
+//    Button btnSave;
+//    @BindView(R.id.btn_pass)
+//    Button btnPass;
 
     private Sal_DsOutFragment1 context = this;
     private static final int SUCC1 = 200, UNSUCC1 = 500, SUCC2 = 201, UNSUCC2 = 501, SUCC3 = 202, UNSUCC3 = 502, PASS = 203, UNPASS = 503;
@@ -104,9 +108,14 @@ public class Sal_DsOutFragment1 extends BaseFragment {
                     case SUCC1:
                         m.strK3Number = JsonUtil.strToString(msgObj);
 
-                        m.btnSave.setVisibility(View.GONE);
-                        m.btnPass.setVisibility(View.VISIBLE);
-                        Comm.showWarnDialog(m.mContext,"保存成功，请点击“审核按钮”！");
+                        m.setEnables(m.etExpressCode, R.drawable.back_style_gray3, false);
+                        m.setEnables(m.etMtlCode, R.drawable.back_style_gray3, false);
+                        m.btnScan.setVisibility(View.GONE);
+                        m.btnScan2.setVisibility(View.GONE);
+//                        m.btnSave.setVisibility(View.GONE);
+//                        m.btnPass.setVisibility(View.VISIBLE);
+//                        Comm.showWarnDialog(m.mContext,"保存成功，请点击“审核按钮”！");
+                        m.run_passDS();
 
                         break;
                     case UNSUCC1:
@@ -115,7 +124,8 @@ public class Sal_DsOutFragment1 extends BaseFragment {
                         break;
                     case PASS: // 审核成功 返回
                         m.reset();
-                        Comm.showWarnDialog(m.mContext,"审核成功✔");
+//                        Comm.showWarnDialog(m.mContext,"审核成功✔");
+                        m.toasts("自动提交数据成功✔");
 
                         break;
                     case UNPASS: // 审核失败 返回
@@ -331,7 +341,7 @@ public class Sal_DsOutFragment1 extends BaseFragment {
         for (int i = 0, size = checkDatas.size(); i < size; i++) {
             ScanningRecord sr = checkDatas.get(i);
             if (sr.getSourceQty() > sr.getRealQty()) {
-                Comm.showWarnDialog(mContext,"第" + (i + 1) + "行货还没捡完货！");
+//                Comm.showWarnDialog(mContext,"第" + (i + 1) + "行货还没捡完货！");
                 return false;
             }
         }
@@ -399,11 +409,15 @@ public class Sal_DsOutFragment1 extends BaseFragment {
 
 
     private void reset() {
+        setEnables(etExpressCode, R.drawable.back_style_blue, true);
+        setEnables(etMtlCode, R.drawable.back_style_blue, true);
+        btnScan.setVisibility(View.VISIBLE);
+        btnScan2.setVisibility(View.VISIBLE);
         strK3Number = null;
         etExpressCode.setText(""); // 快递单号
         etMtlCode.setText(""); // 物料
-        btnSave.setVisibility(View.VISIBLE);
-        btnPass.setVisibility(View.GONE);
+//        btnSave.setVisibility(View.VISIBLE);
+//        btnPass.setVisibility(View.GONE);
         checkDatas.clear();
         curViewFlag = '1';
         expressBarcode = null;
@@ -566,13 +580,19 @@ public class Sal_DsOutFragment1 extends BaseFragment {
 
         setFocusable(etMtlCode);
         mAdapter.notifyDataSetChanged();
+
+        // 判断是否全部拣货完成
+        if(saveBefore()) {
+            run_save();
+        }
     }
 
     /**
      * 保存方法
      */
     private void run_save() {
-        showLoadDialog("保存中...");
+//        showLoadDialog("保存中...", false);
+        showLoadDialog("自动保存中...", false);
 
         String mJson = JsonUtil.objectToString(checkDatas);
         FormBody formBody = new FormBody.Builder()
@@ -616,7 +636,7 @@ public class Sal_DsOutFragment1 extends BaseFragment {
             Comm.showWarnDialog(mContext,"请对准条码！");
             return;
         }
-        showLoadDialog("加载中...");
+        showLoadDialog("加载中...", false);
         String mUrl = null;
         String barcode = null;
         String strCaseId = null;
@@ -671,7 +691,7 @@ public class Sal_DsOutFragment1 extends BaseFragment {
      * 判断表中存在该物料
      */
     private void run_findInStockSum() {
-        showLoadDialog("加载中...");
+        showLoadDialog("加载中...", false);
         StringBuilder strFbillno = new StringBuilder();
         StringBuilder strEntryId = new StringBuilder();
         for (int i = 0, size = checkDatas.size(); i < size; i++) {
@@ -723,7 +743,8 @@ public class Sal_DsOutFragment1 extends BaseFragment {
      * 电商账号审核
      */
     private void run_passDS() {
-        showLoadDialog("正在审核...");
+//        showLoadDialog("正在审核...", false);
+        showLoadDialog("自动审核中...", false);
         String mUrl = getURL("scanningRecord/passDS");
         getUserInfo();
         FormBody formBody = new FormBody.Builder()

@@ -59,6 +59,8 @@ public class Sal_DsOutReturnFragment1 extends BaseFragment {
     EditText etGetFocus;
     @BindView(R.id.et_mtlCode)
     EditText etMtlCode;
+    @BindView(R.id.btn_scan)
+    Button btnScan;
     @BindView(R.id.recyclerView)
     RecyclerView recyclerView;
     @BindView(R.id.btn_save)
@@ -102,6 +104,8 @@ public class Sal_DsOutReturnFragment1 extends BaseFragment {
                     case SUCC1:
                         m.strK3Number = JsonUtil.strToString(msgObj);
 
+                        m.setEnables(m.etMtlCode, R.drawable.back_style_gray3, false);
+                        m.btnScan.setVisibility(View.GONE);
                         m.btnSave.setVisibility(View.GONE);
                         m.btnPass.setVisibility(View.VISIBLE);
                         Comm.showWarnDialog(m.mContext,"保存成功，请点击“审核按钮”！");
@@ -342,6 +346,8 @@ public class Sal_DsOutReturnFragment1 extends BaseFragment {
     }
 
     private void reset() {
+        setEnables(etMtlCode, R.drawable.back_style_blue, true);
+        btnScan.setVisibility(View.VISIBLE);
         strK3Number = null;
         etMtlCode.setText(""); // 物料
         btnSave.setVisibility(View.VISIBLE);
@@ -398,7 +404,7 @@ public class Sal_DsOutReturnFragment1 extends BaseFragment {
             IcStockBill stockOrder = stockBillEntry.getStockBill();
             ICItem icItem = stockBillEntry.getIcItem();
             ScanningRecord sr = new ScanningRecord();
-
+            sr.setId(stockBillEntry.getScanningRecordId()); // 这个值为了插入到退货记录表中
             sr.setType(12); // 1：电商销售出库，10：生产产品入库，11：发货通知单销售出库，12：电商销售退货，13：电商外购入库
             sr.setSourceId(stockBillEntry.getFinterid());
             sr.setSourceNumber(stockBillEntry.getFbillNo());
@@ -429,6 +435,8 @@ public class Sal_DsOutReturnFragment1 extends BaseFragment {
             sr.setSourceObj(JsonUtil.objectToString(stockBillEntry));
             sr.setStrBarcodes(mtlBarcode);
             sr.setIsUniqueness('N');
+            // 临时字段
+            sr.setSalOrderNo(stockBillEntry.getSalOrderNo());
 
             checkDatas.add(sr);
         }

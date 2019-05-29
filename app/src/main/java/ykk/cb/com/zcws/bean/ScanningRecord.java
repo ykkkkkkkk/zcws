@@ -47,6 +47,7 @@ public class ScanningRecord implements Serializable {
     private int empId; // 所属职员id
     private int unitId; // 单位id
     private int isCheck; // 是否选中
+    private String salOrderNo; // 销售订单号
 
 
     public ScanningRecord() {
@@ -331,6 +332,14 @@ public class ScanningRecord implements Serializable {
 
     public void setIsCheck(int isCheck) {
         this.isCheck = isCheck;
+    }
+
+    public String getSalOrderNo() {
+        return salOrderNo;
+    }
+
+    public void setSalOrderNo(String salOrderNo) {
+        this.salOrderNo = salOrderNo;
     }
 
 }

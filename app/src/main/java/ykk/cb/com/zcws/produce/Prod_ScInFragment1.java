@@ -63,6 +63,8 @@ public class Prod_ScInFragment1 extends BaseFragment {
     EditText etGetFocus;
     @BindView(R.id.et_code)
     EditText etCode;
+    @BindView(R.id.btn_scan)
+    Button btnScan;
     @BindView(R.id.recyclerView)
     RecyclerView recyclerView;
     @BindView(R.id.btn_save)
@@ -107,7 +109,9 @@ public class Prod_ScInFragment1 extends BaseFragment {
                 switch (msg.what) {
                     case SUCC1:
                         m.strK3Number = JsonUtil.strToString(msgObj);
-//
+
+                        m.setEnables(m.etCode, R.drawable.back_style_gray3, false);
+                        m.btnScan.setVisibility(View.GONE);
                         m.btnSave.setVisibility(View.GONE);
                         m.btnPass.setVisibility(View.VISIBLE);
                         Comm.showWarnDialog(m.mContext,"保存成功，请点击“审核按钮”！");
@@ -373,6 +377,8 @@ public class Prod_ScInFragment1 extends BaseFragment {
     }
 
     private void reset() {
+        setEnables(etCode, R.drawable.back_style_blue, true);
+        btnScan.setVisibility(View.VISIBLE);
         strK3Number = null;
         etCode.setText(""); // 生产条码号
         btnSave.setVisibility(View.VISIBLE);
