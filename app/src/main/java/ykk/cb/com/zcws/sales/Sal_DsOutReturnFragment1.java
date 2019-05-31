@@ -39,6 +39,8 @@ import ykk.cb.com.zcws.R;
 import ykk.cb.com.zcws.bean.Department;
 import ykk.cb.com.zcws.bean.Organization;
 import ykk.cb.com.zcws.bean.ScanningRecord;
+import ykk.cb.com.zcws.bean.Stock;
+import ykk.cb.com.zcws.bean.StockPosition;
 import ykk.cb.com.zcws.bean.User;
 import ykk.cb.com.zcws.bean.k3Bean.ICItem;
 import ykk.cb.com.zcws.bean.k3Bean.IcStockBill;
@@ -346,7 +348,7 @@ public class Sal_DsOutReturnFragment1 extends BaseFragment {
     }
 
     private void reset() {
-        setEnables(etMtlCode, R.drawable.back_style_blue, true);
+        setEnables(etMtlCode, R.color.transparent, true);
         btnScan.setVisibility(View.VISIBLE);
         strK3Number = null;
         etMtlCode.setText(""); // 物料
@@ -423,10 +425,22 @@ public class Sal_DsOutReturnFragment1 extends BaseFragment {
                 sr.setDeptNumber(department.getDepartmentNumber());
                 sr.setDeptName(department.getDepartmentName());
             }
-            sr.setStockNumber("");
-            sr.setStockName("");
-            sr.setStockPositionNumber("");
-            sr.setStockPositionName("");
+            Stock stock = icItem.getStock();
+            if(stock != null) {
+                sr.setStock(stock);
+                sr.setStockNumber(stock.getFnumber());
+                sr.setStockName(stock.getFname());
+            }
+            StockPosition stockPos = icItem.getStockPos();
+            if(stockPos != null && stockPos.getFspId() > 0) {
+                sr.setStockPos(stockPos);
+                sr.setStockPositionNumber(stockPos.getFnumber());
+                sr.setStockPositionName(stockPos.getFname());
+            }
+//            sr.setStockNumber("");
+//            sr.setStockName("");
+//            sr.setStockPositionNumber("");
+//            sr.setStockPositionName("");
             sr.setDeliveryWay("");
             sr.setSourceQty(stockBillEntry.getFqtymust());
             sr.setRealQty(stockBillEntry.getFqty());
@@ -517,9 +531,7 @@ public class Sal_DsOutReturnFragment1 extends BaseFragment {
         Call call = okHttpClient.newCall(request);
         call.enqueue(new Callback() {
             @Override
-            public void onFailure(Call call, IOException e) {
-                mHandler.sendEmptyMessage(UNSUCC2);
-            }
+            public void onFailure(Call call, IOException e) { mHandler.sendEmptyMessage(UNSUCC2); }
 
             @Override
             public void onResponse(Call call, Response response) throws IOException {

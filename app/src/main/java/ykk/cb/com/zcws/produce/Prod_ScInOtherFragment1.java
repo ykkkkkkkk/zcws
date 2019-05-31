@@ -53,7 +53,7 @@ import ykk.cb.com.zcws.util.LogUtil;
 import ykk.cb.com.zcws.util.basehelper.BaseRecyclerAdapter;
 
 /**
- * 销售订单出库
+ * 生产任务单入库（选单入库）
  */
 public class Prod_ScInOtherFragment1 extends BaseFragment {
 
@@ -89,6 +89,7 @@ public class Prod_ScInOtherFragment1 extends BaseFragment {
     private Activity mContext;
     private Prod_ScInOtherMainActivity parent;
     private String strK3Number; // 保存k3返回的单号
+    private boolean isAllSM; // 是否全部扫完条码
 
     // 消息处理
     private Prod_ScInOtherFragment1.MyHandler mHandler = new Prod_ScInOtherFragment1.MyHandler(this);
@@ -109,10 +110,13 @@ public class Prod_ScInOtherFragment1 extends BaseFragment {
                 switch (msg.what) {
                     case SUCC1:
                         m.strK3Number = JsonUtil.strToString(msgObj);
-//
-                        m.btnSave.setVisibility(View.GONE);
-                        m.btnPass.setVisibility(View.VISIBLE);
-                        Comm.showWarnDialog(m.mContext,"保存成功，请点击“审核按钮”！");
+
+//                        m.btnSave.setVisibility(View.GONE);
+//                        m.btnPass.setVisibility(View.VISIBLE);
+//                        Comm.showWarnDialog(m.mContext,"保存成功，请点击“审核按钮”！");
+                        m.reset(false);
+                        if(!m.isAllSM) m.run_smGetDatas();
+                        Comm.showWarnDialog(m.mContext,"保存成功✔");
 
                         break;
                     case UNSUCC1:
@@ -121,7 +125,8 @@ public class Prod_ScInOtherFragment1 extends BaseFragment {
                         break;
                     case PASS: // 审核成功 返回
                         m.reset(false);
-                        m.run_smGetDatas();
+                        if(!m.isAllSM) m.run_smGetDatas();
+
                         Comm.showWarnDialog(m.mContext,"审核成功✔");
 
                         break;
@@ -451,8 +456,8 @@ public class Prod_ScInOtherFragment1 extends BaseFragment {
             sr.setCreateUserName(user.getUsername());
             sr.setSourceObj(JsonUtil.objectToString(prodOrder));
 
-            // 启用序列号，批次号；    990155：启用批次号，990156：启用序列号
-            if(icItem.getSnManager() == 990156 || icItem.getBatchManager() == 990155) {
+            // 启用序列号，批次号；    990156：启用批次号，990156：启用序列号
+            if(icItem.getSnManager() == 990156 || icItem.getBatchManager() == 990156) {
                 sr.setStrBarcodes("");
                 sr.setIsUniqueness('Y');
                 sr.setRealQty(sr.getUseableQty());
@@ -475,12 +480,18 @@ public class Prod_ScInOtherFragment1 extends BaseFragment {
     private void run_save() {
         List<ScanningRecord> listRecord = new ArrayList<>();
         boolean isUnChecked = true; // 是否全部未选中
-        for(int i=0,size=checkDatas.size(); i<size; i++) {
+        int count = 0;
+        int size = checkDatas.size();
+        for(int i=0; i<size; i++) {
             ScanningRecord sr = checkDatas.get(i);
             if(sr.getIsCheck() == 1) isUnChecked = false;
 
             if(sr.getIsCheck() == 1 && sr.getRealQty() > 0) {
                 listRecord.add(sr);
+            }
+            // 判断没行是否扫完数量
+            if(sr.getRealQty() >= sr.getUseableQty()) {
+                count += 1;
             }
         }
         if(isUnChecked) {
@@ -491,6 +502,9 @@ public class Prod_ScInOtherFragment1 extends BaseFragment {
             Comm.showWarnDialog(mContext,"请至少输入一行数量！");
             return;
         }
+        // 判断是否全部扫完
+        if(size == count) isAllSM = true;
+        else isAllSM = false;
 
         showLoadDialog("保存中...");
         String mJson = JsonUtil.objectToString(listRecord);
@@ -632,6 +646,7 @@ public class Prod_ScInOtherFragment1 extends BaseFragment {
         getUserInfo();
         FormBody formBody = new FormBody.Builder()
                 .add("strK3Number", strK3Number)
+                .add("outInType", "2") // 出入库类型：（1、生产账号--采购订单入库，2、生产账号--生产任务单入库，3、生产账号--发货通知单出库）
                 .build();
 
         Request request = new Request.Builder()

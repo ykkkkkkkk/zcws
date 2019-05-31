@@ -8,6 +8,8 @@ import android.view.ViewGroup;
 import butterknife.OnClick;
 import ykk.cb.com.zcws.R;
 import ykk.cb.com.zcws.comm.BaseFragment;
+import ykk.cb.com.zcws.warehouse.Ds_PurInStockPassMainActivity;
+import ykk.cb.com.zcws.warehouse.Sc_ProdInStockPassMainActivity;
 
 public class MainTabFragment4 extends BaseFragment {
 
@@ -23,12 +25,13 @@ public class MainTabFragment4 extends BaseFragment {
     @OnClick({R.id.relative1, R.id.relative2, R.id.relative3, R.id.relative4, R.id.relative5, R.id.relative6, R.id.relative7})
     public void onViewClicked(View view) {
         switch (view.getId()) {
-            case R.id.relative1: // 装卸单
-//                show(StevedoreActivity.class, null);
+            case R.id.relative1: // 生产入库审核
+                show(Sc_ProdInStockPassMainActivity.class, null);
 
                 break;
-            case R.id.relative2:
-                showLoadDialog("连接服务器...");
+            case R.id.relative2: // 电商入库审核
+                show(Ds_PurInStockPassMainActivity.class, null);
+
                 break;
             case R.id.relative3:
                 showLoadDialog("连接服务器...");

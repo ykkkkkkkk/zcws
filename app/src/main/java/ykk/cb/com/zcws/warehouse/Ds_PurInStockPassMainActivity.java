@@ -1,4 +1,4 @@
-package ykk.cb.com.zcws.purchase;
+package ykk.cb.com.zcws.warehouse;
 
 import android.annotation.SuppressLint;
 import android.bluetooth.BluetoothDevice;
@@ -47,7 +47,7 @@ import static android.hardware.usb.UsbManager.ACTION_USB_DEVICE_DETACHED;
 import static ykk.cb.com.zcws.util.blueTooth.Constant.MESSAGE_UPDATE_PARAMETER;
 import static ykk.cb.com.zcws.util.blueTooth.DeviceConnFactoryManager.CONN_STATE_FAILED;
 
-public class Pur_ScInMainActivity extends BaseActivity {
+public class Ds_PurInStockPassMainActivity extends BaseActivity {
 
     @BindView(R.id.viewRadio1)
     View viewRadio1;
@@ -64,8 +64,8 @@ public class Pur_ScInMainActivity extends BaseActivity {
     @BindView(R.id.tv_connState)
     TextView tvConnState;
 
-    private Pur_ScInMainActivity context = this;
-    private static final String TAG = "Sal_OutMainActivity";
+    private Ds_PurInStockPassMainActivity context = this;
+    private static final String TAG = "Ds_PurInStockPassMainActivity";
     private View curRadio;
     public boolean isChange; // 返回的时候是否需要判断数据是否保存了
     public boolean isKeyboard; // 是否使用软键盘
@@ -80,12 +80,12 @@ public class Pur_ScInMainActivity extends BaseActivity {
     private static final int CONN_STATE_DISCONN = 0x007; // 连接状态断开
     private static final int PRINTER_COMMAND_ERROR = 0x008; // 使用打印机指令错误
     private static final int CONN_PRINTER = 0x12;
-    private Pur_ScInFragment1 fragment1 = new Pur_ScInFragment1();
+    private Ds_PurInStockPassFragment1 fragment1 = new Ds_PurInStockPassFragment1();
 //    private Customer customer; // 客户
 
     @Override
     public int setLayoutResID() {
-        return R.layout.pur_sc_in_main;
+        return R.layout.ware_ds_instock_pass_main;
     }
 
     @Override
@@ -181,7 +181,6 @@ public class Pur_ScInMainActivity extends BaseActivity {
 
                 break;
             case R.id.lin_find: // 查询调拨单
-                fragment1.findFun();
 
                 break;
             case R.id.btn_print: // 打印

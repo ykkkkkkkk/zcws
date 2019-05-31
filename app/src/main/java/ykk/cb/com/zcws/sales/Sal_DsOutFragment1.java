@@ -40,6 +40,8 @@ import ykk.cb.com.zcws.bean.BarCodeTable;
 import ykk.cb.com.zcws.bean.Department;
 import ykk.cb.com.zcws.bean.Organization;
 import ykk.cb.com.zcws.bean.ScanningRecord;
+import ykk.cb.com.zcws.bean.Stock;
+import ykk.cb.com.zcws.bean.StockPosition;
 import ykk.cb.com.zcws.bean.User;
 import ykk.cb.com.zcws.bean.k3Bean.ICItem;
 import ykk.cb.com.zcws.bean.k3Bean.SeOrder;
@@ -68,10 +70,10 @@ public class Sal_DsOutFragment1 extends BaseFragment {
     Button btnScan2;
     @BindView(R.id.recyclerView)
     RecyclerView recyclerView;
-//    @BindView(R.id.btn_save)
-//    Button btnSave;
-//    @BindView(R.id.btn_pass)
-//    Button btnPass;
+    @BindView(R.id.btn_save)
+    Button btnSave;
+    @BindView(R.id.btn_pass)
+    Button btnPass;
 
     private Sal_DsOutFragment1 context = this;
     private static final int SUCC1 = 200, UNSUCC1 = 500, SUCC2 = 201, UNSUCC2 = 501, SUCC3 = 202, UNSUCC3 = 502, PASS = 203, UNPASS = 503;
@@ -119,6 +121,7 @@ public class Sal_DsOutFragment1 extends BaseFragment {
 
                         break;
                     case UNSUCC1:
+                        m.btnSave.setVisibility(View.VISIBLE);
                         Comm.showWarnDialog(m.mContext,"服务器繁忙，请稍候再试！");
 
                         break;
@@ -129,6 +132,7 @@ public class Sal_DsOutFragment1 extends BaseFragment {
 
                         break;
                     case UNPASS: // 审核失败 返回
+                        m.btnPass.setVisibility(View.VISIBLE);
                         errMsg = JsonUtil.strToString(msgObj);
                         Comm.showWarnDialog(m.mContext, errMsg);
 
@@ -341,11 +345,26 @@ public class Sal_DsOutFragment1 extends BaseFragment {
         for (int i = 0, size = checkDatas.size(); i < size; i++) {
             ScanningRecord sr = checkDatas.get(i);
             if (sr.getSourceQty() > sr.getRealQty()) {
-//                Comm.showWarnDialog(mContext,"第" + (i + 1) + "行货还没捡完货！");
+                Comm.showWarnDialog(mContext,"第" + (i + 1) + "行货还没捡完货！");
                 return false;
             }
         }
         return true;
+    }
+
+    /**
+     * 判断是否扫完数
+     */
+    private boolean isFinish() {
+        boolean isBool = true;
+        for (int i = 0, size = checkDatas.size(); i < size; i++) {
+            ScanningRecord sr = checkDatas.get(i);
+            if (sr.getSourceQty() > sr.getRealQty()) {
+                isBool = false;
+                break;
+            }
+        }
+        return isBool;
     }
 
     @OnFocusChange({R.id.et_expressCode, R.id.et_mtlCode})
@@ -409,15 +428,15 @@ public class Sal_DsOutFragment1 extends BaseFragment {
 
 
     private void reset() {
-        setEnables(etExpressCode, R.drawable.back_style_blue, true);
-        setEnables(etMtlCode, R.drawable.back_style_blue, true);
+        setEnables(etExpressCode, R.color.transparent, true);
+        setEnables(etMtlCode, R.color.transparent, true);
         btnScan.setVisibility(View.VISIBLE);
         btnScan2.setVisibility(View.VISIBLE);
         strK3Number = null;
         etExpressCode.setText(""); // 快递单号
         etMtlCode.setText(""); // 物料
-//        btnSave.setVisibility(View.VISIBLE);
-//        btnPass.setVisibility(View.GONE);
+        btnSave.setVisibility(View.GONE);
+        btnPass.setVisibility(View.GONE);
         checkDatas.clear();
         curViewFlag = '1';
         expressBarcode = null;
@@ -499,10 +518,22 @@ public class Sal_DsOutFragment1 extends BaseFragment {
                 sr.setDeptNumber(department.getDepartmentNumber());
                 sr.setDeptName(department.getDepartmentName());
             }
-            sr.setStockNumber("");
-            sr.setStockName("");
-            sr.setStockPositionNumber("");
-            sr.setStockPositionName("");
+            Stock stock = icItem.getStock();
+            if(stock != null) {
+                sr.setStock(stock);
+                sr.setStockNumber(stock.getFnumber());
+                sr.setStockName(stock.getFname());
+            }
+            StockPosition stockPos = icItem.getStockPos();
+            if(stockPos != null && stockPos.getFspId() > 0) {
+                sr.setStockPos(stockPos);
+                sr.setStockPositionNumber(stockPos.getFnumber());
+                sr.setStockPositionName(stockPos.getFname());
+            }
+//            sr.setStockNumber("");
+//            sr.setStockName("");
+//            sr.setStockPositionNumber("");
+//            sr.setStockPositionName("");
             sr.setDeliveryWay("");
             sr.setSourceQty(seOrderEntry.getFqty());
             /* 是否赠品，990160=是 (不是k3自带的，是另外增加的) */
@@ -534,8 +565,8 @@ public class Sal_DsOutFragment1 extends BaseFragment {
             if (bt.getIcItemNumber().equals(sr.getIcItemNumber())) {
                 isFlag = true;
 
-                // 不是赠品，并启用序列号，批次号；    990155：启用批次号，990156：启用序列号
-                if(tmpICItem.getIsComplimentary() != 990160 && tmpICItem.getSnManager() == 990156 || tmpICItem.getBatchManager() == 990155) {
+                // 不是赠品，并启用序列号，批次号；    990156：启用批次号，990156：启用序列号
+                if(tmpICItem.getIsComplimentary() != 990160 && tmpICItem.getSnManager() == 990156 || tmpICItem.getBatchManager() == 990156) {
                     if (srBarcode.indexOf(bt.getBarcode()) > -1) {
                         Comm.showWarnDialog(mContext, "条码已经使用！");
                         return;
@@ -552,7 +583,7 @@ public class Sal_DsOutFragment1 extends BaseFragment {
                     // 去除最后，号
                     sr.setStrBarcodes(sr.getStrBarcodes().substring(0, sr.getStrBarcodes().length()-1));
                     sr.setIsUniqueness('Y');
-                    if(tmpICItem.getBatchManager() == 990155 && tmpICItem.getSnManager() == 0 ) {
+                    if(tmpICItem.getBatchManager() == 990156 && tmpICItem.getSnManager() == 0 ) {
                         sr.setRealQty(sr.getRealQty() + bt.getBarcodeQty());
                     } else {
                         sr.setRealQty(sr.getRealQty() + 1);
@@ -582,7 +613,7 @@ public class Sal_DsOutFragment1 extends BaseFragment {
         mAdapter.notifyDataSetChanged();
 
         // 判断是否全部拣货完成
-        if(saveBefore()) {
+        if(isFinish()) {
             run_save();
         }
     }

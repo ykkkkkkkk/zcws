@@ -48,8 +48,8 @@ public class Pur_ScInFragment1Adapter extends BaseArrayRecyclerAdapter<ScanningR
         tv_row.setText(String.valueOf(pos + 1));
         tv_orderNo.setText(entity.getSourceNumber());
         tv_mtlName.setText(entity.getIcItemName());
-        // 990155：启用批次号，990156：启用序列号
-//        if(icItem.getSnManager() == 990156 || icItem.getBatchManager() == 990155) {
+        // 990156：启用批次号，990156：启用序列号
+//        if(icItem.getSnManager() == 990156 || icItem.getBatchManager() == 990156) {
 //            tv_nums.setEnabled(false);
 //            tv_nums.setBackgroundResource(R.drawable.back_style_gray3b);
 //        } else {

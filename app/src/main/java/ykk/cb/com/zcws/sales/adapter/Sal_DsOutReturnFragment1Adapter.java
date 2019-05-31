@@ -47,8 +47,8 @@ public class Sal_DsOutReturnFragment1Adapter extends BaseArrayRecyclerAdapter<Sc
         tv_row.setText(String.valueOf(pos + 1));
         tv_orderNo.setText(stockBill.getFbillno());
         tv_mtlName.setText(icItem.getFname());
-        // 990155：启用批次号，990156：启用序列号
-        if(icItem.getSnManager() == 990156 || icItem.getBatchManager() == 990155) {
+        // 990156：启用批次号，990156：启用序列号
+        if(icItem.getSnManager() == 990156 || icItem.getBatchManager() == 990156) {
             tv_nums.setEnabled(false);
             tv_nums.setBackgroundResource(R.drawable.back_style_gray3b);
         } else {

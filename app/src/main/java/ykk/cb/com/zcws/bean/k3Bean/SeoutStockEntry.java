@@ -103,12 +103,25 @@ public class SeoutStockEntry implements Serializable {
 	private double fsecstockqty;/* 辅助单位出库数量 */
 	/* 表头单据号 */
 	private String fbillno;
+	/* 电商的采购订单内码 */
+	private int fentryselfs0244;
+	/* 电商的采购订单号 */
+	private String fentryselfs0245;
+	/* 电商的采购订单分录码 */
+	private String fentryselfs0246;
+	/* 电商的销售订单号 */
+	private String fentryselfs0247;
+	/* 电商的销售订单内码 */
+	private String fentryselfs0248;
+	/* 电商的销售订单分录号 */
+	private String fentryselfs0249;
 
 	private SeoutStock seOutStock;
 	private ICItem icItem;
 	private Stock stock; // 仓库
 
 	// 临时字段，不存表
+	private String mtlNumber; // 物料编码
 	private double useableQty; // 可用数
 	private double realQty; // 实际数
 	private int isCheck; // 是否选中
@@ -529,25 +542,61 @@ public class SeoutStockEntry implements Serializable {
 		this.realQty = realQty;
 	}
 
-	@Override
-	public String toString() {
-		return "SeoutStockEntry [fbrno=" + fbrno + ", finterid=" + finterid + ", fentryid=" + fentryid + ", fitemid="
-				+ fitemid + ", fqty=" + fqty + ", fcommitqty=" + fcommitqty + ", fprice=" + fprice + ", famount="
-				+ famount + ", forderinterid=" + forderinterid + ", fdate=" + fdate + ", fnote=" + fnote
-				+ ", finvoiceqty=" + finvoiceqty + ", fbcommitqty=" + fbcommitqty + ", funitid=" + funitid
-				+ ", fauxbcommitqty=" + fauxbcommitqty + ", fauxcommitqty=" + fauxcommitqty + ", fauxinvoiceqty="
-				+ fauxinvoiceqty + ", fauxprice=" + fauxprice + ", fauxqty=" + fauxqty + ", fsourceentryid="
-				+ fsourceentryid + ", fmapnumber=" + fmapnumber + ", fmapname=" + fmapname + ", fauxpropid="
-				+ fauxpropid + ", fbatchno=" + fbatchno + ", fcheckdate=" + fcheckdate + ", fexplanation="
-				+ fexplanation + ", ffetchadd=" + ffetchadd + ", ffetchdate=" + ffetchdate + ", fseccoefficient="
-				+ fseccoefficient + ", fsecqty=" + fsecqty + ", fseccommitqty=" + fseccommitqty + ", fsourcetrantype="
-				+ fsourcetrantype + ", fsourceinterid=" + fsourceinterid + ", fsourcebillno=" + fsourcebillno
-				+ ", fcontractinterid=" + fcontractinterid + ", fcontractentryid=" + fcontractentryid
-				+ ", fcontractbillno=" + fcontractbillno + ", forderentryid=" + forderentryid + ", forderbillno="
-				+ forderbillno + ", fstockid=" + fstockid + ", fplanmode=" + fplanmode + ", fmtono=" + fmtono
-				+ ", fstockqty=" + fstockqty + ", fauxstockqty=" + fauxstockqty + ", fsecstockqty=" + fsecstockqty
-				+ ", fbillno=" + fbillno + ", seOutStock=" + seOutStock + ", icItem=" + icItem + ", stock=" + stock
-				+ "]";
+	public int getFentryselfs0244() {
+		return fentryselfs0244;
 	}
+
+	public void setFentryselfs0244(int fentryselfs0244) {
+		this.fentryselfs0244 = fentryselfs0244;
+	}
+
+	public String getFentryselfs0245() {
+		return fentryselfs0245;
+	}
+
+	public void setFentryselfs0245(String fentryselfs0245) {
+		this.fentryselfs0245 = fentryselfs0245;
+	}
+
+	public String getFentryselfs0246() {
+		return fentryselfs0246;
+	}
+
+	public void setFentryselfs0246(String fentryselfs0246) {
+		this.fentryselfs0246 = fentryselfs0246;
+	}
+
+	public String getFentryselfs0247() {
+		return fentryselfs0247;
+	}
+
+	public void setFentryselfs0247(String fentryselfs0247) {
+		this.fentryselfs0247 = fentryselfs0247;
+	}
+
+	public String getFentryselfs0248() {
+		return fentryselfs0248;
+	}
+
+	public void setFentryselfs0248(String fentryselfs0248) {
+		this.fentryselfs0248 = fentryselfs0248;
+	}
+
+	public String getFentryselfs0249() {
+		return fentryselfs0249;
+	}
+
+	public void setFentryselfs0249(String fentryselfs0249) {
+		this.fentryselfs0249 = fentryselfs0249;
+	}
+
+	public String getMtlNumber() {
+		return mtlNumber;
+	}
+
+	public void setMtlNumber(String mtlNumber) {
+		this.mtlNumber = mtlNumber;
+	}
+
 
 }

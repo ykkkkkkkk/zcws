@@ -293,7 +293,7 @@ public class Sal_ScOutFragment1 extends BaseFragment {
                 break;
             case R.id.btn_save: // 保存
                 hideKeyboard(mContext.getCurrentFocus());
-                if(!saveBefore(false)) {
+                if(!saveBefore()) {
                     return;
                 }
                 isAutoSubmitDate = false;
@@ -338,12 +338,11 @@ public class Sal_ScOutFragment1 extends BaseFragment {
     /**
      * 选择保存之前的判断
      */
-    private boolean saveBefore(boolean isAutoCheck) {
+    private boolean saveBefore() {
         if (checkDatas == null || checkDatas.size() == 0) {
             Comm.showWarnDialog(mContext,"请先扫描发货单号！");
             return false;
         }
-        int count = 0;
         // 检查数据
         int size = checkDatas.size();
         for (int i = 0; i < size; i++) {
@@ -352,14 +351,24 @@ public class Sal_ScOutFragment1 extends BaseFragment {
 //                Comm.showWarnDialog(mContext,"第" + (i + 1) + "行货还没捡完货！");
 //                return false;
 //            }
-            if(isAutoCheck && sr.getRealQty() >= sr.getUseableQty()) {
-                count += 1;
-            }
         }
-        // 自动检查数据，并且全部扫完了
-        if(isAutoCheck && count == size) return true;
 
         return true;
+    }
+
+    /**
+     * 判断是否扫完数
+     */
+    private boolean isFinish() {
+        boolean isBool = true;
+        for (int i = 0, size = checkDatas.size(); i < size; i++) {
+            ScanningRecord sr = checkDatas.get(i);
+            if (sr.getUseableQty() > sr.getRealQty()) {
+                isBool = false;
+                break;
+            }
+        }
+        return isBool;
     }
 
     @OnFocusChange({R.id.et_expressCode, R.id.et_mtlCode})
@@ -422,8 +431,8 @@ public class Sal_ScOutFragment1 extends BaseFragment {
     }
 
     private void reset() {
-        setEnables(etExpressCode, R.drawable.back_style_blue, true);
-        setEnables(etMtlCode, R.drawable.back_style_blue, true);
+        setEnables(etExpressCode, R.color.transparent, true);
+        setEnables(etMtlCode, R.color.transparent, true);
         btnScan.setVisibility(View.VISIBLE);
         btnScan2.setVisibility(View.VISIBLE);
         strK3Number = null;
@@ -548,8 +557,8 @@ public class Sal_ScOutFragment1 extends BaseFragment {
             if (bt.getIcItemNumber().equals(sr.getIcItemNumber())) {
                 isFlag = true;
 
-                // 启用序列号，批次号；    990155：启用批次号，990156：启用序列号
-                if(tmpICItem.getSnManager() == 990156 || tmpICItem.getBatchManager() == 990155) {
+                // 启用序列号，批次号；    990156：启用批次号，990156：启用序列号
+                if(tmpICItem.getSnManager() == 990156 || tmpICItem.getBatchManager() == 990156) {
                     if (srBarcode.indexOf(bt.getBarcode()) > -1) {
                         Comm.showWarnDialog(mContext, "条码已经使用！");
                         return;
@@ -567,7 +576,7 @@ public class Sal_ScOutFragment1 extends BaseFragment {
                     // 去除最后，号
                     sr.setStrBarcodes(sr.getStrBarcodes().substring(0, sr.getStrBarcodes().length()-1));
                     sr.setIsUniqueness('Y');
-                    if(tmpICItem.getBatchManager() == 990155 && tmpICItem.getSnManager() == 0 ) {
+                    if(tmpICItem.getBatchManager() == 990156 && tmpICItem.getSnManager() == 0 ) {
                         sr.setRealQty(sr.getRealQty() + bt.getBarcodeQty());
                     } else {
                         sr.setRealQty(sr.getRealQty() + 1);
@@ -596,7 +605,7 @@ public class Sal_ScOutFragment1 extends BaseFragment {
         setFocusable(etMtlCode);
         mAdapter.notifyDataSetChanged();
         // 自动检查数据是否可以保存
-        if(saveBefore(true)) {
+        if(isFinish()) {
             isAutoSubmitDate = true;
             run_save(true);
         }
@@ -772,6 +781,7 @@ public class Sal_ScOutFragment1 extends BaseFragment {
         getUserInfo();
         FormBody formBody = new FormBody.Builder()
                 .add("strK3Number", strK3Number)
+                .add("outInType", "3") // 出入库类型：（1、生产账号--采购订单入库，2、生产账号--生产任务单入库，3、生产账号--发货通知单出库）
                 .build();
 
         Request request = new Request.Builder()

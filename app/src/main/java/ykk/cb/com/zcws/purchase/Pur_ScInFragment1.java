@@ -362,14 +362,23 @@ public class Pur_ScInFragment1 extends BaseFragment {
                 Comm.showWarnDialog(mContext,"第" + (i + 1) + "行，请选择（仓库）！");
                 return false;
             }
-            if(isAutoCheck && sr.getRealQty() >= sr.getUseableQty()) {
+            if (sr.getRealQty() > sr.getUseableQty()) {
+                Comm.showWarnDialog(mContext,"第" + (i + 1) + "行，入库数不能大于采购数！");
+                return false;
+            }
+
+            if(isAutoCheck && sr.getRealQty() == sr.getUseableQty()) {
                 count += 1;
             }
         }
         // 自动检查数据，并且全部扫完了
-        if(isAutoCheck && count == size) return true;
+        if(isAutoCheck) {
+            if (count == size) return true;
+            else return false;
 
-        return true;
+        } else {
+            return true;
+        }
     }
 
     @OnFocusChange({R.id.et_mtlCode})
@@ -411,7 +420,7 @@ public class Pur_ScInFragment1 extends BaseFragment {
     }
 
     private void reset(boolean isRefresh) {
-        setEnables(etMtlCode, R.drawable.back_style_blue, true);
+        setEnables(etMtlCode, R.color.transparent, true);
         btnScan.setVisibility(View.VISIBLE);
         strK3Number = null;
         btnSave.setVisibility(View.VISIBLE);
@@ -478,10 +487,12 @@ public class Pur_ScInFragment1 extends BaseFragment {
                 }
                 break;
             case SEL_WRITE: // 输入采购单号返回
-                Bundle bundle = data.getExtras();
-                if (bundle != null) {
-                    String value = bundle.getString("resultValue", "");
-                    tvPurNo.setText(value);
+                if (resultCode == Activity.RESULT_OK) {
+                    Bundle bundle = data.getExtras();
+                    if (bundle != null) {
+                        String value = bundle.getString("resultValue", "");
+                        tvPurNo.setText(value);
+                    }
                 }
 
                 break;
@@ -579,8 +590,8 @@ public class Pur_ScInFragment1 extends BaseFragment {
             sr.setCreateUserName(user.getUsername());
             sr.setSourceObj(JsonUtil.objectToString(purEntry));
 
-            // 启用序列号，批次号；    990155：启用批次号，990156：启用序列号
-            if(icItem.getSnManager() == 990156 || icItem.getBatchManager() == 990155) {
+            // 启用序列号，批次号；    990156：启用批次号，990156：启用序列号
+            if(icItem.getSnManager() == 990156 || icItem.getBatchManager() == 990156) {
                 sr.setStrBarcodes("");
                 sr.setIsUniqueness('Y');
 //                sr.setRealQty(sr.getUseableQty());
@@ -612,8 +623,8 @@ public class Pur_ScInFragment1 extends BaseFragment {
             if (bt.getIcItemNumber().equals(sr.getIcItemNumber())) {
                 isFlag = true;
 
-                // 启用序列号，批次号；    990155：启用批次号，990156：启用序列号
-                if(tmpICItem.getSnManager() == 990156 || tmpICItem.getBatchManager() == 990155) {
+                // 启用序列号，批次号；    990156：启用批次号，990156：启用序列号
+                if(tmpICItem.getSnManager() == 990156 || tmpICItem.getBatchManager() == 990156) {
 //                    if (srBarcode.indexOf(bt.getBarcode()) > -1) {
 //                        Comm.showWarnDialog(mContext, "条码已经使用！");
 //                        return;
@@ -632,7 +643,7 @@ public class Pur_ScInFragment1 extends BaseFragment {
 //                    sr.setStrBarcodes(sr.getStrBarcodes().substring(0, sr.getStrBarcodes().length()-1));
                     sr.setStrBarcodes(bt.getBarcode());
                     sr.setIsUniqueness('Y');
-//                    if(tmpICItem.getBatchManager() == 990155 && tmpICItem.getSnManager() == 0 ) {
+//                    if(tmpICItem.getBatchManager() == 990156 && tmpICItem.getSnManager() == 0 ) {
 //                        sr.setRealQty(sr.getRealQty() + bt.getBarcodeQty());
 //                    } else {
 //                        sr.setRealQty(sr.getRealQty() + 1);
@@ -675,6 +686,7 @@ public class Pur_ScInFragment1 extends BaseFragment {
      */
     private void run_save(boolean isAutoSubmit) {
         List<ScanningRecord> listRecord = new ArrayList<>();
+        int count = 0;
         int size = checkDatas.size();
         for(int i=0; i<size; i++) {
             ScanningRecord sr = checkDatas.get(i);
@@ -682,14 +694,17 @@ public class Pur_ScInFragment1 extends BaseFragment {
             if( sr.getRealQty() > 0) {
                 listRecord.add(sr);
             }
+            // 判断没行是否扫完数量
+            if(sr.getRealQty() >= sr.getUseableQty()) {
+                count += 1;
+            }
         }
-        int size2 = listRecord.size();
-        if(size2 == 0) {
+        if(listRecord.size() == 0) {
             Comm.showWarnDialog(mContext,"请至少输入一行数量！");
             return;
         }
         // 判断是否全部扫完
-        if(size == size2) isAllSM = true;
+        if(size == count) isAllSM = true;
         else isAllSM = false;
 
         if(isAutoSubmit) showLoadDialog("自动保存中...", false);
@@ -778,10 +793,11 @@ public class Pur_ScInFragment1 extends BaseFragment {
     private void run_smGetDatas() {
         isTextChange = false;
         showLoadDialog("加载中...");
-        String mUrl = getURL("barCodeTable/findBarcode_DS");
+        String mUrl = getURL("barCodeTable/findBarcode_SC");
         FormBody formBody = new FormBody.Builder()
                 .add("barcode", mtlBarcode)
                 .add("strCaseId", "11")
+                .add("sourceType", "15") // 1：电商销售出库，10：生产产品入库，11：发货通知单销售出库，12：电商销售退货，13：电商外购入库，14：生产产品入库(选单入库)，15：采购订单入库
                 .build();
 
         Request request = new Request.Builder()
@@ -876,6 +892,7 @@ public class Pur_ScInFragment1 extends BaseFragment {
         getUserInfo();
         FormBody formBody = new FormBody.Builder()
                 .add("strK3Number", strK3Number)
+                .add("outInType", "1") // 出入库类型：（1、生产账号--采购订单入库，2、生产账号--生产任务单入库，3、生产账号--发货通知单出库）
                 .build();
 
         Request request = new Request.Builder()

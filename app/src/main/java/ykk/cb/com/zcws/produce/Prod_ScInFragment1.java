@@ -55,7 +55,7 @@ import ykk.cb.com.zcws.util.LogUtil;
 import ykk.cb.com.zcws.util.zxing.android.CaptureActivity;
 
 /**
- * 销售订单出库
+ * 生产任务单入库
  */
 public class Prod_ScInFragment1 extends BaseFragment {
 
@@ -110,11 +110,13 @@ public class Prod_ScInFragment1 extends BaseFragment {
                     case SUCC1:
                         m.strK3Number = JsonUtil.strToString(msgObj);
 
-                        m.setEnables(m.etCode, R.drawable.back_style_gray3, false);
-                        m.btnScan.setVisibility(View.GONE);
-                        m.btnSave.setVisibility(View.GONE);
-                        m.btnPass.setVisibility(View.VISIBLE);
-                        Comm.showWarnDialog(m.mContext,"保存成功，请点击“审核按钮”！");
+//                        m.setEnables(m.etCode, R.drawable.back_style_gray3, false);
+//                        m.btnScan.setVisibility(View.GONE);
+//                        m.btnSave.setVisibility(View.GONE);
+//                        m.btnPass.setVisibility(View.VISIBLE);
+//                        Comm.showWarnDialog(m.mContext,"保存成功，请点击“审核按钮”！");
+                        m.reset();
+                        Comm.showWarnDialog(m.mContext,"保存成功✔");
 
                         break;
                     case UNSUCC1:
@@ -377,7 +379,7 @@ public class Prod_ScInFragment1 extends BaseFragment {
     }
 
     private void reset() {
-        setEnables(etCode, R.drawable.back_style_blue, true);
+        setEnables(etCode, R.color.transparent, true);
         btnScan.setVisibility(View.VISIBLE);
         strK3Number = null;
         etCode.setText(""); // 生产条码号
@@ -534,13 +536,13 @@ public class Prod_ScInFragment1 extends BaseFragment {
         sr.setCreateUserName(user.getUsername());
         sr.setSourceObj(JsonUtil.objectToString(prodOrder));
 
-        // 启用序列号，批次号；    990155：启用批次号，990156：启用序列号
-        if(icItem.getSnManager() == 990156 || icItem.getBatchManager() == 990155) {
+        // 启用序列号，批次号；    990156：启用批次号，990156：启用序列号
+        if(icItem.getSnManager() == 990156 || icItem.getBatchManager() == 990156) {
             sr.setStrBarcodes(bt.getBarcode()+",");
             // 去除最后，号
             sr.setStrBarcodes(sr.getStrBarcodes().substring(0, sr.getStrBarcodes().length()-1));
             sr.setIsUniqueness('Y');
-            if(icItem.getBatchManager() == 990155 && icItem.getSnManager() == 0 ) {
+            if(icItem.getBatchManager() == 990156 && icItem.getSnManager() == 0 ) {
                 sr.setRealQty(sr.getRealQty() + bt.getBarcodeQty());
             } else {
                 sr.setRealQty(sr.getRealQty() + 1);
@@ -573,8 +575,8 @@ public class Prod_ScInFragment1 extends BaseFragment {
             if (bt.getRelationBillId()  == sr.getSourceId()) {
                 isFlag = true;
 
-                // 启用序列号，批次号；    990155：启用批次号，990156：启用序列号
-                if(tmpICItem.getSnManager() == 990156 || tmpICItem.getBatchManager() == 990155) {
+                // 启用序列号，批次号；    990156：启用批次号，990156：启用序列号
+                if(tmpICItem.getSnManager() == 990156 || tmpICItem.getBatchManager() == 990156) {
                     if (srBarcode.indexOf(bt.getBarcode()) > -1) {
                         Comm.showWarnDialog(mContext, "条码已经使用！");
                         return;
@@ -592,7 +594,7 @@ public class Prod_ScInFragment1 extends BaseFragment {
                     // 去除最后，号
                     sr.setStrBarcodes(sr.getStrBarcodes().substring(0, sr.getStrBarcodes().length()-1));
                     sr.setIsUniqueness('Y');
-                    if(tmpICItem.getBatchManager() == 990155 && tmpICItem.getSnManager() == 0 ) {
+                    if(tmpICItem.getBatchManager() == 990156 && tmpICItem.getSnManager() == 0 ) {
                         sr.setRealQty(sr.getRealQty() + bt.getBarcodeQty());
                     } else {
                         sr.setRealQty(sr.getRealQty() + 1);
@@ -774,6 +776,7 @@ public class Prod_ScInFragment1 extends BaseFragment {
         getUserInfo();
         FormBody formBody = new FormBody.Builder()
                 .add("strK3Number", strK3Number)
+                .add("outInType", "2") // 出入库类型：（1、生产账号--采购订单入库，2、生产账号--生产任务单入库，3、生产账号--发货通知单出库）
                 .build();
 
         Request request = new Request.Builder()
