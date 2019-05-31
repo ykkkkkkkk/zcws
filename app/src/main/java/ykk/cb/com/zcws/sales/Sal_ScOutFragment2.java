@@ -120,7 +120,8 @@ public class Sal_ScOutFragment2 extends BaseFragment {
                         if(m.isAutoSubmitDate) {
                             m.run_passSC(true);
                         } else {
-                            Comm.showWarnDialog(m.mContext, "保存成功，请点击“审核按钮”！");
+                            m.run_passSC(false);
+//                            Comm.showWarnDialog(m.mContext, "保存成功，请点击“审核按钮”！");
                         }
 
                         break;

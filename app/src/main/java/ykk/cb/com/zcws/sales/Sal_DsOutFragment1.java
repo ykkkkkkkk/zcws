@@ -458,7 +458,10 @@ public class Sal_DsOutFragment1 extends BaseFragment {
                         double num = parseDouble(value);
                         checkDatas.get(curPos).setRealQty(num);
                         mAdapter.notifyDataSetChanged();
-                        mHandler.sendEmptyMessageDelayed(SETFOCUS,200);
+                        // 判断是否全部拣货完成
+                        if(isFinish()) {
+                            run_save();
+                        }
                     }
                 }
 
