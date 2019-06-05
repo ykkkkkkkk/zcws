@@ -535,6 +535,7 @@ public class Sal_ScOutFragment1 extends BaseFragment {
             sr.setRealQty(0);
             sr.setCreateUserId(user.getId());
             sr.setCreateUserName(user.getUsername());
+            sr.setDataTypeFlag("APP");
             sr.setSourceObj(JsonUtil.objectToString(seoutStockEntry));
 
             checkDatas.add(sr);

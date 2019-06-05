@@ -454,6 +454,7 @@ public class Prod_ScInOtherFragment1 extends BaseFragment {
             sr.setCreateUserId(user.getId());
             sr.setEmpId(user.getEmpId());
             sr.setCreateUserName(user.getUsername());
+            sr.setDataTypeFlag("APP");
             sr.setSourceObj(JsonUtil.objectToString(prodOrder));
 
             // 启用序列号，批次号；    990156：启用批次号，990156：启用序列号

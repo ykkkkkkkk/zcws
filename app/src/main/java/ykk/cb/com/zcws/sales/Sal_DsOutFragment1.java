@@ -545,6 +545,7 @@ public class Sal_DsOutFragment1 extends BaseFragment {
 
             sr.setCreateUserId(user.getId());
             sr.setCreateUserName(user.getUsername());
+            sr.setDataTypeFlag("APP");
             sr.setSourceObj(JsonUtil.objectToString(seOrderEntry));
 
             checkDatas.add(sr);

@@ -51,15 +51,15 @@ import ykk.cb.com.zcws.bean.k3Bean.Icstockbillentry;
 import ykk.cb.com.zcws.bean.k3Bean.ReturnReason;
 import ykk.cb.com.zcws.comm.BaseFragment;
 import ykk.cb.com.zcws.comm.Comm;
-import ykk.cb.com.zcws.sales.adapter.Sal_DsOutReturnFragment1Adapter;
+import ykk.cb.com.zcws.sales.adapter.Sal_NxOutReturnFragment1Adapter;
 import ykk.cb.com.zcws.util.JsonUtil;
 import ykk.cb.com.zcws.util.LogUtil;
 import ykk.cb.com.zcws.util.zxing.android.CaptureActivity;
 
 /**
- * 销售订单出库
+ *  内销帐号退货
  */
-public class Sal_DsOutReturnFragment1 extends BaseFragment {
+public class Sal_NxOutReturnFragment1 extends BaseFragment {
 
     @BindView(R.id.et_getFocus)
     EditText etGetFocus;
@@ -76,10 +76,10 @@ public class Sal_DsOutReturnFragment1 extends BaseFragment {
     @BindView(R.id.btn_pass)
     Button btnPass;
 
-    private Sal_DsOutReturnFragment1 context = this;
+    private Sal_NxOutReturnFragment1 context = this;
     private static final int SUCC1 = 200, UNSUCC1 = 500, SUCC2 = 201, UNSUCC2 = 501, SUCC3 = 202, UNSUCC3 = 502, PASS = 203, UNPASS = 503;
     private static final int SETFOCUS = 1, RESULT_NUM = 2, SAOMA = 3, PRICE = 4, RETURN_REASON = 5;
-    private Sal_DsOutReturnFragment1Adapter mAdapter;
+    private Sal_NxOutReturnFragment1Adapter mAdapter;
     private List<ScanningRecord> checkDatas = new ArrayList<>();
     private String mtlBarcode; // 对应的条码号
     private char curViewFlag = '1'; // 1：仓库，2：库位， 3：车间， 4：物料 ，箱码
@@ -88,23 +88,23 @@ public class Sal_DsOutReturnFragment1 extends BaseFragment {
     private User user;
     private Organization cust; // 客户
     private Activity mContext;
-    private Sal_DsOutReturnMainActivity parent;
+    private Sal_NxOutReturnMainActivity parent;
     private boolean isTextChange; // 是否进入TextChange事件
     private List<String> listBarcode = new ArrayList<>();
     private String strK3Number; // 保存k3返回的单号
 
 
     // 消息处理
-    private Sal_DsOutReturnFragment1.MyHandler mHandler = new Sal_DsOutReturnFragment1.MyHandler(this);
+    private MyHandler mHandler = new MyHandler(this);
     private static class MyHandler extends Handler {
-        private final WeakReference<Sal_DsOutReturnFragment1> mActivity;
+        private final WeakReference<Sal_NxOutReturnFragment1> mActivity;
 
-        public MyHandler(Sal_DsOutReturnFragment1 activity) {
-            mActivity = new WeakReference<Sal_DsOutReturnFragment1>(activity);
+        public MyHandler(Sal_NxOutReturnFragment1 activity) {
+            mActivity = new WeakReference<Sal_NxOutReturnFragment1>(activity);
         }
 
         public void handleMessage(Message msg) {
-            Sal_DsOutReturnFragment1 m = mActivity.get();
+            Sal_NxOutReturnFragment1 m = mActivity.get();
             if (m != null) {
                 m.hideLoadDialog();
 
@@ -210,21 +210,21 @@ public class Sal_DsOutReturnFragment1 extends BaseFragment {
 
     @Override
     public View setLayoutResID(LayoutInflater inflater, ViewGroup container) {
-        return inflater.inflate(R.layout.sal_ds_out_return_fragment1, container, false);
+        return inflater.inflate(R.layout.sal_nx_out_return_fragment1, container, false);
     }
 
     @Override
     public void initView() {
         mContext = getActivity();
-        parent = (Sal_DsOutReturnMainActivity) mContext;
+        parent = (Sal_NxOutReturnMainActivity) mContext;
 
         recyclerView.addItemDecoration(new DividerItemDecoration(mContext, DividerItemDecoration.VERTICAL));
         recyclerView.setLayoutManager(new LinearLayoutManager(mContext));
-        mAdapter = new Sal_DsOutReturnFragment1Adapter(mContext, checkDatas);
+        mAdapter = new Sal_NxOutReturnFragment1Adapter(mContext, checkDatas);
         recyclerView.setAdapter(mAdapter);
         // 设值listview空间失去焦点
         recyclerView.setFocusable(false);
-        mAdapter.setCallBack(new Sal_DsOutReturnFragment1Adapter.MyCallBack() {
+        mAdapter.setCallBack(new Sal_NxOutReturnFragment1Adapter.MyCallBack() {
             @Override
             public void onClick_num(View v, ScanningRecord entity, int position) {
                 curPos = position;
@@ -241,7 +241,7 @@ public class Sal_DsOutReturnFragment1 extends BaseFragment {
             public void sel_returnReason(View v, ScanningRecord entity, int position) {
                 curPos = position;
                 Bundle bundle = new Bundle();
-                bundle.putString("flag", "DS"); // 查询电商账号的数据
+                bundle.putString("flag", "NX"); // 查询内销账号的数据
                 showForResult(ReturnReason_DialogActivity.class, RETURN_REASON, bundle);
             }
 
@@ -501,7 +501,7 @@ public class Sal_DsOutReturnFragment1 extends BaseFragment {
             ICItem icItem = stockBillEntry.getIcItem();
             ScanningRecord sr = new ScanningRecord();
             sr.setId(stockBillEntry.getScanningRecordId()); // 这个值为了插入到退货记录表中
-            sr.setType(12); // 1：电商销售出库，10：生产产品入库，11：发货通知单销售出库，12：电商销售退货，13：电商外购入库
+            sr.setType(16); // 1：（电商）销售出库，10：（生产）生产产品入库，11：（生产）发货通知单销售出库，12：（电商）电商销售退货，13：（电商）电商外购入库，14：（生产）生产产品入库(选单入库)，15：（生产）采购订单入库，16：（内销）销售退货
             sr.setSourceId(stockBillEntry.getFinterid());
             sr.setSourceNumber(stockBillEntry.getFbillNo());
             sr.setSourceEntryId(stockBillEntry.getFentryid());
@@ -619,7 +619,7 @@ public class Sal_DsOutReturnFragment1 extends BaseFragment {
         }
         FormBody formBody = new FormBody.Builder()
                 .add("barcode", barcode)
-                .add("sourceType", "12") // 1：电商销售出库，10：生产产品入库，11：发货通知单销售出库，12：电商销售退货
+                .add("sourceType", "16") // 1：（电商）销售出库，10：（生产）生产产品入库，11：（生产）发货通知单销售出库，12：（电商）电商销售退货，13：（电商）电商外购入库，14：（生产）生产产品入库(选单入库)，15：（生产）采购订单入库，16：（内销）销售退货
                 .build();
 
         Request request = new Request.Builder()

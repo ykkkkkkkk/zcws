@@ -120,7 +120,7 @@
                 android:layout_height="@dimen/_60dp"
                 android:layout_centerHorizontal="true"
                 android:scaleType="fitXY"
-                android:src="@drawable/aa_ico3a_7" />
+                android:src="@drawable/aa_ico3a_8" />
 
             <TextView
                 android:id="@+id/tvMenu3"
@@ -144,8 +144,7 @@
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
         android:layout_marginTop="20dp"
-        android:orientation="horizontal"
-        android:visibility="gone">
+        android:orientation="horizontal">
 
         <RelativeLayout
             android:id="@+id/relative4"
@@ -160,7 +159,7 @@
                 android:layout_height="@dimen/_60dp"
                 android:layout_centerHorizontal="true"
                 android:scaleType="fitXY"
-                android:src="@drawable/aa_ico3a_4" />
+                android:src="@drawable/aa_ico3a_8" />
 
             <TextView
                 android:id="@+id/tvMenu4"
@@ -169,7 +168,7 @@
                 android:layout_below="@+id/imgView4"
                 android:layout_centerHorizontal="true"
                 android:layout_marginTop="@dimen/_3dp"
-                android:text="拣货单"
+                android:text="线下退货"
                 android:textColor="@color/black"
                 android:textSize="@dimen/_18sp" />
 
@@ -181,7 +180,7 @@
             android:layout_height="match_parent"
             android:layout_weight="1"
             android:gravity="center"
-            android:visibility="gone">
+            android:visibility="invisible">
 
             <ImageView
                 android:id="@+id/imgView5"
@@ -210,7 +209,8 @@
             android:layout_height="match_parent"
             android:layout_weight="1"
             android:clickable="true"
-            android:gravity="center">
+            android:gravity="center"
+            android:visibility="invisible">
 
             <ImageView
                 android:id="@+id/imgView6"

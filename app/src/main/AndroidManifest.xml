@@ -121,6 +121,9 @@
         <activity
             android:name=".sales.Sal_DsOutReturnMainActivity"
             android:windowSoftInputMode="adjustResize|stateHidden" />
+        <activity
+            android:name=".sales.Sal_NxOutReturnMainActivity"
+            android:windowSoftInputMode="adjustResize|stateHidden" />
 
 
         <!-- 扫一扫界面 -->

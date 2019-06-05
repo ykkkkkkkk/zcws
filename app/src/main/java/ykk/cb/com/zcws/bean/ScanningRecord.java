@@ -11,7 +11,7 @@ import ykk.cb.com.zcws.bean.k3Bean.ICItem;
  */
 public class ScanningRecord implements Serializable {
     private int id; // 自增长id
-    private int type; // 1：电商销售出库，10：生产产品入库，11：发货通知单销售出库，12：电商销售退货，13：电商外购入库，14：生产产品入库(选单入库)，15：采购订单入库
+    private int type; // 1：（电商）销售出库，10：（生产）生产产品入库，11：（生产）发货通知单销售出库，12：（电商）电商销售退货，13：（电商）电商外购入库，14：（生产）生产产品入库(选单入库)，15：（生产）采购订单入库，16：（内销）销售退货
     private int sourceId; // 来源id
     private String sourceNumber; // 来源单号
     private int sourceEntryId; // 来源分录id
@@ -35,6 +35,7 @@ public class ScanningRecord implements Serializable {
     private int createUserId; // 创建人id
     private String createUserName; // 创建人名称
     private String createDate; // 创建日期
+    private String dataTypeFlag; // 数据类型标识 （APP：来源手机，PC：来源电脑）
 
     // 临时字段，不存表
     private Stock stock; // 仓库
@@ -367,5 +368,13 @@ public class ScanningRecord implements Serializable {
 
     public void setReturnReasonName(String returnReasonName) {
         this.returnReasonName = returnReasonName;
+    }
+
+    public String getDataTypeFlag() {
+        return dataTypeFlag;
+    }
+
+    public void setDataTypeFlag(String dataTypeFlag) {
+        this.dataTypeFlag = dataTypeFlag;
     }
 }
