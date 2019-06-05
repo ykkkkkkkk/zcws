@@ -38,6 +38,9 @@ public class Sal_DsOutReturnFragment1Adapter extends BaseArrayRecyclerAdapter<Sc
         TextView tv_orderNo = holder.obtainView(R.id.tv_orderNo);
         TextView tv_mtlName = holder.obtainView(R.id.tv_mtlName);
         TextView tv_nums = holder.obtainView(R.id.tv_nums);
+        TextView tv_price = holder.obtainView(R.id.tv_price);
+        TextView tv_returnReason = holder.obtainView(R.id.tv_returnReason);
+        TextView tv_delRow = holder.obtainView(R.id.tv_delRow);
 
         // 赋值
         Icstockbillentry stockbillentry = JsonUtil.stringToObject(entity.getSourceObj(), Icstockbillentry.class);
@@ -56,6 +59,8 @@ public class Sal_DsOutReturnFragment1Adapter extends BaseArrayRecyclerAdapter<Sc
             tv_nums.setBackgroundResource(R.drawable.back_style_blue2);
         }
         tv_nums.setText(Html.fromHtml(df.format(entity.getSourceQty())+"<br><font color='#009900'>"+df.format(entity.getRealQty())+"</font>"));
+        tv_price.setText(df.format(entity.getPrice()));
+        tv_returnReason.setText(entity.getReturnReasonName());
 
         View.OnClickListener click = new View.OnClickListener() {
             @Override
@@ -67,10 +72,31 @@ public class Sal_DsOutReturnFragment1Adapter extends BaseArrayRecyclerAdapter<Sc
                         }
 
                         break;
+                    case R.id.tv_price: // 退货理由
+                        if(callBack != null) {
+                            callBack.onClick_price(v, entity, pos);
+                        }
+
+                        break;
+                    case R.id.tv_returnReason: // 退货理由
+                        if(callBack != null) {
+                            callBack.sel_returnReason(v, entity, pos);
+                        }
+
+                        break;
+                    case R.id.tv_delRow: // 删除行
+                        if(callBack != null) {
+                            callBack.onClick_del(v, entity, pos);
+                        }
+
+                        break;
                 }
             }
         };
         tv_nums.setOnClickListener(click);
+        tv_price.setOnClickListener(click);
+        tv_delRow.setOnClickListener(click);
+        tv_returnReason.setOnClickListener(click);
     }
 
     public void setCallBack(MyCallBack callBack) {
@@ -79,6 +105,9 @@ public class Sal_DsOutReturnFragment1Adapter extends BaseArrayRecyclerAdapter<Sc
 
     public interface MyCallBack {
         void onClick_num(View v, ScanningRecord entity, int position);
+        void onClick_price(View v, ScanningRecord entity, int position);
+        void sel_returnReason(View v, ScanningRecord entity, int position);
+        void onClick_del(View v, ScanningRecord entity, int position);
     }
 
     /*之下的方法都是为了方便操作，并不是必须的*/

@@ -92,7 +92,7 @@ public class IcStockBill implements Serializable {
     // -------------------start 以下字段在生产账套中存在-------------------//
     /* 生产账套表示对方客户id，电商账套表示来源单据内码 */
     private String fheadselfb0164;
-    /* 对方客户代码 */
+    /* 生产账号--对方客户代码，电商账号--销售出库单号 */
     private String fheadselfb0165;
     /* 对方客户名称 */
     private String fheadselfb0166;

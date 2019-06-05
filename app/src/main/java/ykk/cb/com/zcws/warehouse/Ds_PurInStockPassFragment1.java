@@ -186,7 +186,7 @@ public class Ds_PurInStockPassFragment1 extends BaseFragment {
                 break;
             case R.id.btn_pass: // 审核
                 if(checkDatas == null || checkDatas.size() == 0) {
-                    Comm.showWarnDialog(mContext,"请扫描入库单号！");
+                    Comm.showWarnDialog(mContext,"请扫描出库单！");
                     return;
                 }
                 run_passSC();
@@ -296,7 +296,7 @@ public class Ds_PurInStockPassFragment1 extends BaseFragment {
         showLoadDialog("加载中...");
         String mUrl = getURL("stockBill/findEntryByBarcodeDS");
         FormBody formBody = new FormBody.Builder()
-                .add("barcode", barcode) // 出入库单号
+                .add("barcode2", barcode) // 生产账号--销售出库单号
                 .add("fstatus", "0") // 0：未审核，1：审核，3：结案
                 .build();
 

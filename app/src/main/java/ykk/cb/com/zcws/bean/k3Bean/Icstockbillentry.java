@@ -263,6 +263,8 @@ public class Icstockbillentry implements Serializable {
     private int fentryselfb0183;
     /* 销售订单分录码 */
     private int fentryselfb0184;
+    /* 退货理由id */
+    private int returnReasonrId;
 
     private IcStockBill stockBill;
     private ICItem icItem;
@@ -1345,6 +1347,13 @@ public class Icstockbillentry implements Serializable {
         this.sumRealQty = sumRealQty;
     }
 
+    public int getReturnReasonrId() {
+        return returnReasonrId;
+    }
+
+    public void setReturnReasonrId(int returnReasonrId) {
+        this.returnReasonrId = returnReasonrId;
+    }
 
     @Override
     public String toString() {

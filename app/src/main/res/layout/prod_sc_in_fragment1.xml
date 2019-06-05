@@ -72,7 +72,7 @@
             <LinearLayout
                 android:id="@+id/lin_rowTitle"
                 android:layout_width="match_parent"
-                android:layout_height="@dimen/_33dp"
+                android:layout_height="@dimen/_25dp"
                 android:layout_marginTop="@dimen/_6dp"
                 android:background="#D8D8D8">
 

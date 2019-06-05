@@ -11,6 +11,7 @@ import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.Editable;
+import android.text.Html;
 import android.text.TextWatcher;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -18,6 +19,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.TextView;
 
 import java.io.IOException;
 import java.lang.ref.WeakReference;
@@ -36,6 +38,7 @@ import okhttp3.Request;
 import okhttp3.Response;
 import okhttp3.ResponseBody;
 import ykk.cb.com.zcws.R;
+import ykk.cb.com.zcws.basics.ReturnReason_DialogActivity;
 import ykk.cb.com.zcws.bean.Department;
 import ykk.cb.com.zcws.bean.Organization;
 import ykk.cb.com.zcws.bean.ScanningRecord;
@@ -45,6 +48,7 @@ import ykk.cb.com.zcws.bean.User;
 import ykk.cb.com.zcws.bean.k3Bean.ICItem;
 import ykk.cb.com.zcws.bean.k3Bean.IcStockBill;
 import ykk.cb.com.zcws.bean.k3Bean.Icstockbillentry;
+import ykk.cb.com.zcws.bean.k3Bean.ReturnReason;
 import ykk.cb.com.zcws.comm.BaseFragment;
 import ykk.cb.com.zcws.comm.Comm;
 import ykk.cb.com.zcws.sales.adapter.Sal_DsOutReturnFragment1Adapter;
@@ -63,6 +67,8 @@ public class Sal_DsOutReturnFragment1 extends BaseFragment {
     EditText etMtlCode;
     @BindView(R.id.btn_scan)
     Button btnScan;
+    @BindView(R.id.tv_custInfo)
+    TextView tvCustInfo;
     @BindView(R.id.recyclerView)
     RecyclerView recyclerView;
     @BindView(R.id.btn_save)
@@ -72,19 +78,21 @@ public class Sal_DsOutReturnFragment1 extends BaseFragment {
 
     private Sal_DsOutReturnFragment1 context = this;
     private static final int SUCC1 = 200, UNSUCC1 = 500, SUCC2 = 201, UNSUCC2 = 501, SUCC3 = 202, UNSUCC3 = 502, PASS = 203, UNPASS = 503;
-    private static final int SETFOCUS = 1, RESULT_NUM = 2, SAOMA = 3;
+    private static final int SETFOCUS = 1, RESULT_NUM = 2, SAOMA = 3, PRICE = 4, RETURN_REASON = 5;
     private Sal_DsOutReturnFragment1Adapter mAdapter;
     private List<ScanningRecord> checkDatas = new ArrayList<>();
     private String mtlBarcode; // 对应的条码号
     private char curViewFlag = '1'; // 1：仓库，2：库位， 3：车间， 4：物料 ，箱码
-    private int curPos; // 当前行
+    private int curPos = -1; // 当前行
     private OkHttpClient okHttpClient = null;
     private User user;
+    private Organization cust; // 客户
     private Activity mContext;
     private Sal_DsOutReturnMainActivity parent;
     private boolean isTextChange; // 是否进入TextChange事件
     private List<String> listBarcode = new ArrayList<>();
     private String strK3Number; // 保存k3返回的单号
+
 
     // 消息处理
     private Sal_DsOutReturnFragment1.MyHandler mHandler = new Sal_DsOutReturnFragment1.MyHandler(this);
@@ -137,6 +145,16 @@ public class Sal_DsOutReturnFragment1 extends BaseFragment {
                         switch (m.curViewFlag) {
                             case '1': // 快递单
                                 List<Icstockbillentry> list = JsonUtil.strToList(msgObj, Icstockbillentry.class);
+                                Icstockbillentry stockBillEntry = list.get(0);
+                                IcStockBill stockOrder = stockBillEntry.getStockBill();
+                                Organization tempCust = stockOrder.getCust();
+                                // 显示客户
+                                if(m.cust != null && !(m.cust.getfNumber().equals(tempCust.getfNumber()))) {
+                                    Comm.showWarnDialog(m.mContext,"扫描的客户不一致，请检查！");
+                                    return;
+                                }
+                                m.cust = tempCust;
+                                m.tvCustInfo.setText(Html.fromHtml("客户：<font color='#000000'>"+tempCust.getfName()+"</font>"));
                                 m.getScanAfterData_1(list);
 
                                 break;
@@ -204,12 +222,35 @@ public class Sal_DsOutReturnFragment1 extends BaseFragment {
         recyclerView.setLayoutManager(new LinearLayoutManager(mContext));
         mAdapter = new Sal_DsOutReturnFragment1Adapter(mContext, checkDatas);
         recyclerView.setAdapter(mAdapter);
+        // 设值listview空间失去焦点
+        recyclerView.setFocusable(false);
         mAdapter.setCallBack(new Sal_DsOutReturnFragment1Adapter.MyCallBack() {
             @Override
             public void onClick_num(View v, ScanningRecord entity, int position) {
-                Log.e("num", "行：" + position);
                 curPos = position;
                 showInputDialog("数量", String.valueOf(entity.getRealQty()), "0.0", RESULT_NUM);
+            }
+
+            @Override
+            public void onClick_price(View v, ScanningRecord entity, int position) {
+                curPos = position;
+                showInputDialog("单价", String.valueOf(entity.getPrice()), "0.0", PRICE);
+            }
+
+            @Override
+            public void sel_returnReason(View v, ScanningRecord entity, int position) {
+                curPos = position;
+                Bundle bundle = new Bundle();
+                bundle.putString("flag", "DS"); // 查询电商账号的数据
+                showForResult(ReturnReason_DialogActivity.class, RETURN_REASON, bundle);
+            }
+
+            @Override
+            public void onClick_del(View v, ScanningRecord entity, int position) {
+                String barcode = checkDatas.get(position).getStrBarcodes();
+                listBarcode.remove(barcode); // 把条码记录也删除掉
+                checkDatas.remove(position);
+                mAdapter.notifyDataSetChanged();
             }
 
         });
@@ -238,13 +279,35 @@ public class Sal_DsOutReturnFragment1 extends BaseFragment {
         }
     }
 
-    @OnClick({R.id.btn_scan, R.id.btn_save, R.id.btn_pass, R.id.btn_clone })
+    @OnClick({R.id.btn_scan, R.id.btn_save, R.id.btn_pass, R.id.btn_clone, R.id.btn_batchAdd })
     public void onViewClicked(View view) {
         Bundle bundle = null;
         switch (view.getId()) {
             case R.id.btn_scan: // 调用摄像头扫描（物料）
                 curViewFlag = '1';
                 showForResult(CaptureActivity.class, CAMERA_SCAN, null);
+
+                break;
+            case R.id.btn_batchAdd: // 批量填充
+                if (checkDatas == null || checkDatas.size() == 0) {
+                    Comm.showWarnDialog(mContext, "请先扫描要退货的条码！");
+                    return;
+                }
+                if(curPos == -1) {
+                    Comm.showWarnDialog(mContext, "请选择任意一行的退货理由！");
+                    return;
+                }
+                ScanningRecord srTemp = checkDatas.get(curPos);
+                int id = srTemp.getReturnReasonId();
+                String name = srTemp.getReturnReasonName();
+                for(int i=curPos; i<checkDatas.size(); i++) {
+                    ScanningRecord sr = checkDatas.get(i);
+                    if (sr.getReturnReasonId() == 0) {
+                        sr.setReturnReasonId(id);
+                        sr.setReturnReasonName(name);
+                    }
+                }
+                mAdapter.notifyDataSetChanged();
 
                 break;
             case R.id.btn_save: // 保存
@@ -301,6 +364,10 @@ public class Sal_DsOutReturnFragment1 extends BaseFragment {
         // 检查数据
         for (int i = 0, size = checkDatas.size(); i < size; i++) {
             ScanningRecord sr = checkDatas.get(i);
+            if(sr.getReturnReasonId() == 0) {
+                Comm.showWarnDialog(mContext,"第（"+(i+1)+"）行，请选择退货理由！");
+                return false;
+            }
 //            if (sr.getSourceQty() > sr.getRealQty()) {
 //                Comm.showWarnDialog(mContext,"第" + (i + 1) + "行货还没捡完货！");
 //                return false;
@@ -348,6 +415,8 @@ public class Sal_DsOutReturnFragment1 extends BaseFragment {
     }
 
     private void reset() {
+        cust = null;
+        tvCustInfo.setText("客户：");
         setEnables(etMtlCode, R.color.transparent, true);
         btnScan.setVisibility(View.VISIBLE);
         strK3Number = null;
@@ -357,6 +426,7 @@ public class Sal_DsOutReturnFragment1 extends BaseFragment {
         checkDatas.clear();
         curViewFlag = '1';
         mtlBarcode = null;
+        curPos = -1;
 
         mAdapter.notifyDataSetChanged();
         mHandler.sendEmptyMessageDelayed(SETFOCUS, 200);
@@ -374,8 +444,32 @@ public class Sal_DsOutReturnFragment1 extends BaseFragment {
                         double num = parseDouble(value);
                         checkDatas.get(curPos).setRealQty(num);
                         mAdapter.notifyDataSetChanged();
-                        mHandler.sendEmptyMessageDelayed(SETFOCUS,200);
                     }
+                }
+
+                break;
+            case PRICE: // 单价
+                if (resultCode == Activity.RESULT_OK) {
+                    Bundle bundle = data.getExtras();
+                    if (bundle != null) {
+                        String value = bundle.getString("resultValue", "");
+                        double num = parseDouble(value);
+                        if(num <= 0) {
+                            Comm.showWarnDialog(mContext,"单价必须大于0！");
+                            return;
+                        }
+                        checkDatas.get(curPos).setPrice(num);
+                        mAdapter.notifyDataSetChanged();
+                    }
+                }
+
+                break;
+            case RETURN_REASON: // 退货理由
+                if (resultCode == Activity.RESULT_OK) {
+                    ReturnReason returnReason = (ReturnReason) data.getSerializableExtra("obj");
+                    checkDatas.get(curPos).setReturnReasonId(returnReason.getFitemId());
+                    checkDatas.get(curPos).setReturnReasonName(returnReason.getFname());
+                    mAdapter.notifyDataSetChanged();
                 }
 
                 break;
@@ -445,15 +539,20 @@ public class Sal_DsOutReturnFragment1 extends BaseFragment {
             sr.setSourceQty(stockBillEntry.getFqtymust());
             sr.setRealQty(stockBillEntry.getFqty());
             sr.setCreateUserId(user.getId());
+            sr.setEmpId(user.getEmpId());
             sr.setCreateUserName(user.getUsername());
             sr.setSourceObj(JsonUtil.objectToString(stockBillEntry));
             sr.setStrBarcodes(mtlBarcode);
             sr.setIsUniqueness('N');
             // 临时字段
             sr.setSalOrderNo(stockBillEntry.getSalOrderNo());
+            sr.setPrice(stockBillEntry.getFprice());
+            sr.setReturnReasonId(0);
+            sr.setReturnReasonName("");
 
             checkDatas.add(sr);
         }
+
         mAdapter.notifyDataSetChanged();
         setFocusable(etMtlCode);
     }

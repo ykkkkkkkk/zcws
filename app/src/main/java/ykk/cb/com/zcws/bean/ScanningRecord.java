@@ -48,6 +48,9 @@ public class ScanningRecord implements Serializable {
     private int unitId; // 单位id
     private int isCheck; // 是否选中
     private String salOrderNo; // 销售订单号
+    private double price; // 单价
+    private int returnReasonId; // 退货理由id
+    private String returnReasonName; // 退货理由
 
 
     public ScanningRecord() {
@@ -342,4 +345,27 @@ public class ScanningRecord implements Serializable {
         this.salOrderNo = salOrderNo;
     }
 
+    public double getPrice() {
+        return price;
+    }
+
+    public void setPrice(double price) {
+        this.price = price;
+    }
+
+    public int getReturnReasonId() {
+        return returnReasonId;
+    }
+
+    public String getReturnReasonName() {
+        return returnReasonName;
+    }
+
+    public void setReturnReasonId(int returnReasonId) {
+        this.returnReasonId = returnReasonId;
+    }
+
+    public void setReturnReasonName(String returnReasonName) {
+        this.returnReasonName = returnReasonName;
+    }
 }
