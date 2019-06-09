@@ -39,6 +39,7 @@ import okhttp3.Response;
 import okhttp3.ResponseBody;
 import ykk.cb.com.zcws.R;
 import ykk.cb.com.zcws.basics.ReturnReason_DialogActivity;
+import ykk.cb.com.zcws.bean.BarCodeTable;
 import ykk.cb.com.zcws.bean.Department;
 import ykk.cb.com.zcws.bean.Organization;
 import ykk.cb.com.zcws.bean.ScanningRecord;
@@ -49,6 +50,7 @@ import ykk.cb.com.zcws.bean.k3Bean.ICItem;
 import ykk.cb.com.zcws.bean.k3Bean.IcStockBill;
 import ykk.cb.com.zcws.bean.k3Bean.Icstockbillentry;
 import ykk.cb.com.zcws.bean.k3Bean.ReturnReason;
+import ykk.cb.com.zcws.bean.prod.ProdOrder;
 import ykk.cb.com.zcws.comm.BaseFragment;
 import ykk.cb.com.zcws.comm.Comm;
 import ykk.cb.com.zcws.sales.adapter.Sal_DsOutReturnFragment1Adapter;
@@ -90,7 +92,6 @@ public class Sal_DsOutReturnFragment1 extends BaseFragment {
     private Activity mContext;
     private Sal_DsOutReturnMainActivity parent;
     private boolean isTextChange; // 是否进入TextChange事件
-    private List<String> listBarcode = new ArrayList<>();
     private String strK3Number; // 保存k3返回的单号
 
 
@@ -136,12 +137,6 @@ public class Sal_DsOutReturnFragment1 extends BaseFragment {
 
                         break;
                     case SUCC2: // 扫码成功后进入
-                        if(m.listBarcode.contains(m.mtlBarcode)) {
-                            Comm.showWarnDialog(m.mContext,"条码已存在！");
-                            return;
-                        }
-                        m.listBarcode.add(m.mtlBarcode);
-
                         switch (m.curViewFlag) {
                             case '1': // 快递单
                                 List<Icstockbillentry> list = JsonUtil.strToList(msgObj, Icstockbillentry.class);
@@ -149,13 +144,31 @@ public class Sal_DsOutReturnFragment1 extends BaseFragment {
                                 IcStockBill stockOrder = stockBillEntry.getStockBill();
                                 Organization tempCust = stockOrder.getCust();
                                 // 显示客户
-                                if(m.cust != null && !(m.cust.getfNumber().equals(tempCust.getfNumber()))) {
+                                if(m.cust != null && tempCust != null && !(m.cust.getfNumber().equals(tempCust.getfNumber()))) {
                                     Comm.showWarnDialog(m.mContext,"扫描的客户不一致，请检查！");
                                     return;
                                 }
                                 m.cust = tempCust;
                                 m.tvCustInfo.setText(Html.fromHtml("客户：<font color='#000000'>"+tempCust.getfName()+"</font>"));
-                                m.getScanAfterData_1(list);
+//                                m.getScanAfterData_1(list);
+
+                                // 填充数据
+                                int size = m.checkDatas.size();
+                                boolean addRow = true;
+                                for (int i = 0; i < size; i++) {
+                                    ScanningRecord sr = m.checkDatas.get(i);
+                                    // 有相同的，就不新增了
+                                    if (sr.getSourceId() == stockOrder.getFinterid() && sr.getSourceEntryId() == stockBillEntry.getFentryid()) {
+                                        addRow = false;
+                                        break;
+                                    }
+                                }
+                                m.parent.isChange = true;
+                                if (addRow) {
+                                    m.getScanAfterData_1(stockBillEntry);
+                                } else {
+                                    m.getMtlAfter(stockBillEntry);
+                                }
 
                                 break;
                         }
@@ -247,8 +260,6 @@ public class Sal_DsOutReturnFragment1 extends BaseFragment {
 
             @Override
             public void onClick_del(View v, ScanningRecord entity, int position) {
-                String barcode = checkDatas.get(position).getStrBarcodes();
-                listBarcode.remove(barcode); // 把条码记录也删除掉
                 checkDatas.remove(position);
                 mAdapter.notifyDataSetChanged();
             }
@@ -493,10 +504,10 @@ public class Sal_DsOutReturnFragment1 extends BaseFragment {
     /**
      * 得到快递单号扫码的数据
      */
-    private void getScanAfterData_1(List<Icstockbillentry> list) {
-        int size = list.size();
-        for(int i=0; i<size; i++) {
-            Icstockbillentry stockBillEntry = list.get(i);
+    private void getScanAfterData_1(Icstockbillentry stockBillEntry) {
+//        int size = list.size();
+//        for(int i=0; i<size; i++) {
+//            Icstockbillentry stockBillEntry = list.get(i);
             IcStockBill stockOrder = stockBillEntry.getStockBill();
             ICItem icItem = stockBillEntry.getIcItem();
             ScanningRecord sr = new ScanningRecord();
@@ -519,22 +530,21 @@ public class Sal_DsOutReturnFragment1 extends BaseFragment {
                 sr.setDeptNumber(department.getDepartmentNumber());
                 sr.setDeptName(department.getDepartmentName());
             }
-            Stock stock = icItem.getStock();
+//            Stock stock = icItem.getStock();
+            Stock stock = new Stock();
+            stock.setFnumber("SC.02.01");
+            stock.setFnumber("不良品仓（售后）");
             if(stock != null) {
                 sr.setStock(stock);
                 sr.setStockNumber(stock.getFnumber());
                 sr.setStockName(stock.getFname());
             }
-            StockPosition stockPos = icItem.getStockPos();
-            if(stockPos != null && stockPos.getFspId() > 0) {
-                sr.setStockPos(stockPos);
-                sr.setStockPositionNumber(stockPos.getFnumber());
-                sr.setStockPositionName(stockPos.getFname());
-            }
-//            sr.setStockNumber("");
-//            sr.setStockName("");
-//            sr.setStockPositionNumber("");
-//            sr.setStockPositionName("");
+//            StockPosition stockPos = icItem.getStockPos();
+//            if(stockPos != null && stockPos.getFspId() > 0) {
+//                sr.setStockPos(stockPos);
+//                sr.setStockPositionNumber(stockPos.getFnumber());
+//                sr.setStockPositionName(stockPos.getFname());
+//            }
             sr.setDeliveryWay("");
             sr.setSourceQty(stockBillEntry.getFqtymust());
             sr.setRealQty(stockBillEntry.getFqty());
@@ -544,18 +554,93 @@ public class Sal_DsOutReturnFragment1 extends BaseFragment {
             sr.setDataTypeFlag("APP");
             sr.setSourceObj(JsonUtil.objectToString(stockBillEntry));
             sr.setStrBarcodes(mtlBarcode);
-            sr.setIsUniqueness('N');
+//            sr.setIsUniqueness('N');
             // 临时字段
             sr.setSalOrderNo(stockBillEntry.getSalOrderNo());
             sr.setPrice(stockBillEntry.getFprice());
             sr.setReturnReasonId(0);
             sr.setReturnReasonName("");
 
+            // 启用序列号，批次号；    990156：启用批次号，990156：启用序列号
+            if(icItem.getSnManager() == 990156 || icItem.getBatchManager() == 990156) {
+                sr.setStrBarcodes(mtlBarcode+",");
+                // 去除最后，号
+                sr.setStrBarcodes(sr.getStrBarcodes().substring(0, sr.getStrBarcodes().length()-1));
+                sr.setIsUniqueness('Y');
+                sr.setRealQty(1);
+
+            } else { // 未启用序列号， 批次号
+                sr.setRealQty(stockBillEntry.getFqty());
+                sr.setIsUniqueness('N');
+                // 不存在条码，就加入
+                sr.setStrBarcodes(mtlBarcode + ",");
+                sr.setStrBarcodes(sr.getStrBarcodes().substring(0, sr.getStrBarcodes().length()-1));
+            }
+
             checkDatas.add(sr);
-        }
+//        }
 
         mAdapter.notifyDataSetChanged();
         setFocusable(etMtlCode);
+    }
+
+    /**
+     * 得到扫码物料 数据
+     */
+    private void getMtlAfter(Icstockbillentry stockBillEntry) {
+        ICItem tmpICItem = stockBillEntry.getIcItem();
+
+        int size = checkDatas.size();
+        boolean isFlag = false; // 是否存在该订单
+        for (int i = 0; i < size; i++) {
+            ScanningRecord sr = checkDatas.get(i);
+            String srBarcode = isNULLS(sr.getStrBarcodes());
+            // 如果扫码相同
+            if (sr.getSourceId() == stockBillEntry.getFinterid() && sr.getSourceEntryId() == stockBillEntry.getFentryid()) {
+                isFlag = true;
+                if (sr.getRealQty() >= sr.getSourceQty()) {
+                    Comm.showWarnDialog(mContext, "第" + (i + 1) + "行，已扫完！");
+                    return;
+                }
+
+                // 启用序列号，批次号；    990156：启用批次号，990156：启用序列号
+                if(tmpICItem.getSnManager() == 990156 || tmpICItem.getBatchManager() == 990156) {
+                    if (srBarcode.indexOf(mtlBarcode) > -1) {
+                        Comm.showWarnDialog(mContext, "条码已使用！");
+                        return;
+                    }
+                    if(srBarcode.length() == 0) {
+                        sr.setStrBarcodes(mtlBarcode+",");
+                    } else {
+                        sr.setStrBarcodes(srBarcode +","+ mtlBarcode +",");
+                    }
+                    // 去除最后，号
+                    sr.setStrBarcodes(sr.getStrBarcodes().substring(0, sr.getStrBarcodes().length()-1));
+                    sr.setIsUniqueness('Y');
+                    sr.setRealQty(sr.getRealQty() + 1);
+
+                } else { // 未启用序列号， 批次号
+                    sr.setRealQty(sr.getSourceQty());
+                    sr.setIsUniqueness('N');
+                    // 不存在条码，就加入
+                    if (srBarcode.indexOf(mtlBarcode) == -1) {
+                        if (srBarcode.length() == 0) {
+                            sr.setStrBarcodes(mtlBarcode + ",");
+                        } else {
+                            sr.setStrBarcodes(srBarcode + "," + mtlBarcode + ",");
+                        }
+                        sr.setStrBarcodes(sr.getStrBarcodes().substring(0, sr.getStrBarcodes().length()-1));
+                    }
+                }
+                break;
+            }
+        }
+        if (!isFlag) {
+            Comm.showWarnDialog(mContext, "该条码与行数据不匹配！");
+            return;
+        }
+        mAdapter.notifyDataSetChanged();
+        mHandler.sendEmptyMessageDelayed(SETFOCUS, 200);
     }
 
     /**

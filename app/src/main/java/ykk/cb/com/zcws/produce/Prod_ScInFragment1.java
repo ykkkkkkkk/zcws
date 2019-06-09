@@ -539,9 +539,7 @@ public class Prod_ScInFragment1 extends BaseFragment {
 
         // 启用序列号，批次号；    990156：启用批次号，990156：启用序列号
         if(icItem.getSnManager() == 990156 || icItem.getBatchManager() == 990156) {
-            sr.setStrBarcodes(bt.getBarcode()+",");
-            // 去除最后，号
-            sr.setStrBarcodes(sr.getStrBarcodes().substring(0, sr.getStrBarcodes().length()-1));
+            sr.setStrBarcodes(bt.getBarcode());
             sr.setIsUniqueness('Y');
             if(icItem.getBatchManager() == 990156 && icItem.getSnManager() == 0 ) {
                 sr.setRealQty(sr.getRealQty() + bt.getBarcodeQty());
@@ -552,8 +550,7 @@ public class Prod_ScInFragment1 extends BaseFragment {
             sr.setRealQty(sr.getUseableQty());
             sr.setIsUniqueness('N');
             // 不存在条码，就加入
-            sr.setStrBarcodes(bt.getBarcode() + ",");
-            sr.setStrBarcodes(sr.getStrBarcodes().substring(0, sr.getStrBarcodes().length()-1));
+            sr.setStrBarcodes(bt.getBarcode());
         }
 
         checkDatas.add(sr);
@@ -588,12 +585,10 @@ public class Prod_ScInFragment1 extends BaseFragment {
                         continue;
                     }
                     if(srBarcode.length() == 0) {
-                        sr.setStrBarcodes(bt.getBarcode()+",");
+                        sr.setStrBarcodes(bt.getBarcode());
                     } else {
-                        sr.setStrBarcodes(srBarcode +","+ bt.getBarcode()+",");
+                        sr.setStrBarcodes(srBarcode +","+ bt.getBarcode());
                     }
-                    // 去除最后，号
-                    sr.setStrBarcodes(sr.getStrBarcodes().substring(0, sr.getStrBarcodes().length()-1));
                     sr.setIsUniqueness('Y');
                     if(tmpICItem.getBatchManager() == 990156 && tmpICItem.getSnManager() == 0 ) {
                         sr.setRealQty(sr.getRealQty() + bt.getBarcodeQty());
@@ -606,11 +601,10 @@ public class Prod_ScInFragment1 extends BaseFragment {
                     // 不存在条码，就加入
                     if (srBarcode.indexOf(bt.getBarcode()) == -1) {
                         if (srBarcode.length() == 0) {
-                            sr.setStrBarcodes(bt.getBarcode() + ",");
+                            sr.setStrBarcodes(bt.getBarcode());
                         } else {
-                            sr.setStrBarcodes(srBarcode + "," + bt.getBarcode() + ",");
+                            sr.setStrBarcodes(srBarcode + "," + bt.getBarcode());
                         }
-                        sr.setStrBarcodes(sr.getStrBarcodes().substring(0, sr.getStrBarcodes().length()-1));
                     }
                 }
                 break;

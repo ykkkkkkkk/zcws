@@ -115,7 +115,11 @@ public class Prod_ScInOtherFragment1 extends BaseFragment {
 //                        m.btnPass.setVisibility(View.VISIBLE);
 //                        Comm.showWarnDialog(m.mContext,"保存成功，请点击“审核按钮”！");
                         m.reset(false);
-                        if(!m.isAllSM) m.run_smGetDatas();
+                        if(!m.isAllSM) {
+                            m.run_smGetDatas();
+                        } else {
+                            m.mAdapter.notifyDataSetChanged();
+                        }
                         Comm.showWarnDialog(m.mContext,"保存成功✔");
 
                         break;

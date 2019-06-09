@@ -11,7 +11,7 @@ import ykk.cb.com.zcws.bean.Organization;
  */
 public class IcStockBill implements Serializable {
     /* 单据内码 */
-    private Integer finterid;
+    private int finterid;
     /* 单据类型 */
     private Short ftrantype;
     /* 单据日期 */
@@ -21,27 +21,27 @@ public class IcStockBill implements Serializable {
     /* 备注 */
     private String fnote;
     /* 收入库房id */
-    private Integer fdcstockid;
+    private int fdcstockid;
     /* 发出库房id */
-    private Integer fscstockid;
+    private int fscstockid;
     /* 部门id */
-    private Integer fdeptid;
+    private int fdeptid;
     /* 业务员id */
-    private Integer fempid;
+    private int fempid;
     /* 供应商id */
-    private Integer fsupplyid;
+    private int fsupplyid;
     /* 记账人id */
-    private Integer fposterid;
+    private int fposterid;
     /* 审核人id */
-    private Integer fcheckerid;
+    private int fcheckerid;
     /* 发货人id */
-    private Integer ffmanagerid;
+    private int ffmanagerid;
     /* 保管人id */
-    private Integer fsmanagerid;
+    private int fsmanagerid;
     /* 制单人id */
-    private Integer fbillerid;
+    private int fbillerid;
     /* 退货单号 */
-    private Integer freturnbillinterid;
+    private int freturnbillinterid;
     /* 已废弃 */
     private String fscbillno;
     /* 状态 0-未审核，1-已审核 */
@@ -49,13 +49,13 @@ public class IcStockBill implements Serializable {
     /* 作废状态。0未作废，1已作废 */
     private Boolean fcancellation;
     /* 原单内码 */
-    private Integer forgbillinterid;
+    private int forgbillinterid;
     /* 单据类别 */
-    private Integer fbilltypeid;
+    private int fbilltypeid;
     /* 唯一标识 */
     private String fuuid;
     /* 关联发票号 */
-    private Integer frelateinvoiceid;
+    private int frelateinvoiceid;
     /* 摘要 */
     private String fexplanation;
     /* 交货地点 */
@@ -63,11 +63,11 @@ public class IcStockBill implements Serializable {
     /* 交货日期 */
     private String ffetchdate;
 
-    private Integer fmanagerid;
+    private int fmanagerid;
     /* 调拨类型 */
-    private Integer freftype;
+    private int freftype;
     /* 源单类型 */
-    private Integer fseltrantype;
+    private int fseltrantype;
     /* 对方单据号 */
     private String fpoordbillno;
     /* 应收款日期 */
@@ -130,7 +130,7 @@ public class IcStockBill implements Serializable {
     private Emp emp;
 
 
-    public Integer getFinterid() {
+    public int getFinterid() {
         return finterid;
     }
     public Short getFtrantype() {
@@ -145,37 +145,37 @@ public class IcStockBill implements Serializable {
     public String getFnote() {
         return fnote;
     }
-    public Integer getFdcstockid() {
+    public int getFdcstockid() {
         return fdcstockid;
     }
-    public Integer getFscstockid() {
+    public int getFscstockid() {
         return fscstockid;
     }
-    public Integer getFdeptid() {
+    public int getFdeptid() {
         return fdeptid;
     }
-    public Integer getFempid() {
+    public int getFempid() {
         return fempid;
     }
-    public Integer getFsupplyid() {
+    public int getFsupplyid() {
         return fsupplyid;
     }
-    public Integer getFposterid() {
+    public int getFposterid() {
         return fposterid;
     }
-    public Integer getFcheckerid() {
+    public int getFcheckerid() {
         return fcheckerid;
     }
-    public Integer getFfmanagerid() {
+    public int getFfmanagerid() {
         return ffmanagerid;
     }
-    public Integer getFsmanagerid() {
+    public int getFsmanagerid() {
         return fsmanagerid;
     }
-    public Integer getFbillerid() {
+    public int getFbillerid() {
         return fbillerid;
     }
-    public Integer getFreturnbillinterid() {
+    public int getFreturnbillinterid() {
         return freturnbillinterid;
     }
     public String getFscbillno() {
@@ -187,16 +187,16 @@ public class IcStockBill implements Serializable {
     public Boolean getFcancellation() {
         return fcancellation;
     }
-    public Integer getForgbillinterid() {
+    public int getForgbillinterid() {
         return forgbillinterid;
     }
-    public Integer getFbilltypeid() {
+    public int getFbilltypeid() {
         return fbilltypeid;
     }
     public String getFuuid() {
         return fuuid;
     }
-    public Integer getFrelateinvoiceid() {
+    public int getFrelateinvoiceid() {
         return frelateinvoiceid;
     }
     public String getFexplanation() {
@@ -208,13 +208,13 @@ public class IcStockBill implements Serializable {
     public String getFfetchdate() {
         return ffetchdate;
     }
-    public Integer getFmanagerid() {
+    public int getFmanagerid() {
         return fmanagerid;
     }
-    public Integer getFreftype() {
+    public int getFreftype() {
         return freftype;
     }
-    public Integer getFseltrantype() {
+    public int getFseltrantype() {
         return fseltrantype;
     }
     public String getFpoordbillno() {
@@ -298,7 +298,7 @@ public class IcStockBill implements Serializable {
     public Emp getEmp() {
         return emp;
     }
-    public void setFinterid(Integer finterid) {
+    public void setFinterid(int finterid) {
         this.finterid = finterid;
     }
     public void setFtrantype(Short ftrantype) {
@@ -313,37 +313,37 @@ public class IcStockBill implements Serializable {
     public void setFnote(String fnote) {
         this.fnote = fnote;
     }
-    public void setFdcstockid(Integer fdcstockid) {
+    public void setFdcstockid(int fdcstockid) {
         this.fdcstockid = fdcstockid;
     }
-    public void setFscstockid(Integer fscstockid) {
+    public void setFscstockid(int fscstockid) {
         this.fscstockid = fscstockid;
     }
-    public void setFdeptid(Integer fdeptid) {
+    public void setFdeptid(int fdeptid) {
         this.fdeptid = fdeptid;
     }
-    public void setFempid(Integer fempid) {
+    public void setFempid(int fempid) {
         this.fempid = fempid;
     }
-    public void setFsupplyid(Integer fsupplyid) {
+    public void setFsupplyid(int fsupplyid) {
         this.fsupplyid = fsupplyid;
     }
-    public void setFposterid(Integer fposterid) {
+    public void setFposterid(int fposterid) {
         this.fposterid = fposterid;
     }
-    public void setFcheckerid(Integer fcheckerid) {
+    public void setFcheckerid(int fcheckerid) {
         this.fcheckerid = fcheckerid;
     }
-    public void setFfmanagerid(Integer ffmanagerid) {
+    public void setFfmanagerid(int ffmanagerid) {
         this.ffmanagerid = ffmanagerid;
     }
-    public void setFsmanagerid(Integer fsmanagerid) {
+    public void setFsmanagerid(int fsmanagerid) {
         this.fsmanagerid = fsmanagerid;
     }
-    public void setFbillerid(Integer fbillerid) {
+    public void setFbillerid(int fbillerid) {
         this.fbillerid = fbillerid;
     }
-    public void setFreturnbillinterid(Integer freturnbillinterid) {
+    public void setFreturnbillinterid(int freturnbillinterid) {
         this.freturnbillinterid = freturnbillinterid;
     }
     public void setFscbillno(String fscbillno) {
@@ -355,16 +355,16 @@ public class IcStockBill implements Serializable {
     public void setFcancellation(Boolean fcancellation) {
         this.fcancellation = fcancellation;
     }
-    public void setForgbillinterid(Integer forgbillinterid) {
+    public void setForgbillinterid(int forgbillinterid) {
         this.forgbillinterid = forgbillinterid;
     }
-    public void setFbilltypeid(Integer fbilltypeid) {
+    public void setFbilltypeid(int fbilltypeid) {
         this.fbilltypeid = fbilltypeid;
     }
     public void setFuuid(String fuuid) {
         this.fuuid = fuuid;
     }
-    public void setFrelateinvoiceid(Integer frelateinvoiceid) {
+    public void setFrelateinvoiceid(int frelateinvoiceid) {
         this.frelateinvoiceid = frelateinvoiceid;
     }
     public void setFexplanation(String fexplanation) {
@@ -376,13 +376,13 @@ public class IcStockBill implements Serializable {
     public void setFfetchdate(String ffetchdate) {
         this.ffetchdate = ffetchdate;
     }
-    public void setFmanagerid(Integer fmanagerid) {
+    public void setFmanagerid(int fmanagerid) {
         this.fmanagerid = fmanagerid;
     }
-    public void setFreftype(Integer freftype) {
+    public void setFreftype(int freftype) {
         this.freftype = freftype;
     }
-    public void setFseltrantype(Integer fseltrantype) {
+    public void setFseltrantype(int fseltrantype) {
         this.fseltrantype = fseltrantype;
     }
     public void setFpoordbillno(String fpoordbillno) {

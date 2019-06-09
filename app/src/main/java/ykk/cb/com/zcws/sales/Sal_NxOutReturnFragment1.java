@@ -519,22 +519,21 @@ public class Sal_NxOutReturnFragment1 extends BaseFragment {
                 sr.setDeptNumber(department.getDepartmentNumber());
                 sr.setDeptName(department.getDepartmentName());
             }
-            Stock stock = icItem.getStock();
+//            Stock stock = icItem.getStock();
+            Stock stock = new Stock();
+            stock.setFnumber("SC.02.01");
+            stock.setFnumber("不良品仓（售后）");
             if(stock != null) {
                 sr.setStock(stock);
                 sr.setStockNumber(stock.getFnumber());
                 sr.setStockName(stock.getFname());
             }
-            StockPosition stockPos = icItem.getStockPos();
-            if(stockPos != null && stockPos.getFspId() > 0) {
-                sr.setStockPos(stockPos);
-                sr.setStockPositionNumber(stockPos.getFnumber());
-                sr.setStockPositionName(stockPos.getFname());
-            }
-//            sr.setStockNumber("");
-//            sr.setStockName("");
-//            sr.setStockPositionNumber("");
-//            sr.setStockPositionName("");
+//            StockPosition stockPos = icItem.getStockPos();
+//            if(stockPos != null && stockPos.getFspId() > 0) {
+//                sr.setStockPos(stockPos);
+//                sr.setStockPositionNumber(stockPos.getFnumber());
+//                sr.setStockPositionName(stockPos.getFname());
+//            }
             sr.setDeliveryWay("");
             sr.setSourceQty(stockBillEntry.getFqtymust());
             sr.setRealQty(stockBillEntry.getFqty());

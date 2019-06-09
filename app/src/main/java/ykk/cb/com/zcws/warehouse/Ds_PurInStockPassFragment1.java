@@ -36,6 +36,7 @@ import okhttp3.Request;
 import okhttp3.Response;
 import okhttp3.ResponseBody;
 import ykk.cb.com.zcws.R;
+import ykk.cb.com.zcws.bean.ScanningRecord;
 import ykk.cb.com.zcws.bean.User;
 import ykk.cb.com.zcws.bean.k3Bean.Icstockbillentry;
 import ykk.cb.com.zcws.comm.BaseFragment;
@@ -335,10 +336,21 @@ public class Ds_PurInStockPassFragment1 extends BaseFragment {
     private void run_passSC() {
         showLoadDialog("正在审核...", false);
 
+        StringBuilder strK3Number = new StringBuilder();
+        for(int i=0; i<checkDatas.size(); i++) {
+            Icstockbillentry entry = checkDatas.get(i);
+            if(strK3Number.indexOf(entry.getFbillNo()) == -1) {
+                strK3Number.append(entry.getFbillNo()+",");
+            }
+        }
+        // 删除最后一个，
+        if(strK3Number.length() > 0) strK3Number.delete(strK3Number.length()-1, strK3Number.length());
+
         String mUrl = getURL("scanningRecord/passDS");
         getUserInfo();
         FormBody formBody = new FormBody.Builder()
-                .add("strK3Number", barcode)
+//                .add("strK3Number", barcode)
+                .add("strK3Number", strK3Number.toString())
                 .build();
 
         Request request = new Request.Builder()

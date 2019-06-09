@@ -142,7 +142,11 @@ public class Pur_ScInFragment1 extends BaseFragment {
                     case PASS: // 审核成功 返回
                         m.reset(false);
                         // 如果没有全部扫完的，审核后继续查询
-                        if(!m.isAllSM) m.run_findPurOrderInStock();
+                        if(!m.isAllSM) {
+                            m.run_findPurOrderInStock();
+                        } else {
+                            m.mAdapter.notifyDataSetChanged();
+                        }
 
                         if(m.isAutoSubmitDate) {
                             m.toasts("自动提交数据成功✔");
