@@ -136,6 +136,7 @@ public class Prod_ScInOtherFragment1 extends BaseFragment {
                         break;
                     case UNPASS: // 审核失败 返回
                         errMsg = JsonUtil.strToString(msgObj);
+                        if(m.isNULLS(errMsg).length() == 0) errMsg = "审核失败！";
                         Comm.showWarnDialog(m.mContext, errMsg);
 
                         break;
@@ -455,6 +456,7 @@ public class Prod_ScInOtherFragment1 extends BaseFragment {
             sr.setSourceQty(prodOrder.getFqty());
             sr.setUseableQty(prodOrder.getUseableQty());
 //        sr.setRealQty(1);
+            sr.setPrice(0);
             sr.setCreateUserId(user.getId());
             sr.setEmpId(user.getEmpId());
             sr.setCreateUserName(user.getUsername());

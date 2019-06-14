@@ -195,7 +195,7 @@ public class ReturnReason_DialogActivity extends BaseDialogActivity implements X
                     mHandler.sendEmptyMessage(UNSUCC1);
                     return;
                 }
-                isNextPage = JsonUtil.isNextPage(result, limit);
+//                isNextPage = JsonUtil.isNextPage(result, limit);
 
                 Message msg = mHandler.obtainMessage(SUCC1, result);
                 Log.e("Dept_DialogActivity --> onResponse", result);

@@ -11,7 +11,11 @@ import ykk.cb.com.zcws.bean.k3Bean.ICItem;
  */
 public class ScanningRecord implements Serializable {
     private int id; // 自增长id
-    private int type; // 1：（电商）销售出库，10：（生产）生产产品入库，11：（生产）发货通知单销售出库，12：（电商）电商销售退货，13：（电商）电商外购入库，14：（生产）生产产品入库(选单入库)，15：（生产）采购订单入库，16：（内销）销售退货
+    /*
+     *  1：（电商）销售出库，10：（生产）生产产品入库，11：（生产）发货通知单销售出库，12：（电商）电商销售退货，13：（电商）电商外购入库，
+     * 	14：（生产）生产产品入库(选单入库)，15：（生产）采购订单入库，16：（内销）销售退货，17：（电商）蓝字推红字到外购入库，18：（生产）蓝字推红字到销售出库
+     */
+    private int type;
     private int sourceId; // 来源id
     private String sourceNumber; // 来源单号
     private int sourceEntryId; // 来源分录id
@@ -30,12 +34,14 @@ public class ScanningRecord implements Serializable {
     private String deptName; // 部门名称
     private double sourceQty; // 来源数量
     private double realQty; // 实收数量
+    private double price; // 单价
     private String pdaNo; // pda产生的流水号
     private String k3BillNo; // k3保存成功返回的单号
     private int createUserId; // 创建人id
     private String createUserName; // 创建人名称
     private String createDate; // 创建日期
     private String dataTypeFlag; // 数据类型标识 （APP：来源手机，PC：来源电脑）
+    private String timesTamp; // 时间戳（时间数+10位随机数）
 
     // 临时字段，不存表
     private Stock stock; // 仓库
@@ -49,9 +55,9 @@ public class ScanningRecord implements Serializable {
     private int unitId; // 单位id
     private int isCheck; // 是否选中
     private String salOrderNo; // 销售订单号
-    private double price; // 单价
     private int returnReasonId; // 退货理由id
     private String returnReasonName; // 退货理由
+    private double tempQty; // 用于临时记录操作的数据
 
 
     public ScanningRecord() {
@@ -376,5 +382,21 @@ public class ScanningRecord implements Serializable {
 
     public void setDataTypeFlag(String dataTypeFlag) {
         this.dataTypeFlag = dataTypeFlag;
+    }
+
+    public double getTempQty() {
+        return tempQty;
+    }
+
+    public void setTempQty(double tempQty) {
+        this.tempQty = tempQty;
+    }
+
+    public String getTimesTamp() {
+        return timesTamp;
+    }
+
+    public void setTimesTamp(String timesTamp) {
+        this.timesTamp = timesTamp;
     }
 }

@@ -133,6 +133,7 @@ public class Sal_DsOutReturnFragment1 extends BaseFragment {
                         break;
                     case UNPASS: // 审核失败 返回
                         errMsg = JsonUtil.strToString(msgObj);
+                        if(m.isNULLS(errMsg).length() == 0) errMsg = "审核失败！";
                         Comm.showWarnDialog(m.mContext, errMsg);
 
                         break;
@@ -533,7 +534,7 @@ public class Sal_DsOutReturnFragment1 extends BaseFragment {
 //            Stock stock = icItem.getStock();
             Stock stock = new Stock();
             stock.setFnumber("SC.02.01");
-            stock.setFnumber("不良品仓（售后）");
+            stock.setFname("不良品仓（售后）");
             if(stock != null) {
                 sr.setStock(stock);
                 sr.setStockNumber(stock.getFnumber());
@@ -548,6 +549,7 @@ public class Sal_DsOutReturnFragment1 extends BaseFragment {
             sr.setDeliveryWay("");
             sr.setSourceQty(stockBillEntry.getFqtymust());
             sr.setRealQty(stockBillEntry.getFqty());
+            sr.setPrice(stockBillEntry.getFprice());
             sr.setCreateUserId(user.getId());
             sr.setEmpId(user.getEmpId());
             sr.setCreateUserName(user.getUsername());
@@ -557,15 +559,13 @@ public class Sal_DsOutReturnFragment1 extends BaseFragment {
 //            sr.setIsUniqueness('N');
             // 临时字段
             sr.setSalOrderNo(stockBillEntry.getSalOrderNo());
-            sr.setPrice(stockBillEntry.getFprice());
             sr.setReturnReasonId(0);
             sr.setReturnReasonName("");
 
             // 启用序列号，批次号；    990156：启用批次号，990156：启用序列号
             if(icItem.getSnManager() == 990156 || icItem.getBatchManager() == 990156) {
-                sr.setStrBarcodes(mtlBarcode+",");
+                sr.setStrBarcodes(mtlBarcode);
                 // 去除最后，号
-                sr.setStrBarcodes(sr.getStrBarcodes().substring(0, sr.getStrBarcodes().length()-1));
                 sr.setIsUniqueness('Y');
                 sr.setRealQty(1);
 
@@ -573,8 +573,7 @@ public class Sal_DsOutReturnFragment1 extends BaseFragment {
                 sr.setRealQty(stockBillEntry.getFqty());
                 sr.setIsUniqueness('N');
                 // 不存在条码，就加入
-                sr.setStrBarcodes(mtlBarcode + ",");
-                sr.setStrBarcodes(sr.getStrBarcodes().substring(0, sr.getStrBarcodes().length()-1));
+                sr.setStrBarcodes(mtlBarcode);
             }
 
             checkDatas.add(sr);
@@ -610,12 +609,11 @@ public class Sal_DsOutReturnFragment1 extends BaseFragment {
                         return;
                     }
                     if(srBarcode.length() == 0) {
-                        sr.setStrBarcodes(mtlBarcode+",");
+                        sr.setStrBarcodes(mtlBarcode);
                     } else {
-                        sr.setStrBarcodes(srBarcode +","+ mtlBarcode +",");
+                        sr.setStrBarcodes(srBarcode +","+ mtlBarcode);
                     }
                     // 去除最后，号
-                    sr.setStrBarcodes(sr.getStrBarcodes().substring(0, sr.getStrBarcodes().length()-1));
                     sr.setIsUniqueness('Y');
                     sr.setRealQty(sr.getRealQty() + 1);
 
@@ -625,11 +623,10 @@ public class Sal_DsOutReturnFragment1 extends BaseFragment {
                     // 不存在条码，就加入
                     if (srBarcode.indexOf(mtlBarcode) == -1) {
                         if (srBarcode.length() == 0) {
-                            sr.setStrBarcodes(mtlBarcode + ",");
+                            sr.setStrBarcodes(mtlBarcode);
                         } else {
-                            sr.setStrBarcodes(srBarcode + "," + mtlBarcode + ",");
+                            sr.setStrBarcodes(srBarcode + "," + mtlBarcode);
                         }
-                        sr.setStrBarcodes(sr.getStrBarcodes().substring(0, sr.getStrBarcodes().length()-1));
                     }
                 }
                 break;
@@ -704,6 +701,7 @@ public class Sal_DsOutReturnFragment1 extends BaseFragment {
         }
         FormBody formBody = new FormBody.Builder()
                 .add("barcode", barcode)
+                .add("targetType", "1") // 目标数据类型
                 .add("sourceType", "12") // 1：电商销售出库，10：生产产品入库，11：发货通知单销售出库，12：电商销售退货
                 .build();
 
@@ -735,66 +733,15 @@ public class Sal_DsOutReturnFragment1 extends BaseFragment {
     }
 
     /**
-     * 判断表中存在该物料
-     */
-    private void run_findInStockSum() {
-        showLoadDialog("加载中...");
-        StringBuilder strFbillno = new StringBuilder();
-        StringBuilder strEntryId = new StringBuilder();
-        for (int i = 0, size = checkDatas.size(); i < size; i++) {
-//            ScanningRecord2 sr2 = checkDatas.get(i);
-//            if((i+1) == size) {
-//                strFbillno.append(sr2.getPoFbillno());
-//                strEntryId.append(sr2.getEntryId());
-//            } else {
-//                strFbillno.append(sr2.getPoFbillno() + ",");
-//                strEntryId.append(sr2.getEntryId() + ",");
-//            }
-        }
-        String mUrl = getURL("scanningRecord/findInStockSum");
-        FormBody formBody = new FormBody.Builder()
-                .add("fbillType", "4") // fbillType  1：采购订单入库，2：收料任务单入库，3：生产订单入库，4：销售订单出库，5：发货通知单出库
-                .add("strFbillno", strFbillno.toString())
-                .add("strEntryId", strEntryId.toString())
-                .build();
-
-        Request request = new Request.Builder()
-                .addHeader("cookie", getSession())
-                .url(mUrl)
-                .post(formBody)
-                .build();
-
-        Call call = okHttpClient.newCall(request);
-        call.enqueue(new Callback() {
-            @Override
-            public void onFailure(Call call, IOException e) {
-                mHandler.sendEmptyMessage(UNSUCC3);
-            }
-
-            @Override
-            public void onResponse(Call call, Response response) throws IOException {
-                ResponseBody body = response.body();
-                String result = body.string();
-                if (!JsonUtil.isSuccess(result)) {
-                    mHandler.sendEmptyMessage(UNSUCC3);
-                    return;
-                }
-                Message msg = mHandler.obtainMessage(SUCC3, result);
-                Log.e("run_findInStockSum --> onResponse", result);
-                mHandler.sendMessage(msg);
-            }
-        });
-    }
-
-    /**
      * 电商账号审核
      */
     private void run_passDS() {
         showLoadDialog("正在审核...");
-        String mUrl = getURL("scanningRecord/passDS");
+        String mUrl = getURL("stockBill/passDS");
         getUserInfo();
         FormBody formBody = new FormBody.Builder()
-                .add("strK3Number", strK3Number)
+                .add("strFbillNo", strK3Number)
+                .add("empId", user != null ? String.valueOf(user.getEmpId()) : "0")
                 .build();
 
         Request request = new Request.Builder()

@@ -132,6 +132,7 @@ public class Sal_NxOutReturnFragment1 extends BaseFragment {
                         break;
                     case UNPASS: // 审核失败 返回
                         errMsg = JsonUtil.strToString(msgObj);
+                        if(m.isNULLS(errMsg).length() == 0) errMsg = "审核失败！";
                         Comm.showWarnDialog(m.mContext, errMsg);
 
                         break;
@@ -155,7 +156,25 @@ public class Sal_NxOutReturnFragment1 extends BaseFragment {
                                 }
                                 m.cust = tempCust;
                                 m.tvCustInfo.setText(Html.fromHtml("客户：<font color='#000000'>"+tempCust.getfName()+"</font>"));
-                                m.getScanAfterData_1(list);
+//                                m.getScanAfterData_1(list);
+                                // 填充数据
+                                int size = m.checkDatas.size();
+                                boolean addRow = true;
+                                for (int i = 0; i < size; i++) {
+                                    ScanningRecord sr = m.checkDatas.get(i);
+                                    // 有相同的，就不新增了
+                                    if (sr.getSourceId() == stockOrder.getFinterid() && sr.getSourceEntryId() == stockBillEntry.getFentryid()) {
+                                        addRow = false;
+                                        break;
+                                    }
+                                }
+                                m.parent.isChange = true;
+                                if (addRow) {
+                                    m.getScanAfterData_1(stockBillEntry);
+                                } else {
+                                    m.getMtlAfter(stockBillEntry);
+                                }
+
 
                                 break;
                         }
@@ -493,10 +512,10 @@ public class Sal_NxOutReturnFragment1 extends BaseFragment {
     /**
      * 得到快递单号扫码的数据
      */
-    private void getScanAfterData_1(List<Icstockbillentry> list) {
-        int size = list.size();
-        for(int i=0; i<size; i++) {
-            Icstockbillentry stockBillEntry = list.get(i);
+    private void getScanAfterData_1(Icstockbillentry stockBillEntry) {
+//        int size = list.size();
+//        for(int i=0; i<size; i++) {
+//            Icstockbillentry stockBillEntry = list.get(i);
             IcStockBill stockOrder = stockBillEntry.getStockBill();
             ICItem icItem = stockBillEntry.getIcItem();
             ScanningRecord sr = new ScanningRecord();
@@ -522,7 +541,7 @@ public class Sal_NxOutReturnFragment1 extends BaseFragment {
 //            Stock stock = icItem.getStock();
             Stock stock = new Stock();
             stock.setFnumber("SC.02.01");
-            stock.setFnumber("不良品仓（售后）");
+            stock.setFname("不良品仓（售后）");
             if(stock != null) {
                 sr.setStock(stock);
                 sr.setStockNumber(stock.getFnumber());
@@ -537,24 +556,93 @@ public class Sal_NxOutReturnFragment1 extends BaseFragment {
             sr.setDeliveryWay("");
             sr.setSourceQty(stockBillEntry.getFqtymust());
             sr.setRealQty(stockBillEntry.getFqty());
+            sr.setPrice(stockBillEntry.getFprice());
             sr.setCreateUserId(user.getId());
             sr.setEmpId(user.getEmpId());
             sr.setCreateUserName(user.getUsername());
             sr.setDataTypeFlag("APP");
             sr.setSourceObj(JsonUtil.objectToString(stockBillEntry));
             sr.setStrBarcodes(mtlBarcode);
-            sr.setIsUniqueness('N');
+//            sr.setIsUniqueness('N');
             // 临时字段
             sr.setSalOrderNo(stockBillEntry.getSalOrderNo());
-            sr.setPrice(stockBillEntry.getFprice());
             sr.setReturnReasonId(0);
             sr.setReturnReasonName("");
 
+            // 启用序列号，批次号；    990156：启用批次号，990156：启用序列号
+            if(icItem.getSnManager() == 990156 || icItem.getBatchManager() == 990156) {
+                sr.setStrBarcodes(mtlBarcode);
+                sr.setIsUniqueness('Y');
+                sr.setRealQty(1);
+
+            } else { // 未启用序列号， 批次号
+                sr.setRealQty(stockBillEntry.getFqty());
+                sr.setIsUniqueness('N');
+                // 不存在条码，就加入
+                sr.setStrBarcodes(mtlBarcode);
+            }
+
             checkDatas.add(sr);
-        }
+//        }
 
         mAdapter.notifyDataSetChanged();
         setFocusable(etMtlCode);
+    }
+
+    /**
+     * 得到扫码物料 数据
+     */
+    private void getMtlAfter(Icstockbillentry stockBillEntry) {
+        ICItem tmpICItem = stockBillEntry.getIcItem();
+
+        int size = checkDatas.size();
+        boolean isFlag = false; // 是否存在该订单
+        for (int i = 0; i < size; i++) {
+            ScanningRecord sr = checkDatas.get(i);
+            String srBarcode = isNULLS(sr.getStrBarcodes());
+            // 如果扫码相同
+            if (sr.getSourceId() == stockBillEntry.getFinterid() && sr.getSourceEntryId() == stockBillEntry.getFentryid()) {
+                isFlag = true;
+                if (sr.getRealQty() >= sr.getSourceQty()) {
+                    Comm.showWarnDialog(mContext, "第" + (i + 1) + "行，已扫完！");
+                    return;
+                }
+
+                // 启用序列号，批次号；    990156：启用批次号，990156：启用序列号
+                if(tmpICItem.getSnManager() == 990156 || tmpICItem.getBatchManager() == 990156) {
+                    if (srBarcode.indexOf(mtlBarcode) > -1) {
+                        Comm.showWarnDialog(mContext, "条码已使用！");
+                        return;
+                    }
+                    if(srBarcode.length() == 0) {
+                        sr.setStrBarcodes(mtlBarcode);
+                    } else {
+                        sr.setStrBarcodes(srBarcode +","+ mtlBarcode);
+                    }
+                    sr.setIsUniqueness('Y');
+                    sr.setRealQty(sr.getRealQty() + 1);
+
+                } else { // 未启用序列号， 批次号
+                    sr.setRealQty(sr.getSourceQty());
+                    sr.setIsUniqueness('N');
+                    // 不存在条码，就加入
+                    if (srBarcode.indexOf(mtlBarcode) == -1) {
+                        if (srBarcode.length() == 0) {
+                            sr.setStrBarcodes(mtlBarcode);
+                        } else {
+                            sr.setStrBarcodes(srBarcode + "," + mtlBarcode);
+                        }
+                    }
+                }
+                break;
+            }
+        }
+        if (!isFlag) {
+            Comm.showWarnDialog(mContext, "该条码与行数据不匹配！");
+            return;
+        }
+        mAdapter.notifyDataSetChanged();
+        mHandler.sendEmptyMessageDelayed(SETFOCUS, 200);
     }
 
     /**
@@ -618,6 +706,7 @@ public class Sal_NxOutReturnFragment1 extends BaseFragment {
         }
         FormBody formBody = new FormBody.Builder()
                 .add("barcode", barcode)
+                .add("targetType", "11") // 目标数据类型
                 .add("sourceType", "16") // 1：（电商）销售出库，10：（生产）生产产品入库，11：（生产）发货通知单销售出库，12：（电商）电商销售退货，13：（电商）电商外购入库，14：（生产）生产产品入库(选单入库)，15：（生产）采购订单入库，16：（内销）销售退货
                 .build();
 
@@ -701,14 +790,15 @@ public class Sal_NxOutReturnFragment1 extends BaseFragment {
     }
 
     /**
-     * 电商账号审核
+     * 生产账号审核
      */
     private void run_passDS() {
         showLoadDialog("正在审核...");
-        String mUrl = getURL("scanningRecord/passDS");
+        String mUrl = getURL("stockBill/passSC");
         getUserInfo();
         FormBody formBody = new FormBody.Builder()
-                .add("strK3Number", strK3Number)
+                .add("strFbillNo", strK3Number)
+                .add("empId", user != null ? String.valueOf(user.getEmpId()) : "0")
                 .build();
 
         Request request = new Request.Builder()

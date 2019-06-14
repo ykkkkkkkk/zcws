@@ -14,32 +14,15 @@
             android:id="@+id/btn_close"
             style="@style/btnClose" />
 
-        <LinearLayout
-            android:id="@+id/lin_find"
+        <TextView
+            android:id="@+id/tv_title"
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
-            android:background="@drawable/btn_blue2_selector"
-            android:gravity="center">
-
-            <TextView
-                android:id="@+id/tv_title"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:gravity="center"
-                android:text="生产入库审核"
-                android:textColor="@android:color/white"
-                android:textSize="18sp" />
-
-            <TextView
-                android:id="@+id/tv_searchIco"
-                android:layout_width="@dimen/_36dp"
-                android:layout_height="@dimen/_36dp"
-                android:background="@drawable/ico_search"
-                android:gravity="center"
-                android:visibility="gone" />
-
-        </LinearLayout>
+            android:gravity="center"
+            android:text="电商退生产"
+            android:textColor="@android:color/white"
+            android:textSize="18sp" />
 
         <Button
             android:id="@+id/btn_print"
@@ -49,8 +32,7 @@
             android:layout_marginRight="@dimen/_4dp"
             android:background="@drawable/aa_ico5a_5b"
             android:textColor="#ffffff"
-            android:textSize="14sp"
-            android:visibility="invisible" />
+            android:textSize="14sp" />
     </LinearLayout>
 
     <TextView

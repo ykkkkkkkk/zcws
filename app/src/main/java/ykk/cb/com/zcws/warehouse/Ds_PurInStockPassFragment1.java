@@ -36,7 +36,6 @@ import okhttp3.Request;
 import okhttp3.Response;
 import okhttp3.ResponseBody;
 import ykk.cb.com.zcws.R;
-import ykk.cb.com.zcws.bean.ScanningRecord;
 import ykk.cb.com.zcws.bean.User;
 import ykk.cb.com.zcws.bean.k3Bean.Icstockbillentry;
 import ykk.cb.com.zcws.comm.BaseFragment;
@@ -190,7 +189,7 @@ public class Ds_PurInStockPassFragment1 extends BaseFragment {
                     Comm.showWarnDialog(mContext,"请扫描出库单！");
                     return;
                 }
-                run_passSC();
+                run_passDS();
 
                 break;
             case R.id.btn_clone: // 重置
@@ -331,9 +330,9 @@ public class Ds_PurInStockPassFragment1 extends BaseFragment {
     }
 
     /**
-     * 生产账号审核
+     * 电商账号审核
      */
-    private void run_passSC() {
+    private void run_passDS() {
         showLoadDialog("正在审核...", false);
 
         StringBuilder strK3Number = new StringBuilder();
@@ -346,11 +345,11 @@ public class Ds_PurInStockPassFragment1 extends BaseFragment {
         // 删除最后一个，
         if(strK3Number.length() > 0) strK3Number.delete(strK3Number.length()-1, strK3Number.length());
 
-        String mUrl = getURL("scanningRecord/passDS");
+        String mUrl = getURL("stockBill/passDS");
         getUserInfo();
         FormBody formBody = new FormBody.Builder()
-//                .add("strK3Number", barcode)
-                .add("strK3Number", strK3Number.toString())
+                .add("strFbillNo", strK3Number.toString())
+                .add("empId", user != null ? String.valueOf(user.getEmpId()) : "0")
                 .build();
 
         Request request = new Request.Builder()
@@ -376,7 +375,7 @@ public class Ds_PurInStockPassFragment1 extends BaseFragment {
                     return;
                 }
                 Message msg = mHandler.obtainMessage(PASS, result);
-                Log.e("run_passSC --> onResponse", result);
+                Log.e("run_passDS --> onResponse", result);
                 mHandler.sendMessage(msg);
             }
         });

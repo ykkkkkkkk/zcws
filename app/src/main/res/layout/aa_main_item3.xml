@@ -180,7 +180,7 @@
             android:layout_height="match_parent"
             android:layout_weight="1"
             android:gravity="center"
-            android:visibility="invisible">
+            >
 
             <ImageView
                 android:id="@+id/imgView5"
@@ -188,7 +188,7 @@
                 android:layout_height="@dimen/_60dp"
                 android:layout_centerHorizontal="true"
                 android:scaleType="fitXY"
-                android:src="@drawable/aa_ico3a_5" />
+                android:src="@drawable/aa_ico3a_8" />
 
             <TextView
                 android:id="@+id/tvMenu5"
@@ -197,7 +197,7 @@
                 android:layout_below="@+id/imgView5"
                 android:layout_centerHorizontal="true"
                 android:layout_marginTop="@dimen/_3dp"
-                android:text="复核单"
+                android:text="电商退生产"
                 android:textColor="@color/black"
                 android:textSize="@dimen/_18sp" />
 

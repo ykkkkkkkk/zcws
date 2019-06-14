@@ -8,6 +8,7 @@ import android.view.ViewGroup;
 import butterknife.OnClick;
 import ykk.cb.com.zcws.R;
 import ykk.cb.com.zcws.comm.BaseFragment;
+import ykk.cb.com.zcws.sales.Sal_DsBToRFromPurchaseInStockMainActivity;
 import ykk.cb.com.zcws.sales.Sal_DsOutMainActivity;
 import ykk.cb.com.zcws.sales.Sal_DsOutReturnMainActivity;
 import ykk.cb.com.zcws.sales.Sal_NxOutReturnMainActivity;
@@ -42,8 +43,8 @@ public class MainTabFragment3 extends BaseFragment {
                 show(Sal_NxOutReturnMainActivity.class, null);
 
                 break;
-            case R.id.relative5: // 复核单
-//                show(Sal_RecombinationActivity.class, null);
+            case R.id.relative5: // 电商退生产
+                show(Sal_DsBToRFromPurchaseInStockMainActivity.class, null);
 
                 break;
             case R.id.relative6: // 销售装箱

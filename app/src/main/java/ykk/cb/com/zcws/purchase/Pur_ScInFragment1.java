@@ -157,6 +157,7 @@ public class Pur_ScInFragment1 extends BaseFragment {
                         break;
                     case UNPASS: // 审核失败 返回
                         errMsg = JsonUtil.strToString(msgObj);
+                        if(m.isNULLS(errMsg).length() == 0) errMsg = "审核失败！";
                         Comm.showWarnDialog(m.mContext, errMsg);
 
                         break;
@@ -233,7 +234,8 @@ public class Pur_ScInFragment1 extends BaseFragment {
             public void onClick_num(View v, ScanningRecord entity, int position) {
                 Log.e("num", "行：" + position);
                 curPos = position;
-                showInputDialog("数量", String.valueOf(entity.getRealQty()), "0.0", RESULT_NUM);
+                String showInfo = "<font color='#666666'>可用数：</font>"+checkDatas.get(curPos).getUseableQty();
+                showInputDialog("入库数", showInfo, "", "0.0", RESULT_NUM);
             }
 
             @Override
@@ -368,7 +370,7 @@ public class Pur_ScInFragment1 extends BaseFragment {
                 return false;
             }
             if (sr.getRealQty() > sr.getUseableQty()) {
-                Comm.showWarnDialog(mContext,"第" + (i + 1) + "行，入库数不能大于采购数！");
+                Comm.showWarnDialog(mContext,"第" + (i + 1) + "行，入库数不能大于可用数！");
                 return false;
             }
 
@@ -467,6 +469,19 @@ public class Pur_ScInFragment1 extends BaseFragment {
                     if (bundle != null) {
                         String value = bundle.getString("resultValue", "");
                         double num = parseDouble(value);
+                        if(num == 0) {
+                            toasts("入库数量必须大于0！");
+                            String showInfo = "<font color='#666666'>可用数：</font>"+checkDatas.get(curPos).getUseableQty();
+                            showInputDialog("入库数", showInfo, "", "0.0", RESULT_NUM);
+                            return;
+                        }
+                        double useableQty = checkDatas.get(curPos).getUseableQty();
+                        if(num > useableQty) {
+                            toasts("入库数不能大于可用数！");
+                            String showInfo = "<font color='#666666'>可用数：</font>"+checkDatas.get(curPos).getUseableQty();
+                            showInputDialog("入库数", showInfo, "", "0.0", RESULT_NUM);
+                            return;
+                        }
                         checkDatas.get(curPos).setRealQty(num);
                         checkDatas.get(curPos).setIsCheck(1);
                         mAdapter.notifyDataSetChanged();
@@ -590,6 +605,7 @@ public class Pur_ScInFragment1 extends BaseFragment {
             sr.setSourceQty(purEntry.getFqty());
             sr.setUseableQty(purEntry.getUseableQty());
             sr.setRealQty(0);
+            sr.setPrice(purEntry.getFprice());
             sr.setCreateUserId(user.getId());
             sr.setEmpId(user.getEmpId());
             sr.setCreateUserName(user.getUsername());
@@ -894,11 +910,12 @@ public class Pur_ScInFragment1 extends BaseFragment {
         if(isAutoSubmit) showLoadDialog("自动审核中...", false);
         else showLoadDialog("正在审核...", false);
 
-        String mUrl = getURL("scanningRecord/passSC");
+        String mUrl = getURL("stockBill/passSC");
         getUserInfo();
         FormBody formBody = new FormBody.Builder()
-                .add("strK3Number", strK3Number)
-                .add("outInType", "1") // 出入库类型：（1、生产账号--采购订单入库，2、生产账号--生产任务单入库，3、生产账号--发货通知单出库）
+                .add("strFbillNo", strK3Number)
+                .add("empId", user != null ? String.valueOf(user.getEmpId()) : "0")
+//                .add("outInType", "1") // 出入库类型：（1、生产账号--采购订单入库，2、生产账号--生产任务单入库，3、生产账号--发货通知单出库）
                 .build();
 
         Request request = new Request.Builder()

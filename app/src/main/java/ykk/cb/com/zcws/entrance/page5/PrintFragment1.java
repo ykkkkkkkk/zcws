@@ -33,6 +33,7 @@ import okhttp3.ResponseBody;
 import ykk.cb.com.zcws.R;
 import ykk.cb.com.zcws.basics.Dept_DialogActivity;
 import ykk.cb.com.zcws.bean.Department;
+import ykk.cb.com.zcws.bean.k3Bean.ICItem;
 import ykk.cb.com.zcws.bean.prod.ProdOrder;
 import ykk.cb.com.zcws.comm.BaseFragment;
 import ykk.cb.com.zcws.comm.Comm;
@@ -199,16 +200,18 @@ public class PrintFragment1 extends BaseFragment implements XRecyclerView.Loadin
                 break;
             case R.id.btn_singleProdCode: // 单行生码
                 prodId = 0;
-                double createQty = 0;
+                double useableQty = 0;
+                ICItem icItem = null;
                 int count = 0;
                 int size = listDatas.size();
                 for(int i=0; i<size; i++) {
                     ProdOrder p = listDatas.get(i);
+                    icItem = p.getIcItem();
                     if(p.getIsCheck() == 1) {
                         count += 1;
                         curPos = i;
                         prodId = p.getProdId();
-                        createQty = p.getUseableQty();
+                        useableQty = p.getUseableQty();
                     }
                 }
                 if(count == 0) {
@@ -220,7 +223,12 @@ public class PrintFragment1 extends BaseFragment implements XRecyclerView.Loadin
                     return;
                 }
 
-                showInputDialog("生码数量", String.valueOf(createQty), "0.0", RESULT_NUM);
+                // 不启用序列号，启用批次号；    990156：启用批次号，990155：不启用序列号
+                if(icItem.getBatchManager() == 990156 && icItem.getSnManager() == 990155) {
+                    run_prodOrderCreate_app(String.valueOf(prodId), useableQty); // 批量生码
+                } else {
+                    showInputDialog("生码数量", String.valueOf(useableQty), "0.0", RESULT_NUM);
+                }
 //                createCodeBefore();
 
                 break;

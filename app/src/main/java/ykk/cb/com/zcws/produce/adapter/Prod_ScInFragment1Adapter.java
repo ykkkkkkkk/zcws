@@ -36,6 +36,7 @@ public class Prod_ScInFragment1Adapter extends BaseArrayRecyclerAdapter<Scanning
         TextView tv_row = holder.obtainView(R.id.tv_row);
         TextView tv_orderNo = holder.obtainView(R.id.tv_orderNo);
         TextView tv_mtlName = holder.obtainView(R.id.tv_mtlName);
+        TextView tv_prodNum = holder.obtainView(R.id.tv_prodNum);
         TextView tv_nums = holder.obtainView(R.id.tv_nums);
         TextView tv_stockAP = holder.obtainView(R.id.tv_stockAP);
 
@@ -46,8 +47,10 @@ public class Prod_ScInFragment1Adapter extends BaseArrayRecyclerAdapter<Scanning
         tv_row.setText(String.valueOf(pos + 1));
         tv_orderNo.setText(prodOrder.getProdNo());
         tv_mtlName.setText(icItem.getFname());
+        tv_prodNum.setText(df.format(entity.getSourceQty()));
         // 990156：启用批次号，990156：启用序列号
-        if(icItem.getSnManager() == 990156 || icItem.getBatchManager() == 990156) {
+//        if(icItem.getSnManager() == 990156 || icItem.getBatchManager() == 990156) {
+        if(icItem.getSnManager() == 990156) {
             tv_nums.setEnabled(false);
             tv_nums.setBackgroundResource(R.drawable.back_style_gray3b);
         } else {

@@ -130,6 +130,7 @@ public class Prod_ScInFragment1 extends BaseFragment {
                         break;
                     case UNPASS: // 审核失败 返回
                         errMsg = JsonUtil.strToString((String)msg.obj);
+                        if(m.isNULLS(errMsg).length() == 0) errMsg = "审核失败！";
                         Comm.showWarnDialog(m.mContext, errMsg);
 
                         break;
@@ -230,7 +231,8 @@ public class Prod_ScInFragment1 extends BaseFragment {
             public void onClick_num(View v, ScanningRecord entity, int position) {
                 Log.e("num", "行：" + position);
                 curPos = position;
-                showInputDialog("数量", String.valueOf(entity.getRealQty()), "0.0", RESULT_NUM);
+                String showInfo = "<font color='#666666'>可用数：</font>"+checkDatas.get(curPos).getUseableQty();
+                showInputDialog("入库数", showInfo, "", "0.0", RESULT_NUM);
             }
 
             @Override
@@ -333,7 +335,7 @@ public class Prod_ScInFragment1 extends BaseFragment {
                 return false;
             }
             if (sr.getRealQty() > sr.getUseableQty()) {
-                Comm.showWarnDialog(mContext,"第" + (i + 1) + "行（入库数）不能大于（生产数）！");
+                Comm.showWarnDialog(mContext,"第" + (i + 1) + "行（入库数）不能大于（可用数）！");
                 return false;
             }
         }
@@ -425,9 +427,22 @@ public class Prod_ScInFragment1 extends BaseFragment {
                     if (bundle != null) {
                         String value = bundle.getString("resultValue", "");
                         double num = parseDouble(value);
+                        if(num == 0) {
+                            toasts("入库数量必须大于0！");
+                            String showInfo = "<font color='#666666'>可用数：</font>"+checkDatas.get(curPos).getUseableQty();
+                            showInputDialog("入库数", showInfo, "", "0.0", RESULT_NUM);
+                            return;
+                        }
+                        double useableQty = checkDatas.get(curPos).getUseableQty();
+                        if(num > useableQty) {
+                            toasts("入库数不能大于可用数！");
+                            String showInfo = "<font color='#666666'>可用数：</font>"+checkDatas.get(curPos).getUseableQty();
+                            showInputDialog("入库数", showInfo, "", "0.0", RESULT_NUM);
+                            return;
+                        }
                         checkDatas.get(curPos).setRealQty(num);
+                        checkDatas.get(curPos).setIsUniqueness('N');
                         mAdapter.notifyDataSetChanged();
-                        mHandler.sendEmptyMessageDelayed(SETFOCUS,200);
                     }
                 }
 
@@ -530,6 +545,7 @@ public class Prod_ScInFragment1 extends BaseFragment {
         sr.setDeliveryWay("");
         sr.setSourceQty(prodOrder.getFqty());
         sr.setUseableQty(prodOrder.getUseableQty());
+        sr.setPrice(0);
 //        sr.setRealQty(1);
         sr.setCreateUserId(user.getId());
         sr.setEmpId(user.getEmpId());
@@ -537,12 +553,15 @@ public class Prod_ScInFragment1 extends BaseFragment {
         sr.setDataTypeFlag("APP");
         sr.setSourceObj(JsonUtil.objectToString(prodOrder));
 
+        boolean isBool = false; // 是否使用弹出框来确认数量
+
         // 启用序列号，批次号；    990156：启用批次号，990156：启用序列号
         if(icItem.getSnManager() == 990156 || icItem.getBatchManager() == 990156) {
             sr.setStrBarcodes(bt.getBarcode());
             sr.setIsUniqueness('Y');
-            if(icItem.getBatchManager() == 990156 && icItem.getSnManager() == 0 ) {
+            if(icItem.getBatchManager() == 990156 && icItem.getSnManager() == 990155 ) {
                 sr.setRealQty(sr.getRealQty() + bt.getBarcodeQty());
+                isBool = true;
             } else {
                 sr.setRealQty(sr.getRealQty() + 1);
             }
@@ -556,6 +575,13 @@ public class Prod_ScInFragment1 extends BaseFragment {
         checkDatas.add(sr);
         mAdapter.notifyDataSetChanged();
         mHandler.sendEmptyMessageDelayed(SETFOCUS, 200);
+
+        if(isBool) {
+            // 使用弹出框确认数量
+            curPos = checkDatas.size() - 1;
+            String showInfo = "<font color='#666666'>可用数：</font>"+sr.getUseableQty();
+            showInputDialog("入库数", showInfo, "", "0.0", RESULT_NUM);
+        }
     }
 
     /**
@@ -566,12 +592,15 @@ public class Prod_ScInFragment1 extends BaseFragment {
 
         int size = checkDatas.size();
         boolean isFlag = false; // 是否存在该订单
+        boolean isBool = false; // 是否使用弹出框来确认数量
+        int pos = -1;
         for (int i = 0; i < size; i++) {
             ScanningRecord sr = checkDatas.get(i);
             String srBarcode = isNULLS(sr.getStrBarcodes());
             // 如果扫码相同
             if (bt.getRelationBillId()  == sr.getSourceId()) {
                 isFlag = true;
+                pos = i;
 
                 // 启用序列号，批次号；    990156：启用批次号，990156：启用序列号
                 if(tmpICItem.getSnManager() == 990156 || tmpICItem.getBatchManager() == 990156) {
@@ -589,15 +618,17 @@ public class Prod_ScInFragment1 extends BaseFragment {
                     } else {
                         sr.setStrBarcodes(srBarcode +","+ bt.getBarcode());
                     }
-                    sr.setIsUniqueness('Y');
-                    if(tmpICItem.getBatchManager() == 990156 && tmpICItem.getSnManager() == 0 ) {
+//                    sr.setIsUniqueness('Y');
+                    if(tmpICItem.getBatchManager() == 990156 && tmpICItem.getSnManager() == 990155 ) {
+                        sr.setStrBarcodes(bt.getBarcode());
                         sr.setRealQty(sr.getRealQty() + bt.getBarcodeQty());
+                        isBool = true;
                     } else {
                         sr.setRealQty(sr.getRealQty() + 1);
                     }
                 } else { // 未启用序列号， 批次号
                     sr.setRealQty(sr.getUseableQty());
-                    sr.setIsUniqueness('N');
+//                    sr.setIsUniqueness('N');
                     // 不存在条码，就加入
                     if (srBarcode.indexOf(bt.getBarcode()) == -1) {
                         if (srBarcode.length() == 0) {
@@ -616,6 +647,13 @@ public class Prod_ScInFragment1 extends BaseFragment {
         }
         mAdapter.notifyDataSetChanged();
         mHandler.sendEmptyMessageDelayed(SETFOCUS, 200);
+
+        if(isBool) {
+            // 使用弹出框确认数量
+            curPos = pos;
+            String showInfo = "<font color='#666666'>可用数：</font>"+checkDatas.get(curPos).getUseableQty();
+            showInputDialog("入库数", showInfo, "", "0.0", RESULT_NUM);
+        }
     }
 
     /**

@@ -335,11 +335,12 @@ public class Sc_ProdInStockPassFragment1 extends BaseFragment {
     private void run_passSC() {
         showLoadDialog("正在审核...", false);
 
-        String mUrl = getURL("scanningRecord/passSC");
+        String mUrl = getURL("stockBill/passSC");
         getUserInfo();
         FormBody formBody = new FormBody.Builder()
-                .add("strK3Number", barcode)
-                .add("outInType", "2") // 出入库类型：（1、生产账号--采购订单入库，2、生产账号--生产任务单入库，3、生产账号--发货通知单出库）
+                .add("strFbillNo", barcode)
+                .add("empId", user != null ? String.valueOf(user.getEmpId()) : "0")
+//                .add("outInType", "2") // 出入库类型：（1、生产账号--采购订单入库，2、生产账号--生产任务单入库，3、生产账号--发货通知单出库）
                 .build();
 
         Request request = new Request.Builder()

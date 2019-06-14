@@ -38,6 +38,7 @@ public class Sal_ScOutFragment1Adapter extends BaseArrayRecyclerAdapter<Scanning
         TextView tv_row = holder.obtainView(R.id.tv_row);
         TextView tv_custName = holder.obtainView(R.id.tv_custName);
         TextView tv_mtlName = holder.obtainView(R.id.tv_mtlName);
+        TextView tv_deliNum = holder.obtainView(R.id.tv_deliNum);
         TextView tv_nums = holder.obtainView(R.id.tv_nums);
         TextView tv_stockAP = holder.obtainView(R.id.tv_stockAP);
 
@@ -49,6 +50,7 @@ public class Sal_ScOutFragment1Adapter extends BaseArrayRecyclerAdapter<Scanning
         tv_row.setText(String.valueOf(pos + 1));
         tv_custName.setText(Comm.isNULLS(entity.getCustName()));
         tv_mtlName.setText(icItem.getFname());
+        tv_deliNum.setText(df.format(entity.getSourceQty()));
         // 990156：启用批次号，990156：启用序列号
         if (icItem.getSnManager() == 990156 || icItem.getBatchManager() == 990156) {
             tv_nums.setEnabled(false);

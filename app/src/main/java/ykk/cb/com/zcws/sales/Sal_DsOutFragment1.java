@@ -134,6 +134,7 @@ public class Sal_DsOutFragment1 extends BaseFragment {
                     case UNPASS: // 审核失败 返回
                         m.btnPass.setVisibility(View.VISIBLE);
                         errMsg = JsonUtil.strToString(msgObj);
+                        if(m.isNULLS(errMsg).length() == 0) errMsg = "审核失败！";
                         Comm.showWarnDialog(m.mContext, errMsg);
 
                         break;
@@ -542,7 +543,7 @@ public class Sal_DsOutFragment1 extends BaseFragment {
             /* 是否赠品，990160=是 (不是k3自带的，是另外增加的) */
             if(icItem.getIsComplimentary() == 990160) sr.setRealQty(seOrderEntry.getFqty());
             else sr.setRealQty(0);
-
+            sr.setPrice(seOrderEntry.getFprice());
             sr.setCreateUserId(user.getId());
             sr.setCreateUserName(user.getUsername());
             sr.setDataTypeFlag("APP");
@@ -580,14 +581,12 @@ public class Sal_DsOutFragment1 extends BaseFragment {
                         return;
                     }
                     if(srBarcode.length() == 0) {
-                        sr.setStrBarcodes(bt.getBarcode()+",");
+                        sr.setStrBarcodes(bt.getBarcode());
                     } else {
-                        sr.setStrBarcodes(srBarcode +","+ bt.getBarcode()+",");
+                        sr.setStrBarcodes(srBarcode +","+ bt.getBarcode());
                     }
-                    // 去除最后，号
-                    sr.setStrBarcodes(sr.getStrBarcodes().substring(0, sr.getStrBarcodes().length()-1));
                     sr.setIsUniqueness('Y');
-                    if(tmpICItem.getBatchManager() == 990156 && tmpICItem.getSnManager() == 0 ) {
+                    if(tmpICItem.getBatchManager() == 990156 && tmpICItem.getSnManager() == 990155 ) {
                         sr.setRealQty(sr.getRealQty() + bt.getBarcodeQty());
                     } else {
                         sr.setRealQty(sr.getRealQty() + 1);
@@ -598,11 +597,10 @@ public class Sal_DsOutFragment1 extends BaseFragment {
                     // 不存在条码，就加入
                     if (srBarcode.indexOf(bt.getBarcode()) == -1) {
                         if (srBarcode.length() == 0) {
-                            sr.setStrBarcodes(bt.getBarcode() + ",");
+                            sr.setStrBarcodes(bt.getBarcode());
                         } else {
-                            sr.setStrBarcodes(srBarcode + "," + bt.getBarcode() + ",");
+                            sr.setStrBarcodes(srBarcode + "," + bt.getBarcode());
                         }
-                        sr.setStrBarcodes(sr.getStrBarcodes().substring(0, sr.getStrBarcodes().length()-1));
                     }
                 }
                 break;
@@ -780,10 +778,11 @@ public class Sal_DsOutFragment1 extends BaseFragment {
     private void run_passDS() {
 //        showLoadDialog("正在审核...", false);
         showLoadDialog("自动审核中...", false);
-        String mUrl = getURL("scanningRecord/passDS");
+        String mUrl = getURL("stockBill/passDS");
         getUserInfo();
         FormBody formBody = new FormBody.Builder()
-                .add("strK3Number", strK3Number)
+                .add("strFbillNo", strK3Number)
+                .add("empId", user != null ? String.valueOf(user.getEmpId()) : "0")
                 .build();
 
         Request request = new Request.Builder()

@@ -1,4 +1,4 @@
-package ykk.cb.com.zcws.purchase.adapter;
+package ykk.cb.com.zcws.sales.adapter;
 
 import android.app.Activity;
 import android.text.Html;
@@ -11,25 +11,24 @@ import java.util.List;
 import ykk.cb.com.zcws.R;
 import ykk.cb.com.zcws.bean.ScanningRecord;
 import ykk.cb.com.zcws.bean.k3Bean.ICItem;
-import ykk.cb.com.zcws.bean.prod.ProdOrder;
-import ykk.cb.com.zcws.bean.pur.POOrderEntry;
+import ykk.cb.com.zcws.bean.k3Bean.IcStockBill;
+import ykk.cb.com.zcws.bean.k3Bean.Icstockbillentry;
 import ykk.cb.com.zcws.util.JsonUtil;
-import ykk.cb.com.zcws.util.LogUtil;
 import ykk.cb.com.zcws.util.basehelper.BaseArrayRecyclerAdapter;
 
-public class Pur_ScInFragment1Adapter extends BaseArrayRecyclerAdapter<ScanningRecord> {
+public class Sal_DsBToRFromPurchaseInStockFragment1Adapter extends BaseArrayRecyclerAdapter<ScanningRecord> {
     private DecimalFormat df = new DecimalFormat("#.######");
     private Activity context;
     private MyCallBack callBack;
 
-    public Pur_ScInFragment1Adapter(Activity context, List<ScanningRecord> datas) {
+    public Sal_DsBToRFromPurchaseInStockFragment1Adapter(Activity context, List<ScanningRecord> datas) {
         super(datas);
         this.context = context;
     }
 
     @Override
     public int bindView(int viewtype) {
-        return R.layout.pur_sc_in_fragment1_item;
+        return R.layout.sal_ds_btor_purchaseinstock_fragment1_item;
     }
 
     @Override
@@ -38,34 +37,29 @@ public class Pur_ScInFragment1Adapter extends BaseArrayRecyclerAdapter<ScanningR
         TextView tv_row = holder.obtainView(R.id.tv_row);
         TextView tv_orderNo = holder.obtainView(R.id.tv_orderNo);
         TextView tv_mtlName = holder.obtainView(R.id.tv_mtlName);
-        TextView tv_purNum = holder.obtainView(R.id.tv_purNum);
         TextView tv_nums = holder.obtainView(R.id.tv_nums);
-        TextView tv_stockAP = holder.obtainView(R.id.tv_stockAP);
+        TextView tv_price = holder.obtainView(R.id.tv_price);
+        TextView tv_returnReason = holder.obtainView(R.id.tv_returnReason);
+        TextView tv_delRow = holder.obtainView(R.id.tv_delRow);
+
 
         // 赋值
-        POOrderEntry purEntry = JsonUtil.stringToObject(entity.getSourceObj(), POOrderEntry.class);
-        ICItem icItem = purEntry.getIcItem();
+        ICItem icItem = entity.getIcItem();
 
         tv_row.setText(String.valueOf(pos + 1));
         tv_orderNo.setText(entity.getSourceNumber());
         tv_mtlName.setText(entity.getIcItemName());
-        tv_purNum.setText(df.format(entity.getSourceQty()));
         // 990156：启用批次号，990156：启用序列号
-//        if(icItem.getSnManager() == 990156 || icItem.getBatchManager() == 990156) {
-//            tv_nums.setEnabled(false);
-//            tv_nums.setBackgroundResource(R.drawable.back_style_gray3b);
-//        } else {
-//            tv_nums.setEnabled(true);
-//            tv_nums.setBackgroundResource(R.drawable.back_style_blue2);
-//        }
-        tv_nums.setText(Html.fromHtml(df.format(entity.getUseableQty())+"<br><font color='#009900'>"+df.format(entity.getRealQty())+"</font>"));
-        if(entity.getStockPos() != null) {
-            tv_stockAP.setText(Html.fromHtml(entity.getStock().getFname()+"<br><font color='#6a5acd'>"+entity.getStockPos().getFname()+"</font>"));
-        } else if(entity.getStock() != null) {
-            tv_stockAP.setText(entity.getStock().getFname());
+        if(icItem.getSnManager() == 990156 || icItem.getBatchManager() == 990156) {
+            tv_nums.setEnabled(false);
+            tv_nums.setBackgroundResource(R.drawable.back_style_gray3b);
         } else {
-            tv_stockAP.setText("");
+            tv_nums.setEnabled(true);
+            tv_nums.setBackgroundResource(R.drawable.back_style_blue2);
         }
+        tv_nums.setText(Html.fromHtml(df.format(entity.getSourceQty())+"<br><font color='#009900'>"+df.format(entity.getRealQty())+"</font>"));
+        tv_price.setText(df.format(entity.getPrice()));
+        tv_returnReason.setText(entity.getReturnReasonName());
 
         View.OnClickListener click = new View.OnClickListener() {
             @Override
@@ -77,9 +71,21 @@ public class Pur_ScInFragment1Adapter extends BaseArrayRecyclerAdapter<ScanningR
                         }
 
                         break;
-                    case R.id.tv_stockAP: // 选择仓库
+                    case R.id.tv_price: // 退货理由
                         if(callBack != null) {
-                            callBack.onClick_selStock(v, entity, pos);
+                            callBack.onClick_price(v, entity, pos);
+                        }
+
+                        break;
+                    case R.id.tv_returnReason: // 退货理由
+                        if(callBack != null) {
+                            callBack.sel_returnReason(v, entity, pos);
+                        }
+
+                        break;
+                    case R.id.tv_delRow: // 删除行
+                        if(callBack != null) {
+                            callBack.onClick_del(v, entity, pos);
                         }
 
                         break;
@@ -87,7 +93,9 @@ public class Pur_ScInFragment1Adapter extends BaseArrayRecyclerAdapter<ScanningR
             }
         };
         tv_nums.setOnClickListener(click);
-        tv_stockAP.setOnClickListener(click);
+        tv_price.setOnClickListener(click);
+        tv_delRow.setOnClickListener(click);
+        tv_returnReason.setOnClickListener(click);
     }
 
     public void setCallBack(MyCallBack callBack) {
@@ -96,7 +104,9 @@ public class Pur_ScInFragment1Adapter extends BaseArrayRecyclerAdapter<ScanningR
 
     public interface MyCallBack {
         void onClick_num(View v, ScanningRecord entity, int position);
-        void onClick_selStock(View v, ScanningRecord entity, int position);
+        void onClick_price(View v, ScanningRecord entity, int position);
+        void sel_returnReason(View v, ScanningRecord entity, int position);
+        void onClick_del(View v, ScanningRecord entity, int position);
     }
 
     /*之下的方法都是为了方便操作，并不是必须的*/
