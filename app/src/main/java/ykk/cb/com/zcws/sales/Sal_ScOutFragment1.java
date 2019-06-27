@@ -18,9 +18,11 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.TextView;
 
 import java.io.IOException;
 import java.lang.ref.WeakReference;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -74,6 +76,10 @@ public class Sal_ScOutFragment1 extends BaseFragment {
     Button btnSave;
     @BindView(R.id.btn_pass)
     Button btnPass;
+    @BindView(R.id.tv_needNum)
+    TextView tvNeedNum;
+    @BindView(R.id.tv_okNum)
+    TextView tvOkNum;
 
     private Sal_ScOutFragment1 context = this;
     private static final int SUCC1 = 200, UNSUCC1 = 500, SUCC2 = 201, UNSUCC2 = 501, SUCC3 = 202, UNSUCC3 = 502, PASS = 203, UNPASS = 503;
@@ -90,6 +96,7 @@ public class Sal_ScOutFragment1 extends BaseFragment {
     private boolean isTextChange; // 是否进入TextChange事件
     private String strK3Number; // 保存k3返回的单号
     private boolean isAutoSubmitDate; // 是否自动提交数据
+    private DecimalFormat df = new DecimalFormat("#.####");
 
     // 消息处理
     private Sal_ScOutFragment1.MyHandler mHandler = new Sal_ScOutFragment1.MyHandler(this);
@@ -250,8 +257,9 @@ public class Sal_ScOutFragment1 extends BaseFragment {
             public void onClick_num(View v, ScanningRecord entity, int position) {
                 Log.e("num", "行：" + position);
                 curPos = position;
-                String showInfo = "<font color='#666666'>可用数：</font>"+checkDatas.get(curPos).getUseableQty();
-                showInputDialog("拣货数", showInfo, "", "0.0", RESULT_NUM);
+                double useableQty = checkDatas.get(curPos).getUseableQty();
+                String showInfo = "<font color='#666666'>可用数：</font>"+useableQty;
+                showInputDialog("拣货数", showInfo, String.valueOf(useableQty), "0.0", RESULT_NUM);
             }
         });
     }
@@ -354,6 +362,10 @@ public class Sal_ScOutFragment1 extends BaseFragment {
 //                Comm.showWarnDialog(mContext,"第" + (i + 1) + "行货还没捡完货！");
 //                return false;
 //            }
+            if (sr.getRealQty() > sr.getUseableQty()) {
+                Comm.showWarnDialog(mContext,"第" + (i + 1) + "行,拣货数不能大于可用数！");
+                return false;
+            }
         }
 
         return true;
@@ -463,8 +475,15 @@ public class Sal_ScOutFragment1 extends BaseFragment {
                         String value = bundle.getString("resultValue", "");
                         double num = parseDouble(value);
                         checkDatas.get(curPos).setRealQty(num);
+                        checkDatas.get(curPos).setIsUniqueness('N');
                         mAdapter.notifyDataSetChanged();
                         mHandler.sendEmptyMessageDelayed(SETFOCUS,200);
+                        countNum();
+                        // 自动检查数据是否可以保存
+                        if (isFinish()) {
+                            isAutoSubmitDate = true;
+                            run_save(true);
+                        }
                     }
                 }
 
@@ -555,12 +574,15 @@ public class Sal_ScOutFragment1 extends BaseFragment {
 
         int size = checkDatas.size();
         boolean isFlag = false; // 是否存在该订单
+        boolean isBool = false; // 是否使用弹出框来确认数量
+        int pos = -1;
         for (int i = 0; i < size; i++) {
             ScanningRecord sr = checkDatas.get(i);
             String srBarcode = isNULLS(sr.getStrBarcodes());
             // 如果扫码相同
             if (bt.getIcItemNumber().equals(sr.getIcItemNumber())) {
                 isFlag = true;
+                pos = i;
 
                 // 启用序列号，批次号；    990156：启用批次号，990156：启用序列号
                 if(tmpICItem.getSnManager() == 990156 || tmpICItem.getBatchManager() == 990156) {
@@ -580,7 +602,9 @@ public class Sal_ScOutFragment1 extends BaseFragment {
                     }
                     sr.setIsUniqueness('Y');
                     if(tmpICItem.getBatchManager() == 990156 && tmpICItem.getSnManager() == 990155 ) {
+                        sr.setStrBarcodes(bt.getBarcode());
                         sr.setRealQty(sr.getRealQty() + bt.getBarcodeQty());
+                        isBool = true;
                     } else {
                         sr.setRealQty(sr.getRealQty() + 1);
                     }
@@ -606,11 +630,36 @@ public class Sal_ScOutFragment1 extends BaseFragment {
 
         setFocusable(etMtlCode);
         mAdapter.notifyDataSetChanged();
-        // 自动检查数据是否可以保存
-        if(isFinish()) {
-            isAutoSubmitDate = true;
-            run_save(true);
+        countNum();
+
+        if(isBool) {
+            // 使用弹出框确认数量
+            curPos = pos;
+            double useableQty = checkDatas.get(curPos).getUseableQty();
+            String showInfo = "<font color='#666666'>可用数：</font>"+useableQty;
+            showInputDialog("拣货数", showInfo, String.valueOf(useableQty), "0.0", RESULT_NUM);
+        } else {
+            // 自动检查数据是否可以保存
+            if (isFinish()) {
+                isAutoSubmitDate = true;
+                run_save(true);
+            }
         }
+    }
+
+    /**
+     * 统计数量
+     */
+    private void countNum() {
+        double needNum = 0;
+        double okNum = 0;
+        for(int i=0; i<checkDatas.size(); i++) {
+            ScanningRecord sc = checkDatas.get(i);
+            needNum += sc.getUseableQty();
+            okNum += sc.getRealQty();
+        }
+        tvNeedNum.setText(df.format(needNum));
+        tvOkNum.setText(df.format(okNum));
     }
 
     /**

@@ -18,9 +18,13 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.TextView;
+
+import org.w3c.dom.Text;
 
 import java.io.IOException;
 import java.lang.ref.WeakReference;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -71,6 +75,10 @@ public class Prod_ScInFragment1 extends BaseFragment {
     Button btnSave;
     @BindView(R.id.btn_pass)
     Button btnPass;
+    @BindView(R.id.tv_needNum)
+    TextView tvNeedNum;
+    @BindView(R.id.tv_okNum)
+    TextView tvOkNum;
 
     private Prod_ScInFragment1 context = this;
     private static final int SEL_STOCK = 10, SEL_STOCKPOS = 11;
@@ -89,6 +97,7 @@ public class Prod_ScInFragment1 extends BaseFragment {
     private Prod_ScInMainActivity parent;
     private boolean isTextChange; // 是否进入TextChange事件
     private String strK3Number; // 保存k3返回的单号
+    private DecimalFormat df = new DecimalFormat("#.####");
 
     // 消息处理
     private Prod_ScInFragment1.MyHandler mHandler = new Prod_ScInFragment1.MyHandler(this);
@@ -231,8 +240,9 @@ public class Prod_ScInFragment1 extends BaseFragment {
             public void onClick_num(View v, ScanningRecord entity, int position) {
                 Log.e("num", "行：" + position);
                 curPos = position;
-                String showInfo = "<font color='#666666'>可用数：</font>"+checkDatas.get(curPos).getUseableQty();
-                showInputDialog("入库数", showInfo, "", "0.0", RESULT_NUM);
+                double useableQty = checkDatas.get(curPos).getUseableQty();
+                String showInfo = "<font color='#666666'>可用数：</font>"+useableQty;
+                showInputDialog("入库数", showInfo, String.valueOf(useableQty), "0.0", RESULT_NUM);
             }
 
             @Override
@@ -429,20 +439,23 @@ public class Prod_ScInFragment1 extends BaseFragment {
                         double num = parseDouble(value);
                         if(num == 0) {
                             toasts("入库数量必须大于0！");
-                            String showInfo = "<font color='#666666'>可用数：</font>"+checkDatas.get(curPos).getUseableQty();
-                            showInputDialog("入库数", showInfo, "", "0.0", RESULT_NUM);
+                            double useableQty = checkDatas.get(curPos).getUseableQty();
+                            String showInfo = "<font color='#666666'>可用数：</font>"+useableQty;
+                            showInputDialog("入库数", showInfo, String.valueOf(useableQty), "0.0", RESULT_NUM);
                             return;
                         }
                         double useableQty = checkDatas.get(curPos).getUseableQty();
                         if(num > useableQty) {
                             toasts("入库数不能大于可用数！");
-                            String showInfo = "<font color='#666666'>可用数：</font>"+checkDatas.get(curPos).getUseableQty();
-                            showInputDialog("入库数", showInfo, "", "0.0", RESULT_NUM);
+                            double useableQty2 = checkDatas.get(curPos).getUseableQty();
+                            String showInfo = "<font color='#666666'>可用数：</font>"+useableQty2;
+                            showInputDialog("入库数", showInfo, String.valueOf(useableQty2), "0.0", RESULT_NUM);
                             return;
                         }
                         checkDatas.get(curPos).setRealQty(num);
                         checkDatas.get(curPos).setIsUniqueness('N');
                         mAdapter.notifyDataSetChanged();
+                        countNum();
                     }
                 }
 
@@ -575,12 +588,14 @@ public class Prod_ScInFragment1 extends BaseFragment {
         checkDatas.add(sr);
         mAdapter.notifyDataSetChanged();
         mHandler.sendEmptyMessageDelayed(SETFOCUS, 200);
+        countNum();
 
         if(isBool) {
             // 使用弹出框确认数量
             curPos = checkDatas.size() - 1;
-            String showInfo = "<font color='#666666'>可用数：</font>"+sr.getUseableQty();
-            showInputDialog("入库数", showInfo, "", "0.0", RESULT_NUM);
+            double useableQty = checkDatas.get(curPos).getUseableQty();
+            String showInfo = "<font color='#666666'>可用数：</font>"+useableQty;
+            showInputDialog("入库数", showInfo, String.valueOf(useableQty), "0.0", RESULT_NUM);
         }
     }
 
@@ -647,13 +662,31 @@ public class Prod_ScInFragment1 extends BaseFragment {
         }
         mAdapter.notifyDataSetChanged();
         mHandler.sendEmptyMessageDelayed(SETFOCUS, 200);
+        countNum();
 
         if(isBool) {
             // 使用弹出框确认数量
             curPos = pos;
-            String showInfo = "<font color='#666666'>可用数：</font>"+checkDatas.get(curPos).getUseableQty();
-            showInputDialog("入库数", showInfo, "", "0.0", RESULT_NUM);
+            double useableQty = checkDatas.get(curPos).getUseableQty();
+            String showInfo = "<font color='#666666'>可用数：</font>"+useableQty;
+            showInputDialog("入库数", showInfo, String.valueOf(useableQty), "0.0", RESULT_NUM);
         }
+
+    }
+
+    /**
+     * 统计数量
+     */
+    private void countNum() {
+        double needNum = 0;
+        double okNum = 0;
+        for(int i=0; i<checkDatas.size(); i++) {
+            ScanningRecord sc = checkDatas.get(i);
+            needNum += sc.getUseableQty();
+            okNum += sc.getRealQty();
+        }
+        tvNeedNum.setText(df.format(needNum));
+        tvOkNum.setText(df.format(okNum));
     }
 
     /**

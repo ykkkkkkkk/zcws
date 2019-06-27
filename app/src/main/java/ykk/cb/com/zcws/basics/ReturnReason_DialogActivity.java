@@ -54,7 +54,7 @@ public class ReturnReason_DialogActivity extends BaseDialogActivity implements X
     private OkHttpClient okHttpClient = new OkHttpClient();
     private int limit = 1;
     private boolean isRefresh, isLoadMore, isNextPage;
-    private String flag; // DS：电商账号数据，NX：内销账号数据
+    private String flag; // DS：电商账号数据，NX：内销账号数据，SC：生产账号数据
 
     // 消息处理
     private MyHandler mHandler = new MyHandler(this);
@@ -168,6 +168,8 @@ public class ReturnReason_DialogActivity extends BaseDialogActivity implements X
             mUrl = getURL("returnReason/findReturnReasonList_DS");
         } else if(flag != null && flag.equals("NX")) { // 内销账号数据
             mUrl = getURL("returnReason/findReturnReasonList_NX");
+        } else if(flag != null && flag.equals("SC")) { // 生产账号数据
+            mUrl = getURL("returnReason/findReturnReasonList_SC");
         }
         FormBody formBody = new FormBody.Builder()
                 .add("limit", String.valueOf(limit))

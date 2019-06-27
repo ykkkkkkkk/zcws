@@ -23,6 +23,7 @@ import android.widget.TextView;
 
 import java.io.IOException;
 import java.lang.ref.WeakReference;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -43,7 +44,6 @@ import ykk.cb.com.zcws.bean.Department;
 import ykk.cb.com.zcws.bean.Organization;
 import ykk.cb.com.zcws.bean.ScanningRecord;
 import ykk.cb.com.zcws.bean.Stock;
-import ykk.cb.com.zcws.bean.StockPosition;
 import ykk.cb.com.zcws.bean.User;
 import ykk.cb.com.zcws.bean.k3Bean.ICItem;
 import ykk.cb.com.zcws.bean.k3Bean.IcStockBill;
@@ -75,6 +75,8 @@ public class Sal_NxOutReturnFragment1 extends BaseFragment {
     Button btnSave;
     @BindView(R.id.btn_pass)
     Button btnPass;
+    @BindView(R.id.tv_okNum)
+    TextView tvOkNum;
 
     private Sal_NxOutReturnFragment1 context = this;
     private static final int SUCC1 = 200, UNSUCC1 = 500, SUCC2 = 201, UNSUCC2 = 501, SUCC3 = 202, UNSUCC3 = 502, PASS = 203, UNPASS = 503;
@@ -92,6 +94,7 @@ public class Sal_NxOutReturnFragment1 extends BaseFragment {
     private boolean isTextChange; // 是否进入TextChange事件
     private List<String> listBarcode = new ArrayList<>();
     private String strK3Number; // 保存k3返回的单号
+    private DecimalFormat df = new DecimalFormat("#.####");
 
 
     // 消息处理
@@ -149,6 +152,10 @@ public class Sal_NxOutReturnFragment1 extends BaseFragment {
                                 Icstockbillentry stockBillEntry = list.get(0);
                                 IcStockBill stockOrder = stockBillEntry.getStockBill();
                                 Organization tempCust = stockOrder.getCust();
+                                if(tempCust != null && tempCust.getFitemId() == 33067) {
+                                    Comm.showWarnDialog(m.mContext,"该条码对应的客户是电商客户，请在电商退货页面操作！");
+                                    return;
+                                }
                                 // 显示客户
                                 if(m.cust != null && !(m.cust.getfNumber().equals(tempCust.getfNumber()))) {
                                     Comm.showWarnDialog(m.mContext,"扫描的客户不一致，请检查！");
@@ -247,7 +254,9 @@ public class Sal_NxOutReturnFragment1 extends BaseFragment {
             @Override
             public void onClick_num(View v, ScanningRecord entity, int position) {
                 curPos = position;
-                showInputDialog("数量", String.valueOf(entity.getRealQty()), "0.0", RESULT_NUM);
+                double useableQty = checkDatas.get(curPos).getUseableQty();
+                String showInfo = "<font color='#666666'>可退数：</font>"+useableQty;
+                showInputDialog("退货数", showInfo, String.valueOf(useableQty), "0.0", RESULT_NUM);
             }
 
             @Override
@@ -260,7 +269,7 @@ public class Sal_NxOutReturnFragment1 extends BaseFragment {
             public void sel_returnReason(View v, ScanningRecord entity, int position) {
                 curPos = position;
                 Bundle bundle = new Bundle();
-                bundle.putString("flag", "NX"); // 查询内销账号的数据
+                bundle.putString("flag", "SC"); // 查询内销账号的数据
                 showForResult(ReturnReason_DialogActivity.class, RETURN_REASON, bundle);
             }
 
@@ -343,7 +352,7 @@ public class Sal_NxOutReturnFragment1 extends BaseFragment {
                     Comm.showWarnDialog(mContext,"请先保存数据！");
                     return;
                 }
-                run_passDS();
+                run_passSC();
 
                 break;
             case R.id.btn_clone: // 重置
@@ -387,10 +396,10 @@ public class Sal_NxOutReturnFragment1 extends BaseFragment {
                 Comm.showWarnDialog(mContext,"第（"+(i+1)+"）行，请选择退货理由！");
                 return false;
             }
-//            if (sr.getSourceQty() > sr.getRealQty()) {
-//                Comm.showWarnDialog(mContext,"第" + (i + 1) + "行货还没捡完货！");
-//                return false;
-//            }
+            if(sr.getRealQty() > sr.getUseableQty()) {
+                Comm.showWarnDialog(mContext,"第" + (i + 1) + "行，退货数不能大于可退数！");
+                return false;
+            }
         }
         return true;
     }
@@ -462,7 +471,9 @@ public class Sal_NxOutReturnFragment1 extends BaseFragment {
                         String value = bundle.getString("resultValue", "");
                         double num = parseDouble(value);
                         checkDatas.get(curPos).setRealQty(num);
+                        checkDatas.get(curPos).setIsUniqueness('N');
                         mAdapter.notifyDataSetChanged();
+                        countNum();
                     }
                 }
 
@@ -555,6 +566,7 @@ public class Sal_NxOutReturnFragment1 extends BaseFragment {
 //            }
             sr.setDeliveryWay("");
             sr.setSourceQty(stockBillEntry.getFqtymust());
+            sr.setUseableQty(stockBillEntry.getUseableQty());
             sr.setRealQty(stockBillEntry.getFqty());
             sr.setPrice(stockBillEntry.getFprice());
             sr.setCreateUserId(user.getId());
@@ -587,6 +599,15 @@ public class Sal_NxOutReturnFragment1 extends BaseFragment {
 
         mAdapter.notifyDataSetChanged();
         setFocusable(etMtlCode);
+        countNum();
+
+        if(icItem.getBatchManager() == 990156) {
+            // 使用弹出框确认数量
+            curPos = checkDatas.size()-1;
+            double useableQty = checkDatas.get(curPos).getUseableQty();
+            String showInfo = "<font color='#666666'>可退数：</font>"+useableQty;
+            showInputDialog("退货数", showInfo, String.valueOf(useableQty), "0.0", RESULT_NUM);
+        }
     }
 
     /**
@@ -643,6 +664,27 @@ public class Sal_NxOutReturnFragment1 extends BaseFragment {
         }
         mAdapter.notifyDataSetChanged();
         mHandler.sendEmptyMessageDelayed(SETFOCUS, 200);
+        countNum();
+
+        if(tmpICItem.getBatchManager() == 990156) {
+            // 使用弹出框确认数量
+            curPos = checkDatas.size()-1;
+            double useableQty = checkDatas.get(curPos).getUseableQty();
+            String showInfo = "<font color='#666666'>可退数：</font>"+useableQty;
+            showInputDialog("退货数", showInfo, String.valueOf(useableQty), "0.0", RESULT_NUM);
+        }
+    }
+
+    /**
+     * 统计数量
+     */
+    private void countNum() {
+        double okNum = 0;
+        for(int i=0; i<checkDatas.size(); i++) {
+            ScanningRecord sc = checkDatas.get(i);
+            okNum += sc.getRealQty();
+        }
+        tvOkNum.setText(df.format(okNum));
     }
 
     /**
@@ -792,7 +834,7 @@ public class Sal_NxOutReturnFragment1 extends BaseFragment {
     /**
      * 生产账号审核
      */
-    private void run_passDS() {
+    private void run_passSC() {
         showLoadDialog("正在审核...");
         String mUrl = getURL("stockBill/passSC");
         getUserInfo();
@@ -824,7 +866,7 @@ public class Sal_NxOutReturnFragment1 extends BaseFragment {
                     return;
                 }
                 Message msg = mHandler.obtainMessage(PASS, result);
-                Log.e("run_passDS --> onResponse", result);
+                Log.e("run_passSC --> onResponse", result);
                 mHandler.sendMessage(msg);
             }
         });

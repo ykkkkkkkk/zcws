@@ -18,9 +18,11 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.TextView;
 
 import java.io.IOException;
 import java.lang.ref.WeakReference;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -74,6 +76,10 @@ public class Sal_DsOutFragment1 extends BaseFragment {
     Button btnSave;
     @BindView(R.id.btn_pass)
     Button btnPass;
+    @BindView(R.id.tv_needNum)
+    TextView tvNeedNum;
+    @BindView(R.id.tv_okNum)
+    TextView tvOkNum;
 
     private Sal_DsOutFragment1 context = this;
     private static final int SUCC1 = 200, UNSUCC1 = 500, SUCC2 = 201, UNSUCC2 = 501, SUCC3 = 202, UNSUCC3 = 502, PASS = 203, UNPASS = 503;
@@ -89,6 +95,7 @@ public class Sal_DsOutFragment1 extends BaseFragment {
     private Sal_DsOutMainActivity parent;
     private boolean isTextChange; // 是否进入TextChange事件
     private String strK3Number; // 保存k3返回的单号
+    private DecimalFormat df = new DecimalFormat("#.####");
 
     // 消息处理
     private Sal_DsOutFragment1.MyHandler mHandler = new Sal_DsOutFragment1.MyHandler(this);
@@ -459,6 +466,7 @@ public class Sal_DsOutFragment1 extends BaseFragment {
                         double num = parseDouble(value);
                         checkDatas.get(curPos).setRealQty(num);
                         mAdapter.notifyDataSetChanged();
+                        countNum();
                         // 判断是否全部拣货完成
                         if(isFinish()) {
                             run_save();
@@ -613,11 +621,27 @@ public class Sal_DsOutFragment1 extends BaseFragment {
 
         setFocusable(etMtlCode);
         mAdapter.notifyDataSetChanged();
+        countNum();
 
         // 判断是否全部拣货完成
         if(isFinish()) {
             run_save();
         }
+    }
+
+    /**
+     * 统计数量
+     */
+    private void countNum() {
+        double needNum = 0;
+        double okNum = 0;
+        for(int i=0; i<checkDatas.size(); i++) {
+            ScanningRecord sc = checkDatas.get(i);
+            needNum += sc.getSourceQty();
+            okNum += sc.getRealQty();
+        }
+        tvNeedNum.setText(df.format(needNum));
+        tvOkNum.setText(df.format(okNum));
     }
 
     /**

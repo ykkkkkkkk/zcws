@@ -52,7 +52,8 @@ public class Sal_ScOutFragment2Adapter extends BaseArrayRecyclerAdapter<Scanning
         tv_mtlName.setText(icItem.getFname());
         tv_deliNum.setText(df.format(entity.getSourceQty()));
         // 990156：启用批次号，990156：启用序列号
-        if (icItem.getSnManager() == 990156 || icItem.getBatchManager() == 990156) {
+        //        if(icItem.getSnManager() == 990156 || icItem.getBatchManager() == 990156) {
+        if(icItem.getSnManager() == 990156) {
             tv_nums.setEnabled(false);
             tv_nums.setBackgroundResource(R.drawable.back_style_gray3b);
         } else {

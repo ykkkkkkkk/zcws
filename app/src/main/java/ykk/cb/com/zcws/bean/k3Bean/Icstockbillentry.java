@@ -265,6 +265,8 @@ public class Icstockbillentry implements Serializable {
     private int fentryselfb0184;
     /* 退货理由id */
     private int returnReasonId;
+    /* (生产帐号)退货理由id */
+    private int fentryselfb0185;
 
     private IcStockBill stockBill;
     private ICItem icItem;
@@ -273,6 +275,9 @@ public class Icstockbillentry implements Serializable {
     private int scanningRecordId; // 扫码记录表id
     private String salOrderNo; // 销售订单号
     private double sumRealQty; // 实际出入库总数
+    private double realQty; // 实际出入库数量
+    private double useableQty; // 可用数
+    private int isCheck; // 是否选中
 
 
     public Integer getFinterid() {
@@ -1353,6 +1358,38 @@ public class Icstockbillentry implements Serializable {
 
     public void setReturnReasonrId(int returnReasonId) {
         this.returnReasonId = returnReasonId;
+    }
+
+    public double getRealQty() {
+        return realQty;
+    }
+
+    public void setRealQty(double realQty) {
+        this.realQty = realQty;
+    }
+
+    public double getUseableQty() {
+        return useableQty;
+    }
+
+    public int getIsCheck() {
+        return isCheck;
+    }
+
+    public void setUseableQty(double useableQty) {
+        this.useableQty = useableQty;
+    }
+
+    public void setIsCheck(int isCheck) {
+        this.isCheck = isCheck;
+    }
+
+    public int getFentryselfb0185() {
+        return fentryselfb0185;
+    }
+
+    public void setFentryselfb0185(int fentryselfb0185) {
+        this.fentryselfb0185 = fentryselfb0185;
     }
 
     @Override

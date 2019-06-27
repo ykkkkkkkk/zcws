@@ -22,6 +22,7 @@ import android.widget.TextView;
 
 import java.io.IOException;
 import java.lang.ref.WeakReference;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -81,6 +82,10 @@ public class Pur_ScInFragment1 extends BaseFragment {
     Button btnSave;
     @BindView(R.id.btn_pass)
     Button btnPass;
+    @BindView(R.id.tv_needNum)
+    TextView tvNeedNum;
+    @BindView(R.id.tv_okNum)
+    TextView tvOkNum;
 
     private Pur_ScInFragment1 context = this;
     private static final int SEL_STOCK = 10, SEL_STOCKPOS = 11, SEL_SUPP = 12, SEL_WRITE = 13;
@@ -101,6 +106,7 @@ public class Pur_ScInFragment1 extends BaseFragment {
     private boolean isTextChange; // 是否进入TextChange事件
     private boolean isAutoSubmitDate; // 是否自动提交数据
     private boolean isAllSM; // 是否全部扫完条码
+    private DecimalFormat df = new DecimalFormat("#.####");
 
     // 消息处理
     private Pur_ScInFragment1.MyHandler mHandler = new Pur_ScInFragment1.MyHandler(this);
@@ -485,6 +491,7 @@ public class Pur_ScInFragment1 extends BaseFragment {
                         checkDatas.get(curPos).setRealQty(num);
                         checkDatas.get(curPos).setIsCheck(1);
                         mAdapter.notifyDataSetChanged();
+                        countNum();
                     }
                 }
 
@@ -661,8 +668,6 @@ public class Pur_ScInFragment1 extends BaseFragment {
 //                    } else {
 //                        sr.setStrBarcodes(srBarcode +","+ bt.getBarcode()+",");
 //                    }
-                    // 去除最后，号
-//                    sr.setStrBarcodes(sr.getStrBarcodes().substring(0, sr.getStrBarcodes().length()-1));
                     sr.setStrBarcodes(bt.getBarcode());
                     sr.setIsUniqueness('Y');
 //                    if(tmpICItem.getBatchManager() == 990156 && tmpICItem.getSnManager() == 0 ) {
@@ -696,11 +701,27 @@ public class Pur_ScInFragment1 extends BaseFragment {
 
         setFocusable(etMtlCode);
         mAdapter.notifyDataSetChanged();
+        countNum();
         // 自动检查数据是否可以保存
         if(saveBefore(true)) {
             isAutoSubmitDate = true;
             run_save(true);
         }
+    }
+
+    /**
+     * 统计数量
+     */
+    private void countNum() {
+        double needNum = 0;
+        double okNum = 0;
+        for(int i=0; i<checkDatas.size(); i++) {
+            ScanningRecord sc = checkDatas.get(i);
+            needNum += sc.getUseableQty();
+            okNum += sc.getRealQty();
+        }
+        tvNeedNum.setText(df.format(needNum));
+        tvOkNum.setText(df.format(okNum));
     }
 
     /**

@@ -50,14 +50,15 @@ public class Sal_DsBToRFromPurchaseInStockFragment1Adapter extends BaseArrayRecy
         tv_orderNo.setText(entity.getSourceNumber());
         tv_mtlName.setText(entity.getIcItemName());
         // 990156：启用批次号，990156：启用序列号
-        if(icItem.getSnManager() == 990156 || icItem.getBatchManager() == 990156) {
+        //        if(icItem.getSnManager() == 990156 || icItem.getBatchManager() == 990156) {
+        if(icItem.getSnManager() == 990156) {
             tv_nums.setEnabled(false);
             tv_nums.setBackgroundResource(R.drawable.back_style_gray3b);
         } else {
             tv_nums.setEnabled(true);
             tv_nums.setBackgroundResource(R.drawable.back_style_blue2);
         }
-        tv_nums.setText(Html.fromHtml(df.format(entity.getSourceQty())+"<br><font color='#009900'>"+df.format(entity.getRealQty())+"</font>"));
+        tv_nums.setText(Html.fromHtml(df.format(entity.getUseableQty())+"<br><font color='#009900'>"+df.format(entity.getRealQty())+"</font>"));
         tv_price.setText(df.format(entity.getPrice()));
         tv_returnReason.setText(entity.getReturnReasonName());
 

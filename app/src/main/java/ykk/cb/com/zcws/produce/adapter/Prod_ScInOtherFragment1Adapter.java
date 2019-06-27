@@ -48,7 +48,8 @@ public class Prod_ScInOtherFragment1Adapter extends BaseArrayRecyclerAdapter<Sca
         tv_orderNo.setText(prodOrder.getProdNo());
         tv_mtlName.setText(icItem.getFname());
         // 990156：启用批次号，990156：启用序列号
-        if(icItem.getSnManager() == 990156 || icItem.getBatchManager() == 990156) {
+        //        if(icItem.getSnManager() == 990156 || icItem.getBatchManager() == 990156) {
+        if(icItem.getSnManager() == 990156) {
             tv_nums.setEnabled(false);
             tv_nums.setBackgroundResource(R.drawable.back_style_gray3b);
         } else {
