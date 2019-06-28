@@ -53,6 +53,7 @@ public class MainTabFragment1 extends BaseFragment implements IDownloadContract.
     private OkHttpClient okHttpClient = new OkHttpClient();
     private static final int UPDATE = 201, UNUPDATE = 501, UPDATE_PLAN = 1;
     private IDownloadPresenter mPresenter;
+    private boolean isCheckUpdate = false; // 是否已经检查过更新
 
     public MainTabFragment1() {
     }
@@ -73,6 +74,7 @@ public class MainTabFragment1 extends BaseFragment implements IDownloadContract.
 
                 switch (msg.what) {
                     case UPDATE: // 更新版本  成功
+                        m.isCheckUpdate = true;
                         AppInfo appInfo = JsonUtil.strToObject((String) msg.obj, AppInfo.class);
                         if (m.getAppVersionCode(m.mContext) != appInfo.getAppVersion()) {
                             m.showNoticeDialog(appInfo.getAppRemark());
@@ -121,8 +123,10 @@ public class MainTabFragment1 extends BaseFragment implements IDownloadContract.
     @Override
     public void initData() {
         mPresenter = new IDownloadPresenter(context);
-        // 执行更新版本请求
-        run_findAppInfo();
+        if(!isCheckUpdate) {
+            // 执行更新版本请求
+            run_findAppInfo();
+        }
     }
 
     @OnClick({R.id.relative1, R.id.relative2, R.id.relative3, R.id.relative4})
@@ -151,12 +155,8 @@ public class MainTabFragment1 extends BaseFragment implements IDownloadContract.
      * 获取服务端的App信息
      */
     private void run_findAppInfo() {
-        showLoadDialog("加载中...");
         String mUrl = getURL("appInfo/findAppInfo");
-        ;
         FormBody formBody = new FormBody.Builder()
-//                .add("limit", "10")
-//                .add("pageSize", "100")
                 .build();
 
         Request request = new Request.Builder()

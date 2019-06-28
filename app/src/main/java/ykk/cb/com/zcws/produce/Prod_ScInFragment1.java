@@ -83,7 +83,7 @@ public class Prod_ScInFragment1 extends BaseFragment {
     private Prod_ScInFragment1 context = this;
     private static final int SEL_STOCK = 10, SEL_STOCKPOS = 11;
     private static final int SUCC1 = 200, UNSUCC1 = 500, SUCC2 = 201, UNSUCC2 = 501, SUCC3 = 202, UNSUCC3 = 502, PASS = 203, UNPASS = 503;
-    private static final int SETFOCUS = 1, RESULT_NUM = 2, SAOMA = 3;
+    private static final int SETFOCUS = 1, RESULT_NUM = 2, SAOMA = 3, WRITE_CODE = 4;
     private Prod_ScInFragment1Adapter mAdapter;
     private List<ScanningRecord> checkDatas = new ArrayList<>();
     private Stock stock;
@@ -272,9 +272,16 @@ public class Prod_ScInFragment1 extends BaseFragment {
     @Override
     public void setUserVisibleHint(boolean isVisibleToUser) {
         super.setUserVisibleHint(isVisibleToUser);
+        LogUtil.e("setUserVisibleHint", "冒泡麻婆。。。。。");
         if(isVisibleToUser) {
             mHandler.sendEmptyMessageDelayed(SETFOCUS, 200);
         }
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        mHandler.sendEmptyMessageDelayed(SETFOCUS, 200);
     }
 
     @OnClick({R.id.btn_scan, R.id.btn_save, R.id.btn_pass, R.id.btn_clone })
@@ -388,6 +395,15 @@ public class Prod_ScInFragment1 extends BaseFragment {
                 }
             }
         });
+
+        // 长按输入条码
+        etCode.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+                showInputDialog("输入条码", "", "none", WRITE_CODE);
+                return true;
+            }
+        });
     }
 
     private void reset() {
@@ -400,6 +416,8 @@ public class Prod_ScInFragment1 extends BaseFragment {
         checkDatas.clear();
         curViewFlag = '1';
         barcode = null;
+        tvNeedNum.setText("0");
+        tvOkNum.setText("0");
 
         mAdapter.notifyDataSetChanged();
         mHandler.sendEmptyMessageDelayed(SETFOCUS, 200);
@@ -456,6 +474,16 @@ public class Prod_ScInFragment1 extends BaseFragment {
                         checkDatas.get(curPos).setIsUniqueness('N');
                         mAdapter.notifyDataSetChanged();
                         countNum();
+                    }
+                }
+
+                break;
+            case WRITE_CODE: // 输入条码返回
+                if (resultCode == Activity.RESULT_OK) {
+                    Bundle bundle = data.getExtras();
+                    if (bundle != null) {
+                        String value = bundle.getString("resultValue", "");
+                        etCode.setText(value.toUpperCase());
                     }
                 }
 
@@ -608,6 +636,7 @@ public class Prod_ScInFragment1 extends BaseFragment {
         int size = checkDatas.size();
         boolean isFlag = false; // 是否存在该订单
         boolean isBool = false; // 是否使用弹出框来确认数量
+        boolean isOkNum = false; // 相同的物料不同的条码是否扫完数
         int pos = -1;
         for (int i = 0; i < size; i++) {
             ScanningRecord sr = checkDatas.get(i);
@@ -626,6 +655,7 @@ public class Prod_ScInFragment1 extends BaseFragment {
                     if (sr.getRealQty() >= sr.getUseableQty()) {
 //                        Comm.showWarnDialog(mContext, "第" + (i + 1) + "行，已拣完！");
 //                        return;
+                        isOkNum = true;
                         continue;
                     }
                     if(srBarcode.length() == 0) {
@@ -641,6 +671,7 @@ public class Prod_ScInFragment1 extends BaseFragment {
                     } else {
                         sr.setRealQty(sr.getRealQty() + 1);
                     }
+                    isOkNum = false;
                 } else { // 未启用序列号， 批次号
                     sr.setRealQty(sr.getUseableQty());
 //                    sr.setIsUniqueness('N');
@@ -660,6 +691,11 @@ public class Prod_ScInFragment1 extends BaseFragment {
             Comm.showWarnDialog(mContext, "该物料与订单不匹配！");
             return;
         }
+        if(isOkNum) {
+            Comm.showWarnDialog(mContext, "该物料条码在订单中数量已扫完！");
+            return;
+        }
+
         mAdapter.notifyDataSetChanged();
         mHandler.sendEmptyMessageDelayed(SETFOCUS, 200);
         countNum();

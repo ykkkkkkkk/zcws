@@ -83,7 +83,7 @@ public class Sal_ScOutFragment1 extends BaseFragment {
 
     private Sal_ScOutFragment1 context = this;
     private static final int SUCC1 = 200, UNSUCC1 = 500, SUCC2 = 201, UNSUCC2 = 501, SUCC3 = 202, UNSUCC3 = 502, PASS = 203, UNPASS = 503;
-    private static final int SETFOCUS = 1, RESULT_NUM = 2, SAOMA = 3;
+    private static final int SETFOCUS = 1, RESULT_NUM = 2, SAOMA = 3, WRITE_CODE = 4, WRITE_CODE2 = 5;
     private Sal_ScOutFragment1Adapter mAdapter;
     private List<ScanningRecord> checkDatas = new ArrayList<>();
     private String deliBarcode, mtlBarcode; // 对应的条码号
@@ -443,6 +443,24 @@ public class Sal_ScOutFragment1 extends BaseFragment {
                 }
             }
         });
+
+        // 长按输入条码
+        etExpressCode.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+                showInputDialog("输入发货单", "", "none", WRITE_CODE);
+                return true;
+            }
+        });
+
+        // 长按输入条码
+        etMtlCode.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+                showInputDialog("输入条码", "", "none", WRITE_CODE2);
+                return true;
+            }
+        });
     }
 
     private void reset() {
@@ -459,6 +477,8 @@ public class Sal_ScOutFragment1 extends BaseFragment {
         curViewFlag = '1';
         deliBarcode = null;
         mtlBarcode = null;
+        tvNeedNum.setText("0");
+        tvOkNum.setText("0");
 
         mAdapter.notifyDataSetChanged();
         mHandler.sendEmptyMessageDelayed(SETFOCUS, 200);
@@ -484,6 +504,26 @@ public class Sal_ScOutFragment1 extends BaseFragment {
                             isAutoSubmitDate = true;
                             run_save(true);
                         }
+                    }
+                }
+
+                break;
+            case WRITE_CODE: // 输入条码返回
+                if (resultCode == Activity.RESULT_OK) {
+                    Bundle bundle = data.getExtras();
+                    if (bundle != null) {
+                        String value = bundle.getString("resultValue", "");
+                        etExpressCode.setText(value.toUpperCase());
+                    }
+                }
+
+                break;
+            case WRITE_CODE2: // 输入条码返回
+                if (resultCode == Activity.RESULT_OK) {
+                    Bundle bundle = data.getExtras();
+                    if (bundle != null) {
+                        String value = bundle.getString("resultValue", "");
+                        etMtlCode.setText(value.toUpperCase());
                     }
                 }
 
@@ -564,6 +604,7 @@ public class Sal_ScOutFragment1 extends BaseFragment {
         }
         mAdapter.notifyDataSetChanged();
         setFocusable(etMtlCode);
+        countNum();
     }
 
     /**
@@ -575,6 +616,7 @@ public class Sal_ScOutFragment1 extends BaseFragment {
         int size = checkDatas.size();
         boolean isFlag = false; // 是否存在该订单
         boolean isBool = false; // 是否使用弹出框来确认数量
+        boolean isOkNum = false; // 相同的物料不同的条码是否扫完数
         int pos = -1;
         for (int i = 0; i < size; i++) {
             ScanningRecord sr = checkDatas.get(i);
@@ -593,6 +635,7 @@ public class Sal_ScOutFragment1 extends BaseFragment {
                     if (sr.getRealQty() >= sr.getUseableQty()) {
 //                        Comm.showWarnDialog(mContext, "第" + (i + 1) + "行，已拣完！");
 //                        return;
+                        isOkNum = true;
                         continue;
                     }
                     if(srBarcode.length() == 0) {
@@ -608,6 +651,7 @@ public class Sal_ScOutFragment1 extends BaseFragment {
                     } else {
                         sr.setRealQty(sr.getRealQty() + 1);
                     }
+                    isOkNum = false;
                 } else { // 未启用序列号， 批次号
                     sr.setRealQty(sr.getUseableQty());
                     sr.setIsUniqueness('N');
@@ -625,6 +669,10 @@ public class Sal_ScOutFragment1 extends BaseFragment {
         }
         if (!isFlag) {
             Comm.showWarnDialog(mContext, "该物料与订单不匹配！");
+            return;
+        }
+        if(isOkNum) {
+            Comm.showWarnDialog(mContext, "该物料条码在订单中数量已扫完！");
             return;
         }
 

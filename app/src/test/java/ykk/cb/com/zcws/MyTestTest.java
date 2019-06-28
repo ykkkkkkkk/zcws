@@ -8,5 +8,7 @@ public class MyTestTest {
 
     @Test
     public void main() {
+        String a = "1234";
+        System.out.print(a.toUpperCase());
     }
 }

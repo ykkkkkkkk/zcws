@@ -80,7 +80,7 @@ public class Sal_NxOutReturnFragment1 extends BaseFragment {
 
     private Sal_NxOutReturnFragment1 context = this;
     private static final int SUCC1 = 200, UNSUCC1 = 500, SUCC2 = 201, UNSUCC2 = 501, SUCC3 = 202, UNSUCC3 = 502, PASS = 203, UNPASS = 503;
-    private static final int SETFOCUS = 1, RESULT_NUM = 2, SAOMA = 3, PRICE = 4, RETURN_REASON = 5;
+    private static final int SETFOCUS = 1, RESULT_NUM = 2, SAOMA = 3, PRICE = 4, RETURN_REASON = 5, WRITE_CODE = 6;
     private Sal_NxOutReturnFragment1Adapter mAdapter;
     private List<ScanningRecord> checkDatas = new ArrayList<>();
     private String mtlBarcode; // 对应的条码号
@@ -307,6 +307,12 @@ public class Sal_NxOutReturnFragment1 extends BaseFragment {
         }
     }
 
+    @Override
+    public void onResume() {
+        super.onResume();
+        mHandler.sendEmptyMessageDelayed(SETFOCUS, 200);
+    }
+
     @OnClick({R.id.btn_scan, R.id.btn_save, R.id.btn_pass, R.id.btn_clone, R.id.btn_batchAdd })
     public void onViewClicked(View view) {
         Bundle bundle = null;
@@ -440,6 +446,15 @@ public class Sal_NxOutReturnFragment1 extends BaseFragment {
                 }
             }
         });
+
+        // 长按输入条码
+        etMtlCode.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+                showInputDialog("输入条码", "", "none", WRITE_CODE);
+                return true;
+            }
+        });
     }
 
     private void reset() {
@@ -455,6 +470,7 @@ public class Sal_NxOutReturnFragment1 extends BaseFragment {
         curViewFlag = '1';
         mtlBarcode = null;
         curPos = -1;
+        tvOkNum.setText("0");
 
         mAdapter.notifyDataSetChanged();
         mHandler.sendEmptyMessageDelayed(SETFOCUS, 200);
@@ -474,6 +490,16 @@ public class Sal_NxOutReturnFragment1 extends BaseFragment {
                         checkDatas.get(curPos).setIsUniqueness('N');
                         mAdapter.notifyDataSetChanged();
                         countNum();
+                    }
+                }
+
+                break;
+            case WRITE_CODE: // 输入条码返回
+                if (resultCode == Activity.RESULT_OK) {
+                    Bundle bundle = data.getExtras();
+                    if (bundle != null) {
+                        String value = bundle.getString("resultValue", "");
+                        etMtlCode.setText(value.toUpperCase());
                     }
                 }
 

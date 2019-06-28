@@ -188,6 +188,7 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="@dimen/_38dp"
+        android:background="@drawable/back_style_gray2a"
         android:orientation="horizontal">
 
         <CheckBox

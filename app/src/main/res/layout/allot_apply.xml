@@ -335,7 +335,7 @@
                     android:layout_width="108dp"
                     android:layout_height="match_parent"
                     android:gravity="center"
-                    android:text="0.0"
+                    android:text="0"
                     android:textColor="@color/c_FF4400"
                     android:textSize="14sp" />
 
