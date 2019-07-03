@@ -249,7 +249,7 @@ public class Prod_ScInOtherFragment1 extends BaseFragment {
 
     @OnClick({R.id.btn_search, R.id.tv_deptSel, R.id.tv_dateSel, R.id.btn_save, R.id.btn_pass })
     public void onViewClicked(View view) {
-        if(isClickButton) {
+        if(isClickButton && view.getId() == R.id.btn_save) {
             isClickButton = false;
             view.setEnabled(false);
             view.setClickable(false);
@@ -257,6 +257,8 @@ public class Prod_ScInOtherFragment1 extends BaseFragment {
 
             Message msgView = mHandler.obtainMessage(DELAYED_CLICK, view);
             mHandler.sendMessageDelayed(msgView,1000);
+        } else {
+            btnClickAfter(view);
         }
     }
 

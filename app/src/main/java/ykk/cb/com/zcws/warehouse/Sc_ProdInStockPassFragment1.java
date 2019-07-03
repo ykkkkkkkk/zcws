@@ -18,6 +18,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 
 import java.io.IOException;
 import java.lang.ref.WeakReference;
@@ -52,6 +53,8 @@ public class Sc_ProdInStockPassFragment1 extends BaseFragment {
 
     @BindView(R.id.et_getFocus)
     EditText etGetFocus;
+    @BindView(R.id.lin_focus1)
+    LinearLayout linFocus1;
     @BindView(R.id.et_code)
     EditText etCode;
     @BindView(R.id.btn_scan)
@@ -260,6 +263,17 @@ public class Sc_ProdInStockPassFragment1 extends BaseFragment {
             public boolean onLongClick(View v) {
                 showInputDialog("输入单号", "", "none", WRITE_CODE);
                 return true;
+            }
+        });
+
+        etCode.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+            @Override
+            public void onFocusChange(View v, boolean hasFocus) {
+                if(hasFocus) {
+                    linFocus1.setBackgroundResource(R.drawable.back_style_red);
+                } else {
+                    linFocus1.setBackgroundResource(R.drawable.back_style_gray4);
+                }
             }
         });
     }

@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.support.annotation.DrawableRes;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -18,6 +19,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import java.io.IOException;
@@ -61,6 +63,10 @@ public class Sal_ScOutFragment1 extends BaseFragment {
 
     @BindView(R.id.et_getFocus)
     EditText etGetFocus;
+    @BindView(R.id.lin_focus1)
+    LinearLayout linFocus1;
+    @BindView(R.id.lin_focus2)
+    LinearLayout linFocus2;
     @BindView(R.id.et_expressCode)
     EditText etExpressCode;
     @BindView(R.id.et_mtlCode)
@@ -305,7 +311,7 @@ public class Sal_ScOutFragment1 extends BaseFragment {
 
     @OnClick({R.id.btn_scan, R.id.btn_scan2, R.id.btn_save, R.id.btn_pass, R.id.btn_clone })
     public void onViewClicked(View view) {
-        if(isClickButton) {
+        if(isClickButton && view.getId() == R.id.btn_save) {
             isClickButton = false;
             view.setEnabled(false);
             view.setClickable(false);
@@ -313,6 +319,8 @@ public class Sal_ScOutFragment1 extends BaseFragment {
 
             Message msgView = mHandler.obtainMessage(DELAYED_CLICK, view);
             mHandler.sendMessageDelayed(msgView,1000);
+        } else {
+            btnClickAfter(view);
         }
     }
 
@@ -491,6 +499,30 @@ public class Sal_ScOutFragment1 extends BaseFragment {
             public boolean onLongClick(View v) {
                 showInputDialog("输入条码", "", "none", WRITE_CODE2);
                 return true;
+            }
+        });
+
+        etExpressCode.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+            @Override
+            public void onFocusChange(View v, boolean hasFocus) {
+                if(hasFocus) {
+                    linFocus1.setBackgroundResource(R.drawable.back_style_red);
+                    linFocus2.setBackgroundResource(R.drawable.back_style_gray4);
+                } else {
+                    linFocus1.setBackgroundResource(R.drawable.back_style_gray4);
+                }
+            }
+        });
+
+        etMtlCode.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+            @Override
+            public void onFocusChange(View v, boolean hasFocus) {
+                if(hasFocus) {
+                    linFocus1.setBackgroundResource(R.drawable.back_style_gray4);
+                    linFocus2.setBackgroundResource(R.drawable.back_style_red);
+                } else {
+                    linFocus2.setBackgroundResource(R.drawable.back_style_gray4);
+                }
             }
         });
     }

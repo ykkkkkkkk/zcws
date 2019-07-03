@@ -19,6 +19,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import java.io.IOException;
@@ -63,6 +64,8 @@ public class Sal_DsBToRFromPurchaseInStockFragment1 extends BaseFragment {
 
     @BindView(R.id.et_getFocus)
     EditText etGetFocus;
+    @BindView(R.id.lin_focus1)
+    LinearLayout linFocus1;
     @BindView(R.id.et_mtlCode)
     EditText etMtlCode;
     @BindView(R.id.btn_scan)
@@ -302,7 +305,7 @@ public class Sal_DsBToRFromPurchaseInStockFragment1 extends BaseFragment {
 
     @OnClick({R.id.btn_scan, R.id.btn_save, R.id.btn_pass, R.id.btn_clone, R.id.btn_batchAdd })
     public void onViewClicked(View view) {
-        if(isClickButton) {
+        if(isClickButton && view.getId() == R.id.btn_save) {
             isClickButton = false;
             view.setEnabled(false);
             view.setClickable(false);
@@ -310,6 +313,8 @@ public class Sal_DsBToRFromPurchaseInStockFragment1 extends BaseFragment {
 
             Message msgView = mHandler.obtainMessage(DELAYED_CLICK, view);
             mHandler.sendMessageDelayed(msgView,1000);
+        } else {
+            btnClickAfter(view);
         }
     }
 
@@ -457,6 +462,17 @@ public class Sal_DsBToRFromPurchaseInStockFragment1 extends BaseFragment {
             public boolean onLongClick(View v) {
                 showInputDialog("输入条码", "", "none", WRITE_CODE);
                 return true;
+            }
+        });
+
+        etMtlCode.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+            @Override
+            public void onFocusChange(View v, boolean hasFocus) {
+                if(hasFocus) {
+                    linFocus1.setBackgroundResource(R.drawable.back_style_red);
+                } else {
+                    linFocus1.setBackgroundResource(R.drawable.back_style_gray4);
+                }
             }
         });
     }

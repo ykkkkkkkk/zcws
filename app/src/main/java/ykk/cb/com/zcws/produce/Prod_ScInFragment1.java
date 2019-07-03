@@ -18,6 +18,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import org.w3c.dom.Text;
@@ -68,6 +69,8 @@ public class Prod_ScInFragment1 extends BaseFragment {
     Button btnClone;
     @BindView(R.id.et_getFocus)
     EditText etGetFocus;
+    @BindView(R.id.lin_focus1)
+    LinearLayout linFocus1;
     @BindView(R.id.et_code)
     EditText etCode;
     @BindView(R.id.btn_scan)
@@ -300,7 +303,7 @@ public class Prod_ScInFragment1 extends BaseFragment {
 
     @OnClick({R.id.btn_scan, R.id.btn_save, R.id.btn_pass, R.id.btn_clone })
     public void onViewClicked(View view) {
-        if(isClickButton) {
+        if(isClickButton && view.getId() == R.id.btn_save) {
             isClickButton = false;
             view.setEnabled(false);
             view.setClickable(false);
@@ -308,7 +311,10 @@ public class Prod_ScInFragment1 extends BaseFragment {
 
             Message msgView = mHandler.obtainMessage(DELAYED_CLICK, view);
             mHandler.sendMessageDelayed(msgView,1000);
+        } else {
+            btnClickAfter(view);
         }
+
     }
 
     private void btnClickAfter(View view) {
@@ -433,6 +439,17 @@ public class Prod_ScInFragment1 extends BaseFragment {
             public boolean onLongClick(View v) {
                 showInputDialog("输入条码", "", "none", WRITE_CODE);
                 return true;
+            }
+        });
+
+        etCode.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+            @Override
+            public void onFocusChange(View v, boolean hasFocus) {
+                if(hasFocus) {
+                    linFocus1.setBackgroundResource(R.drawable.back_style_red);
+                } else {
+                    linFocus1.setBackgroundResource(R.drawable.back_style_gray4);
+                }
             }
         });
     }

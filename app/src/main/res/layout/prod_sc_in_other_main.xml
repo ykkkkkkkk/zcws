@@ -32,7 +32,8 @@
             android:layout_marginRight="@dimen/_4dp"
             android:background="@drawable/aa_ico5a_5b"
             android:textColor="#ffffff"
-            android:textSize="14sp" />
+            android:textSize="14sp"
+            android:visibility="invisible" />
     </LinearLayout>
 
     <TextView

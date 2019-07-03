@@ -18,6 +18,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import java.io.IOException;
@@ -66,6 +67,8 @@ public class Pur_ScInFragment1 extends BaseFragment {
 
     @BindView(R.id.et_getFocus)
     EditText etGetFocus;
+    @BindView(R.id.lin_focus1)
+    LinearLayout linFocus1;
     @BindView(R.id.tv_suppSel)
     TextView tvSuppSel;
     @BindView(R.id.tv_dateSel)
@@ -282,6 +285,7 @@ public class Pur_ScInFragment1 extends BaseFragment {
                     .build();
         }
 
+        hideSoftInputMode(mContext, etMtlCode);
         getUserInfo();
         tvDateSel.setText(Comm.getSysDate(7));
         timesTamp = user.getId()+"-"+Comm.randomUUID();
@@ -303,7 +307,7 @@ public class Pur_ScInFragment1 extends BaseFragment {
 
     @OnClick({R.id.btn_scan, R.id.tv_purNo, R.id.tv_suppSel, R.id.tv_dateSel, R.id.btn_save, R.id.btn_pass, R.id.btn_clone })
     public void onViewClicked(View view) {
-        if(isClickButton) {
+        if(isClickButton && view.getId() == R.id.btn_save) {
             isClickButton = false;
             view.setEnabled(false);
             view.setClickable(false);
@@ -311,6 +315,8 @@ public class Pur_ScInFragment1 extends BaseFragment {
 
             Message msgView = mHandler.obtainMessage(DELAYED_CLICK, view);
             mHandler.sendMessageDelayed(msgView,1000);
+        } else {
+            btnClickAfter(view);
         }
     }
 
@@ -471,6 +477,17 @@ public class Pur_ScInFragment1 extends BaseFragment {
             public boolean onLongClick(View v) {
                 showInputDialog("输入条码", "", "none", WRITE_CODE);
                 return true;
+            }
+        });
+
+        etMtlCode.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+            @Override
+            public void onFocusChange(View v, boolean hasFocus) {
+                if(hasFocus) {
+                    linFocus1.setBackgroundResource(R.drawable.back_style_red);
+                } else {
+                    linFocus1.setBackgroundResource(R.drawable.back_style_gray4);
+                }
             }
         });
     }
