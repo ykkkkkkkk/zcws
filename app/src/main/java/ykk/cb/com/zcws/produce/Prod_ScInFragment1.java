@@ -54,6 +54,7 @@ import ykk.cb.com.zcws.bean.prod.ProdOrder;
 import ykk.cb.com.zcws.comm.BaseFragment;
 import ykk.cb.com.zcws.comm.Comm;
 import ykk.cb.com.zcws.produce.adapter.Prod_ScInFragment1Adapter;
+import ykk.cb.com.zcws.util.CheckDoubleClickListener;
 import ykk.cb.com.zcws.util.JsonUtil;
 import ykk.cb.com.zcws.util.LogUtil;
 import ykk.cb.com.zcws.util.zxing.android.CaptureActivity;
@@ -63,6 +64,8 @@ import ykk.cb.com.zcws.util.zxing.android.CaptureActivity;
  */
 public class Prod_ScInFragment1 extends BaseFragment {
 
+    @BindView(R.id.btn_clone)
+    Button btnClone;
     @BindView(R.id.et_getFocus)
     EditText etGetFocus;
     @BindView(R.id.et_code)
@@ -83,7 +86,7 @@ public class Prod_ScInFragment1 extends BaseFragment {
     private Prod_ScInFragment1 context = this;
     private static final int SEL_STOCK = 10, SEL_STOCKPOS = 11;
     private static final int SUCC1 = 200, UNSUCC1 = 500, SUCC2 = 201, UNSUCC2 = 501, SUCC3 = 202, UNSUCC3 = 502, PASS = 203, UNPASS = 503;
-    private static final int SETFOCUS = 1, RESULT_NUM = 2, SAOMA = 3, WRITE_CODE = 4;
+    private static final int SETFOCUS = 1, RESULT_NUM = 2, SAOMA = 3, WRITE_CODE = 4, DELAYED_CLICK = 5;
     private Prod_ScInFragment1Adapter mAdapter;
     private List<ScanningRecord> checkDatas = new ArrayList<>();
     private Stock stock;
@@ -98,6 +101,8 @@ public class Prod_ScInFragment1 extends BaseFragment {
     private boolean isTextChange; // 是否进入TextChange事件
     private String strK3Number; // 保存k3返回的单号
     private DecimalFormat df = new DecimalFormat("#.####");
+    private String timesTamp; // 时间戳
+    private boolean isClickButton; // 是否点击了按钮
 
     // 消息处理
     private Prod_ScInFragment1.MyHandler mHandler = new Prod_ScInFragment1.MyHandler(this);
@@ -114,7 +119,10 @@ public class Prod_ScInFragment1 extends BaseFragment {
                 m.hideLoadDialog();
 
                 String errMsg = null;
-                String msgObj = (String) msg.obj;
+                String msgObj = null;
+                if(msg.obj instanceof String) {
+                    msgObj = (String) msg.obj;
+                }
                 switch (msg.what) {
                     case SUCC1:
                         m.strK3Number = JsonUtil.strToString(msgObj);
@@ -214,6 +222,11 @@ public class Prod_ScInFragment1 extends BaseFragment {
                         }
 
                         break;
+                    case DELAYED_CLICK: // 延时进入点击后的操作
+                        View btnView = (View) msg.obj;
+                        m.btnClickAfter(btnView);
+
+                        break;
                 }
             }
         }
@@ -266,7 +279,7 @@ public class Prod_ScInFragment1 extends BaseFragment {
 
         hideSoftInputMode(mContext, etCode);
         getUserInfo();
-
+        timesTamp = user.getId()+"-"+Comm.randomUUID();
     }
 
     @Override
@@ -281,11 +294,29 @@ public class Prod_ScInFragment1 extends BaseFragment {
     @Override
     public void onResume() {
         super.onResume();
+        isClickButton = true;
         mHandler.sendEmptyMessageDelayed(SETFOCUS, 200);
     }
 
     @OnClick({R.id.btn_scan, R.id.btn_save, R.id.btn_pass, R.id.btn_clone })
     public void onViewClicked(View view) {
+        if(isClickButton) {
+            isClickButton = false;
+            view.setEnabled(false);
+            view.setClickable(false);
+            showLoadDialog("稍等哈...",false);
+
+            Message msgView = mHandler.obtainMessage(DELAYED_CLICK, view);
+            mHandler.sendMessageDelayed(msgView,1000);
+        }
+    }
+
+    private void btnClickAfter(View view) {
+        hideLoadDialog();
+        isClickButton = true;
+        view.setEnabled(true);
+        view.setClickable(true);
+
         Bundle bundle = null;
         switch (view.getId()) {
             case R.id.btn_scan: // 调用摄像头扫描（物料）
@@ -407,6 +438,8 @@ public class Prod_ScInFragment1 extends BaseFragment {
     }
 
     private void reset() {
+        isClickButton = true;
+        timesTamp = user.getId()+"-"+Comm.randomUUID();
         setEnables(etCode, R.color.transparent, true);
         btnScan.setVisibility(View.VISIBLE);
         strK3Number = null;
@@ -592,6 +625,7 @@ public class Prod_ScInFragment1 extends BaseFragment {
         sr.setEmpId(user.getEmpId());
         sr.setCreateUserName(user.getUsername());
         sr.setDataTypeFlag("APP");
+        sr.setTempTimesTamp(timesTamp);
         sr.setSourceObj(JsonUtil.objectToString(prodOrder));
 
         boolean isBool = false; // 是否使用弹出框来确认数量
@@ -673,6 +707,9 @@ public class Prod_ScInFragment1 extends BaseFragment {
                     }
                     isOkNum = false;
                 } else { // 未启用序列号， 批次号
+                    if (sr.getRealQty() >= sr.getUseableQty()) {
+                        continue;
+                    }
                     sr.setRealQty(sr.getUseableQty());
 //                    sr.setIsUniqueness('N');
                     // 不存在条码，就加入
@@ -729,7 +766,7 @@ public class Prod_ScInFragment1 extends BaseFragment {
      * 保存方法
      */
     private void run_save() {
-        showLoadDialog("保存中...");
+        showLoadDialog("保存中...",false);
 
         String mJson = JsonUtil.objectToString(checkDatas);
         FormBody formBody = new FormBody.Builder()
@@ -773,7 +810,7 @@ public class Prod_ScInFragment1 extends BaseFragment {
             Comm.showWarnDialog(mContext,"请对准条码！");
             return;
         }
-        showLoadDialog("加载中...");
+        showLoadDialog("加载中...",false);
         String mUrl = null;
         String barcode = null;
         switch (curViewFlag) {
@@ -821,7 +858,7 @@ public class Prod_ScInFragment1 extends BaseFragment {
      * 判断表中存在该物料
      */
     private void run_findInStockSum() {
-        showLoadDialog("加载中...");
+        showLoadDialog("加载中...",false);
         StringBuilder strFbillno = new StringBuilder();
         StringBuilder strEntryId = new StringBuilder();
         for (int i = 0, size = checkDatas.size(); i < size; i++) {
@@ -873,12 +910,13 @@ public class Prod_ScInFragment1 extends BaseFragment {
      * 生产账号审核
      */
     private void run_passSC() {
-        showLoadDialog("正在审核...");
-        String mUrl = getURL("scanningRecord/passSC");
+        showLoadDialog("正在审核...",false);
+        String mUrl = getURL("stockBill/passSC");
         getUserInfo();
         FormBody formBody = new FormBody.Builder()
-                .add("strK3Number", strK3Number)
-                .add("outInType", "2") // 出入库类型：（1、生产账号--采购订单入库，2、生产账号--生产任务单入库，3、生产账号--发货通知单出库）
+                .add("strFbillNo", strK3Number)
+                .add("empId", user != null ? String.valueOf(user.getEmpId()) : "0")
+//                .add("outInType", "2") // 出入库类型：（1、生产账号--采购订单入库，2、生产账号--生产任务单入库，3、生产账号--发货通知单出库）
                 .build();
 
         Request request = new Request.Builder()

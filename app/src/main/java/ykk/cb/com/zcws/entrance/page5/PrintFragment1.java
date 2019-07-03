@@ -329,7 +329,7 @@ public class PrintFragment1 extends BaseFragment implements XRecyclerView.Loadin
      * 仓库信息，库区，库位，部门，物料
      */
     private void run_okhttpDatas() {
-        showLoadDialog("加载中...");
+        showLoadDialog("加载中...",false);
         String mUrl = getURL("prodOrder/findProdOrderByPage");
         String prodNo = getValues(etProdNo).trim();
         String date = getValues(tvDateSel);
@@ -382,7 +382,7 @@ public class PrintFragment1 extends BaseFragment implements XRecyclerView.Loadin
      */
     private void run_prodOrderCreate_app(String strIds, double createCodeQty) {
         strProdId = strIds;
-        showLoadDialog("加载中...");
+        showLoadDialog("加载中...",false);
         String mUrl = getURL("barCodeCreate/prodOrderCreate_app");
         if(createCodeQty > 0) {
             mUrl = getURL("barCodeCreate/prodOrderPartCreate_app");
@@ -429,7 +429,7 @@ public class PrintFragment1 extends BaseFragment implements XRecyclerView.Loadin
      * 修改打印次数
      */
     private void run_modifyPrintNumberByBarcode(String createDateTime) {
-        showLoadDialog("正在打印...");
+        showLoadDialog("正在打印...",false);
         String mUrl = getURL("barCodeTable/modifyPrintNumberByBarcode");
         FormBody formBody = new FormBody.Builder()
                 .add("createDateTime", createDateTime)

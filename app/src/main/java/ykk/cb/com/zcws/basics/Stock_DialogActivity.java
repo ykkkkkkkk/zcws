@@ -158,7 +158,7 @@ public class Stock_DialogActivity extends BaseDialogActivity implements XRecycle
      * 通过okhttp加载数据
      */
     private void run_okhttpDatas() {
-        showLoadDialog("加载中...");
+        showLoadDialog("加载中...",false);
         String mUrl = getURL("stock/findStockListByParam");
         FormBody formBody = new FormBody.Builder()
                 .add("fnumberOrName", getValues(etSearch).trim())

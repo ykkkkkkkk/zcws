@@ -169,7 +169,7 @@ public class LoginActivity extends BaseActivity {
      * 登录的方法
      */
     private void run_appLogin() {
-        showLoadDialog("登录中...");
+        showLoadDialog("登录中...",false);
         String mUrl = getURL("appLogin");
         FormBody formBody = new FormBody.Builder()
                 .add("username", getValues(etUserName).trim())

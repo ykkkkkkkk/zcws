@@ -160,7 +160,7 @@ public class ReturnReason_DialogActivity extends BaseDialogActivity implements X
      * 通过okhttp加载数据
      */
     private void run_okhttpDatas() {
-        showLoadDialog("加载中...");
+        showLoadDialog("加载中...",false);
 
         String mUrl = getURL("returnReason/findReturnReasonList_DS");
         // 判断是哪个账号的数据

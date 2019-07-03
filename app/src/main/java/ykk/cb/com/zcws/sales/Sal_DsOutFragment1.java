@@ -83,7 +83,7 @@ public class Sal_DsOutFragment1 extends BaseFragment {
 
     private Sal_DsOutFragment1 context = this;
     private static final int SUCC1 = 200, UNSUCC1 = 500, SUCC2 = 201, UNSUCC2 = 501, SUCC3 = 202, UNSUCC3 = 502, PASS = 203, UNPASS = 503;
-    private static final int SETFOCUS = 1, RESULT_NUM = 2, SAOMA = 3, WRITE_CODE = 4, WRITE_CODE2 = 5;
+    private static final int SETFOCUS = 1, RESULT_NUM = 2, SAOMA = 3, WRITE_CODE = 4, WRITE_CODE2 = 5, DELAYED_CLICK = 6;
     private Sal_DsOutFragment1Adapter mAdapter;
     private List<ScanningRecord> checkDatas = new ArrayList<>();
     private String expressBarcode, mtlBarcode; // 对应的条码号
@@ -96,6 +96,8 @@ public class Sal_DsOutFragment1 extends BaseFragment {
     private boolean isTextChange; // 是否进入TextChange事件
     private String strK3Number; // 保存k3返回的单号
     private DecimalFormat df = new DecimalFormat("#.####");
+    private String timesTamp; // 时间戳
+    private boolean isClickButton; // 是否点击了按钮
 
     // 消息处理
     private Sal_DsOutFragment1.MyHandler mHandler = new Sal_DsOutFragment1.MyHandler(this);
@@ -113,7 +115,10 @@ public class Sal_DsOutFragment1 extends BaseFragment {
                 m.hideLoadDialog();
 
                 String errMsg = null;
-                String msgObj = (String) msg.obj;
+                String msgObj = null;
+                if(msg.obj instanceof String) {
+                    msgObj = (String) msg.obj;
+                }
                 switch (msg.what) {
                     case SUCC1:
                         m.strK3Number = JsonUtil.strToString(msgObj);
@@ -226,6 +231,11 @@ public class Sal_DsOutFragment1 extends BaseFragment {
                         }
 
                         break;
+                    case DELAYED_CLICK: // 延时进入点击后的操作
+                        View btnView = (View) msg.obj;
+                        m.btnClickAfter(btnView);
+
+                        break;
                 }
             }
         }
@@ -275,7 +285,7 @@ public class Sal_DsOutFragment1 extends BaseFragment {
         hideSoftInputMode(mContext, etExpressCode);
         hideSoftInputMode(mContext, etMtlCode);
         getUserInfo();
-
+        timesTamp = user.getId()+"-"+Comm.randomUUID();
     }
 
     @Override
@@ -289,11 +299,29 @@ public class Sal_DsOutFragment1 extends BaseFragment {
     @Override
     public void onResume() {
         super.onResume();
+        isClickButton = true;
         mHandler.sendEmptyMessageDelayed(SETFOCUS, 200);
     }
 
     @OnClick({R.id.btn_scan, R.id.btn_scan2, R.id.btn_save, R.id.btn_pass, R.id.btn_clone})
     public void onViewClicked(View view) {
+        if(isClickButton) {
+            isClickButton = false;
+            view.setEnabled(false);
+            view.setClickable(false);
+            showLoadDialog("稍等哈...",false);
+
+            Message msgView = mHandler.obtainMessage(DELAYED_CLICK, view);
+            mHandler.sendMessageDelayed(msgView,1000);
+        }
+    }
+
+    private void btnClickAfter(View view) {
+        hideLoadDialog();
+        isClickButton = true;
+        view.setEnabled(true);
+        view.setClickable(true);
+
         Bundle bundle = null;
         switch (view.getId()) {
             case R.id.btn_scan: // 调用摄像头扫描（快递单）
@@ -474,6 +502,8 @@ public class Sal_DsOutFragment1 extends BaseFragment {
 
 
     private void reset() {
+        isClickButton = true;
+        timesTamp = user.getId()+"-"+Comm.randomUUID();
         setEnables(etExpressCode, R.color.transparent, true);
         setEnables(etMtlCode, R.color.transparent, true);
         btnScan.setVisibility(View.VISIBLE);
@@ -615,6 +645,7 @@ public class Sal_DsOutFragment1 extends BaseFragment {
             sr.setCreateUserId(user.getId());
             sr.setCreateUserName(user.getUsername());
             sr.setDataTypeFlag("APP");
+            sr.setTempTimesTamp(timesTamp);
             sr.setSourceObj(JsonUtil.objectToString(seOrderEntry));
 
             checkDatas.add(sr);
@@ -632,6 +663,7 @@ public class Sal_DsOutFragment1 extends BaseFragment {
 
         int size = checkDatas.size();
         boolean isFlag = false; // 是否存在该订单
+        boolean isOkNum = false; // 相同的物料不同的条码是否扫完数
         for (int i = 0; i < size; i++) {
             ScanningRecord sr = checkDatas.get(i);
             String srBarcode = isNULLS(sr.getStrBarcodes());
@@ -646,8 +678,10 @@ public class Sal_DsOutFragment1 extends BaseFragment {
                         return;
                     }
                     if (sr.getRealQty() >= sr.getSourceQty()) {
-                        Comm.showWarnDialog(mContext, "第" + (i + 1) + "行，已拣完！");
-                        return;
+//                        Comm.showWarnDialog(mContext, "第" + (i + 1) + "行，已拣完！");
+//                        return;
+                        isOkNum = true;
+                        continue;
                     }
                     if (srBarcode.length() == 0) {
                         sr.setStrBarcodes(bt.getBarcode());
@@ -660,7 +694,11 @@ public class Sal_DsOutFragment1 extends BaseFragment {
                     } else {
                         sr.setRealQty(sr.getRealQty() + 1);
                     }
+                    isOkNum = false;
                 } else { // 未启用序列号， 批次号
+                    if (sr.getRealQty() >= sr.getUseableQty()) {
+                        continue;
+                    }
                     sr.setRealQty(sr.getSourceQty());
                     sr.setIsUniqueness('N');
                     // 不存在条码，就加入
@@ -677,6 +715,10 @@ public class Sal_DsOutFragment1 extends BaseFragment {
         }
         if (!isFlag) {
             Comm.showWarnDialog(mContext, "该物料与订单不匹配！");
+            return;
+        }
+        if(isOkNum) {
+            Comm.showWarnDialog(mContext, "该物料条码在订单中数量已扫完！");
             return;
         }
 
@@ -710,7 +752,7 @@ public class Sal_DsOutFragment1 extends BaseFragment {
      */
     private void run_save() {
 //        showLoadDialog("保存中...", false);
-        showLoadDialog("自动保存中...", false);
+        showLoadDialog("自动保存中...",false);
 
         String mJson = JsonUtil.objectToString(checkDatas);
         FormBody formBody = new FormBody.Builder()

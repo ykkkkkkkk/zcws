@@ -245,7 +245,7 @@ public class MainTabFragment5 extends BaseFragment implements IDownloadContract.
      * 获取服务端的App信息
      */
     private void run_findAppInfo() {
-        showLoadDialog("加载中...");
+        showLoadDialog("加载中...",false);
         String mUrl = getURL("findAppInfo");
         ;
         FormBody formBody = new FormBody.Builder()
@@ -288,7 +288,7 @@ public class MainTabFragment5 extends BaseFragment implements IDownloadContract.
      * 网络测试
      */
     private void run_test() {
-        showLoadDialog("测试中...");
+        showLoadDialog("测试中...",false);
         String mUrl = getURL("");
         int len = mUrl.indexOf("mdwms");
         String url = mUrl.substring(0, len);

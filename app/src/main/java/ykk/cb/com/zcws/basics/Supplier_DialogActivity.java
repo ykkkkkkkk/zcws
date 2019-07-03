@@ -182,7 +182,7 @@ public class Supplier_DialogActivity extends BaseDialogActivity implements XRecy
      * 通过okhttp加载数据
      */
     private void run_okhttpDatas() {
-        showLoadDialog("加载中...");
+        showLoadDialog("加载中...",false);
         String mUrl = getURL("supplier/findSupplierListByParam");
         FormBody formBody = new FormBody.Builder()
                 .add("fNumberAndName", getValues(etSearch).trim())

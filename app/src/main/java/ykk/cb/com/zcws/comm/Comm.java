@@ -39,40 +39,6 @@ public class Comm {
 	public static final String publicPaths = Environment.getExternalStorageDirectory().toString()+"/zcws/";
 
 	/**
-	 * 字符串截取
-	 * (index=0,从0的位置开始截取，否则从大于0的位置截取)
-	 */
-	public static String subString(String str,char ch, int index) {
-		String result = null;
-		if (str != null && str != "") {
-			if (index == 0) {
-				for (int i = 0; i < str.length(); i++) {
-					if (str.charAt(i) == ch) {
-						result = str.substring(0, i);
-					}
-				}
-			}else{
-				for (int i = 0; i < str.length(); i++) {
-					if (str.charAt(i) == ch) {
-						result = str.substring(i+1);
-					}
-				}
-			}
-
-		}
-		return result;
-	}
-	/**
-	 * 转换成int类型
-	 */
-	public static int toInt(String str){
-		int result = 0;
-		try { result = str!=null && str!=""?Integer.parseInt(str):0; }
-		catch (Exception e) { result = 0; }
-		return result;
-	}
-
-	/**
 	 * 隐藏软键盘
 	 */
 	public static void hideInputMode(Context context) {

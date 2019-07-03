@@ -90,7 +90,7 @@ public class Pur_ScInFragment1 extends BaseFragment {
     private Pur_ScInFragment1 context = this;
     private static final int SEL_STOCK = 10, SEL_STOCKPOS = 11, SEL_SUPP = 12, SEL_WRITE = 13;
     private static final int SUCC1 = 200, UNSUCC1 = 500, SUCC2 = 201, UNSUCC2 = 501, SUCC3 = 202, UNSUCC3 = 502, PASS = 203, UNPASS = 503;
-    private static final int SETFOCUS = 1, RESULT_NUM = 2, SAOMA = 3, WRITE_CODE = 4;
+    private static final int SETFOCUS = 1, RESULT_NUM = 2, SAOMA = 3, WRITE_CODE = 4, DELAYED_CLICK = 5;
     private Pur_ScInFragment1Adapter mAdapter;
     private List<ScanningRecord> checkDatas = new ArrayList<>();
     private Stock stock;
@@ -107,6 +107,8 @@ public class Pur_ScInFragment1 extends BaseFragment {
     private boolean isAutoSubmitDate; // 是否自动提交数据
     private boolean isAllSM; // 是否全部扫完条码
     private DecimalFormat df = new DecimalFormat("#.####");
+    private String timesTamp; // 时间戳
+    private boolean isClickButton; // 是否点击了按钮
 
     // 消息处理
     private Pur_ScInFragment1.MyHandler mHandler = new Pur_ScInFragment1.MyHandler(this);
@@ -123,7 +125,10 @@ public class Pur_ScInFragment1 extends BaseFragment {
                 m.hideLoadDialog();
 
                 String errMsg = null;
-                String msgObj = (String) msg.obj;
+                String msgObj = null;
+                if(msg.obj instanceof String) {
+                    msgObj = (String) msg.obj;
+                }
                 switch (msg.what) {
                     case SUCC1:
                         m.strK3Number = JsonUtil.strToString(msgObj);
@@ -214,6 +219,11 @@ public class Pur_ScInFragment1 extends BaseFragment {
                         m.run_smGetDatas();
 
                         break;
+                    case DELAYED_CLICK: // 延时进入点击后的操作
+                        View btnView = (View) msg.obj;
+                        m.btnClickAfter(btnView);
+
+                        break;
                 }
             }
         }
@@ -274,6 +284,7 @@ public class Pur_ScInFragment1 extends BaseFragment {
 
         getUserInfo();
         tvDateSel.setText(Comm.getSysDate(7));
+        timesTamp = user.getId()+"-"+Comm.randomUUID();
     }
 
     @Override
@@ -284,8 +295,31 @@ public class Pur_ScInFragment1 extends BaseFragment {
         }
     }
 
+    @Override
+    public void onResume() {
+        super.onResume();
+        isClickButton = true;
+    }
+
     @OnClick({R.id.btn_scan, R.id.tv_purNo, R.id.tv_suppSel, R.id.tv_dateSel, R.id.btn_save, R.id.btn_pass, R.id.btn_clone })
     public void onViewClicked(View view) {
+        if(isClickButton) {
+            isClickButton = false;
+            view.setEnabled(false);
+            view.setClickable(false);
+            showLoadDialog("稍等哈...",false);
+
+            Message msgView = mHandler.obtainMessage(DELAYED_CLICK, view);
+            mHandler.sendMessageDelayed(msgView,1000);
+        }
+    }
+
+    private void btnClickAfter(View view) {
+        hideLoadDialog();
+        isClickButton = true;
+        view.setEnabled(true);
+        view.setClickable(true);
+
         Bundle bundle = null;
         switch (view.getId()) {
             case R.id.btn_scan: // 调用摄像头扫描（快递单）
@@ -442,6 +476,7 @@ public class Pur_ScInFragment1 extends BaseFragment {
     }
 
     private void reset(boolean isRefresh) {
+        timesTamp = user.getId()+"-"+Comm.randomUUID();
         setEnables(etMtlCode, R.color.transparent, true);
         btnScan.setVisibility(View.VISIBLE);
         strK3Number = null;
@@ -638,6 +673,7 @@ public class Pur_ScInFragment1 extends BaseFragment {
             sr.setEmpId(user.getEmpId());
             sr.setCreateUserName(user.getUsername());
             sr.setDataTypeFlag("APP");
+            sr.setTempTimesTamp(timesTamp);
             sr.setSourceObj(JsonUtil.objectToString(purEntry));
 
             // 启用序列号，批次号；    990156：启用批次号，990156：启用序列号
@@ -703,6 +739,9 @@ public class Pur_ScInFragment1 extends BaseFragment {
                     isOkNum = false;
 
                 } else { // 未启用序列号， 批次号
+                    if (sr.getRealQty() >= sr.getUseableQty()) {
+                        continue;
+                    }
                     sr.setRealQty(sr.getUseableQty());
                     sr.setIsUniqueness('N');
                     sr.setStrBarcodes(bt.getBarcode());
@@ -779,8 +818,8 @@ public class Pur_ScInFragment1 extends BaseFragment {
         if(size == count) isAllSM = true;
         else isAllSM = false;
 
-        if(isAutoSubmit) showLoadDialog("自动保存中...", false);
-        else showLoadDialog("保存中...", false);
+        if(isAutoSubmit) showLoadDialog("自动保存中...",false);
+        else showLoadDialog("保存中...",false);
         String mJson = JsonUtil.objectToString(listRecord);
         FormBody formBody = new FormBody.Builder()
                 .add("strJson", mJson)
@@ -818,7 +857,7 @@ public class Pur_ScInFragment1 extends BaseFragment {
      * 扫码查询对应的方法
      */
     private void run_findPurOrderInStock() {
-        showLoadDialog("加载中...");
+        showLoadDialog("加载中...",false);
         String mUrl = getURL("purOrder/findPurOrderInStock");
         String purNo = getValues(tvPurNo).trim();
         String date = getValues(tvDateSel);
@@ -864,7 +903,7 @@ public class Pur_ScInFragment1 extends BaseFragment {
      */
     private void run_smGetDatas() {
         isTextChange = false;
-        showLoadDialog("加载中...");
+        showLoadDialog("加载中...",false);
         String mUrl = getURL("barCodeTable/findBarcode_SC");
         FormBody formBody = new FormBody.Builder()
                 .add("barcode", mtlBarcode)
@@ -905,7 +944,7 @@ public class Pur_ScInFragment1 extends BaseFragment {
      * 判断表中存在该物料
      */
     private void run_findInStockSum() {
-        showLoadDialog("加载中...");
+        showLoadDialog("加载中...",false);
         StringBuilder strFbillno = new StringBuilder();
         StringBuilder strEntryId = new StringBuilder();
         for (int i = 0, size = checkDatas.size(); i < size; i++) {

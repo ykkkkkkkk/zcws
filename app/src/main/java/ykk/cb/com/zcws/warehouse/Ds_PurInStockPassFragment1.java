@@ -61,7 +61,7 @@ public class Ds_PurInStockPassFragment1 extends BaseFragment {
 
     private Ds_PurInStockPassFragment1 context = this;
     private static final int SUCC1 = 200, UNSUCC1 = 500, SUCC2 = 201, UNSUCC2 = 501, SUCC3 = 202, UNSUCC3 = 502, PASS = 203, UNPASS = 503;
-    private static final int SETFOCUS = 1, RESULT_NUM = 2, SAOMA = 3;
+    private static final int SETFOCUS = 1, RESULT_NUM = 2, SAOMA = 3, WRITE_CODE = 4;
     private Ds_PurInStockPassFragment1Adapter mAdapter;
     private List<Icstockbillentry> checkDatas = new ArrayList<>();
     private OkHttpClient okHttpClient = null;
@@ -253,6 +253,15 @@ public class Ds_PurInStockPassFragment1 extends BaseFragment {
                 }
             }
         });
+
+        // 长按输入条码
+        etCode.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+                showInputDialog("输入单号", "", "none", WRITE_CODE);
+                return true;
+            }
+        });
     }
 
     private void reset() {
@@ -280,6 +289,16 @@ public class Ds_PurInStockPassFragment1 extends BaseFragment {
                     }
                 }
                 break;
+            case WRITE_CODE: // 输入条码返回
+                if (resultCode == Activity.RESULT_OK) {
+                    Bundle bundle = data.getExtras();
+                    if (bundle != null) {
+                        String value = bundle.getString("resultValue", "");
+                        etCode.setText(value.toUpperCase());
+                    }
+                }
+
+                break;
         }
         mHandler.sendEmptyMessageDelayed(SETFOCUS, 300);
     }
@@ -293,7 +312,7 @@ public class Ds_PurInStockPassFragment1 extends BaseFragment {
             Comm.showWarnDialog(mContext,"请先审核当前入库单！");
             return;
         }
-        showLoadDialog("加载中...");
+        showLoadDialog("加载中...",false);
         String mUrl = getURL("stockBill/findEntryByBarcodeDS");
         FormBody formBody = new FormBody.Builder()
                 .add("barcode2", barcode) // 生产账号--销售出库单号

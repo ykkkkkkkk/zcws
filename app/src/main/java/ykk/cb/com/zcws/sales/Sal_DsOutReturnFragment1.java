@@ -83,7 +83,7 @@ public class Sal_DsOutReturnFragment1 extends BaseFragment {
 
     private Sal_DsOutReturnFragment1 context = this;
     private static final int SUCC1 = 200, UNSUCC1 = 500, SUCC2 = 201, UNSUCC2 = 501, SUCC3 = 202, UNSUCC3 = 502, PASS = 203, UNPASS = 503;
-    private static final int SETFOCUS = 1, RESULT_NUM = 2, SAOMA = 3, PRICE = 4, RETURN_REASON = 5, WRITE_CODE = 6;
+    private static final int SETFOCUS = 1, RESULT_NUM = 2, SAOMA = 3, PRICE = 4, RETURN_REASON = 5, WRITE_CODE = 6, DELAYED_CLICK = 7;
     private Sal_DsOutReturnFragment1Adapter mAdapter;
     private List<ScanningRecord> checkDatas = new ArrayList<>();
     private String mtlBarcode; // 对应的条码号
@@ -97,7 +97,8 @@ public class Sal_DsOutReturnFragment1 extends BaseFragment {
     private boolean isTextChange; // 是否进入TextChange事件
     private String strK3Number; // 保存k3返回的单号
     private DecimalFormat df = new DecimalFormat("#.####");
-
+    private String timesTamp; // 时间戳
+    private boolean isClickButton; // 是否点击了按钮
 
     // 消息处理
     private Sal_DsOutReturnFragment1.MyHandler mHandler = new Sal_DsOutReturnFragment1.MyHandler(this);
@@ -114,7 +115,10 @@ public class Sal_DsOutReturnFragment1 extends BaseFragment {
                 m.hideLoadDialog();
 
                 String errMsg = null;
-                String msgObj = (String) msg.obj;
+                String msgObj = null;
+                if(msg.obj instanceof String) {
+                    msgObj = (String) msg.obj;
+                }
                 switch (msg.what) {
                     case SUCC1:
                         m.strK3Number = JsonUtil.strToString(msgObj);
@@ -221,6 +225,11 @@ public class Sal_DsOutReturnFragment1 extends BaseFragment {
                         }
 
                         break;
+                    case DELAYED_CLICK: // 延时进入点击后的操作
+                        View btnView = (View) msg.obj;
+                        m.btnClickAfter(btnView);
+
+                        break;
                 }
             }
         }
@@ -286,6 +295,7 @@ public class Sal_DsOutReturnFragment1 extends BaseFragment {
 
         hideSoftInputMode(mContext, etMtlCode);
         getUserInfo();
+        timesTamp = user.getId()+"-"+Comm.randomUUID();
     }
 
     @Override
@@ -299,11 +309,29 @@ public class Sal_DsOutReturnFragment1 extends BaseFragment {
     @Override
     public void onResume() {
         super.onResume();
+        isClickButton = true;
         mHandler.sendEmptyMessageDelayed(SETFOCUS, 200);
     }
 
     @OnClick({R.id.btn_scan, R.id.btn_save, R.id.btn_pass, R.id.btn_clone, R.id.btn_batchAdd })
     public void onViewClicked(View view) {
+        if(isClickButton) {
+            isClickButton = false;
+            view.setEnabled(false);
+            view.setClickable(false);
+            showLoadDialog("稍等哈...",false);
+
+            Message msgView = mHandler.obtainMessage(DELAYED_CLICK, view);
+            mHandler.sendMessageDelayed(msgView,1000);
+        }
+    }
+
+    private void btnClickAfter(View view) {
+        hideLoadDialog();
+        isClickButton = true;
+        view.setEnabled(true);
+        view.setClickable(true);
+
         Bundle bundle = null;
         switch (view.getId()) {
             case R.id.btn_scan: // 调用摄像头扫描（物料）
@@ -447,6 +475,8 @@ public class Sal_DsOutReturnFragment1 extends BaseFragment {
     }
 
     private void reset() {
+        isClickButton = true;
+        timesTamp = user.getId()+"-"+Comm.randomUUID();
         cust = null;
         tvCustInfo.setText("客户：");
         setEnables(etMtlCode, R.color.transparent, true);
@@ -588,6 +618,7 @@ public class Sal_DsOutReturnFragment1 extends BaseFragment {
             sr.setEmpId(user.getEmpId());
             sr.setCreateUserName(user.getUsername());
             sr.setDataTypeFlag("APP");
+            sr.setTempTimesTamp(timesTamp);
             sr.setSourceObj(JsonUtil.objectToString(stockBillEntry));
             sr.setStrBarcodes(mtlBarcode);
 //            sr.setIsUniqueness('N');
@@ -706,7 +737,7 @@ public class Sal_DsOutReturnFragment1 extends BaseFragment {
      * 保存方法
      */
     private void run_save() {
-        showLoadDialog("保存中...");
+        showLoadDialog("保存中...",false);
 
         String mJson = JsonUtil.objectToString(checkDatas);
         FormBody formBody = new FormBody.Builder()
@@ -750,7 +781,7 @@ public class Sal_DsOutReturnFragment1 extends BaseFragment {
             Comm.showWarnDialog(mContext,"请对准条码！");
             return;
         }
-        showLoadDialog("加载中...");
+        showLoadDialog("加载中...",false);
         String mUrl = null;
         String barcode = null;
         String strCaseId = null;
@@ -798,7 +829,7 @@ public class Sal_DsOutReturnFragment1 extends BaseFragment {
      * 电商账号审核
      */
     private void run_passDS() {
-        showLoadDialog("正在审核...");
+        showLoadDialog("正在审核...",false);
         String mUrl = getURL("stockBill/passDS");
         getUserInfo();
         FormBody formBody = new FormBody.Builder()

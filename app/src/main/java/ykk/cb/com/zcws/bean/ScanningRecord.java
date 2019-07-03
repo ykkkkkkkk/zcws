@@ -42,6 +42,7 @@ public class ScanningRecord implements Serializable {
     private String createDate; // 创建日期
     private String dataTypeFlag; // 数据类型标识 （APP：来源手机，PC：来源电脑）
     private String timesTamp; // 时间戳（时间数+10位随机数）
+    private int entryId; // 分录id
 
     // 临时字段，不存表
     private Stock stock; // 仓库
@@ -58,6 +59,7 @@ public class ScanningRecord implements Serializable {
     private int returnReasonId; // 退货理由id
     private String returnReasonName; // 退货理由
     private double tempQty; // 用于临时记录操作的数据
+    private String tempTimesTamp; // 用于插入到临时表
 
 
     public ScanningRecord() {
@@ -398,5 +400,21 @@ public class ScanningRecord implements Serializable {
 
     public void setTimesTamp(String timesTamp) {
         this.timesTamp = timesTamp;
+    }
+
+    public String getTempTimesTamp() {
+        return tempTimesTamp;
+    }
+
+    public void setTempTimesTamp(String tempTimesTamp) {
+        this.tempTimesTamp = tempTimesTamp;
+    }
+
+    public int getEntryId() {
+        return entryId;
+    }
+
+    public void setEntryId(int entryId) {
+        this.entryId = entryId;
     }
 }
