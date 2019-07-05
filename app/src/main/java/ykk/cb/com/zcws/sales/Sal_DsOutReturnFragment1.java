@@ -41,18 +41,15 @@ import okhttp3.Response;
 import okhttp3.ResponseBody;
 import ykk.cb.com.zcws.R;
 import ykk.cb.com.zcws.basics.ReturnReason_DialogActivity;
-import ykk.cb.com.zcws.bean.BarCodeTable;
 import ykk.cb.com.zcws.bean.Department;
 import ykk.cb.com.zcws.bean.Organization;
 import ykk.cb.com.zcws.bean.ScanningRecord;
 import ykk.cb.com.zcws.bean.Stock;
-import ykk.cb.com.zcws.bean.StockPosition;
 import ykk.cb.com.zcws.bean.User;
 import ykk.cb.com.zcws.bean.k3Bean.ICItem;
 import ykk.cb.com.zcws.bean.k3Bean.IcStockBill;
 import ykk.cb.com.zcws.bean.k3Bean.Icstockbillentry;
 import ykk.cb.com.zcws.bean.k3Bean.ReturnReason;
-import ykk.cb.com.zcws.bean.prod.ProdOrder;
 import ykk.cb.com.zcws.comm.BaseFragment;
 import ykk.cb.com.zcws.comm.Comm;
 import ykk.cb.com.zcws.sales.adapter.Sal_DsOutReturnFragment1Adapter;
@@ -134,7 +131,9 @@ public class Sal_DsOutReturnFragment1 extends BaseFragment {
 
                         break;
                     case UNSUCC1:
-                        Comm.showWarnDialog(m.mContext,"服务器繁忙，请稍候再试！");
+                        errMsg = JsonUtil.strToString(msgObj);
+                        if(Comm.isNULLS(errMsg).length() == 0) errMsg = "服务器繁忙，请稍候再试！";
+                        Comm.showWarnDialog(m.mContext, errMsg);
 
                         break;
                     case PASS: // 审核成功 返回
@@ -482,7 +481,7 @@ public class Sal_DsOutReturnFragment1 extends BaseFragment {
             @Override
             public void onFocusChange(View v, boolean hasFocus) {
                 if(hasFocus) {
-                    linFocus1.setBackgroundResource(R.drawable.back_style_red);
+                    linFocus1.setBackgroundResource(R.drawable.back_style_red_focus);
                 } else {
                     linFocus1.setBackgroundResource(R.drawable.back_style_gray4);
                 }
@@ -779,7 +778,8 @@ public class Sal_DsOutReturnFragment1 extends BaseFragment {
                 String result = body.string();
                 LogUtil.e("run_save --> onResponse", result);
                 if (!JsonUtil.isSuccess(result)) {
-                    mHandler.sendEmptyMessage(UNSUCC1);
+                    Message msg = mHandler.obtainMessage(UNSUCC1, result);
+                    mHandler.sendMessage(msg);
                     return;
                 }
                 Message msg = mHandler.obtainMessage(SUCC1, result);

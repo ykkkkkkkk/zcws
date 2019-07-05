@@ -270,7 +270,7 @@ public class Sc_ProdInStockPassFragment1 extends BaseFragment {
             @Override
             public void onFocusChange(View v, boolean hasFocus) {
                 if(hasFocus) {
-                    linFocus1.setBackgroundResource(R.drawable.back_style_red);
+                    linFocus1.setBackgroundResource(R.drawable.back_style_red_focus);
                 } else {
                     linFocus1.setBackgroundResource(R.drawable.back_style_gray4);
                 }

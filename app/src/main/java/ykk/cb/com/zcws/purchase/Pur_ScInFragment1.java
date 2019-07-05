@@ -150,7 +150,9 @@ public class Pur_ScInFragment1 extends BaseFragment {
 
                         break;
                     case UNSUCC1:
-                        Comm.showWarnDialog(m.mContext,"服务器繁忙，请稍候再试！");
+                        errMsg = JsonUtil.strToString(msgObj);
+                        if(Comm.isNULLS(errMsg).length() == 0) errMsg = "服务器繁忙，请稍候再试！";
+                        Comm.showWarnDialog(m.mContext, errMsg);
 
                         break;
                     case PASS: // 审核成功 返回
@@ -484,7 +486,7 @@ public class Pur_ScInFragment1 extends BaseFragment {
             @Override
             public void onFocusChange(View v, boolean hasFocus) {
                 if(hasFocus) {
-                    linFocus1.setBackgroundResource(R.drawable.back_style_red);
+                    linFocus1.setBackgroundResource(R.drawable.back_style_red_focus);
                 } else {
                     linFocus1.setBackgroundResource(R.drawable.back_style_gray4);
                 }
@@ -861,7 +863,8 @@ public class Pur_ScInFragment1 extends BaseFragment {
                 String result = body.string();
                 LogUtil.e("run_save --> onResponse", result);
                 if (!JsonUtil.isSuccess(result)) {
-                    mHandler.sendEmptyMessage(UNSUCC1);
+                    Message msg = mHandler.obtainMessage(UNSUCC1, result);
+                    mHandler.sendMessage(msg);
                     return;
                 }
                 Message msg = mHandler.obtainMessage(SUCC1, result);

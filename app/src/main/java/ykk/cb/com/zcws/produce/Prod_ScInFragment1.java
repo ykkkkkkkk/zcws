@@ -21,8 +21,6 @@ import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import org.w3c.dom.Text;
-
 import java.io.IOException;
 import java.lang.ref.WeakReference;
 import java.text.DecimalFormat;
@@ -55,7 +53,6 @@ import ykk.cb.com.zcws.bean.prod.ProdOrder;
 import ykk.cb.com.zcws.comm.BaseFragment;
 import ykk.cb.com.zcws.comm.Comm;
 import ykk.cb.com.zcws.produce.adapter.Prod_ScInFragment1Adapter;
-import ykk.cb.com.zcws.util.CheckDoubleClickListener;
 import ykk.cb.com.zcws.util.JsonUtil;
 import ykk.cb.com.zcws.util.LogUtil;
 import ykk.cb.com.zcws.util.zxing.android.CaptureActivity;
@@ -140,7 +137,9 @@ public class Prod_ScInFragment1 extends BaseFragment {
 
                         break;
                     case UNSUCC1:
-                        Comm.showWarnDialog(m.mContext,"服务器繁忙，请稍候再试！");
+                        errMsg = JsonUtil.strToString(msgObj);
+                        if(Comm.isNULLS(errMsg).length() == 0) errMsg = "服务器繁忙，请稍候再试！";
+                        Comm.showWarnDialog(m.mContext, errMsg);
 
                         break;
                     case PASS: // 审核成功 返回
@@ -446,7 +445,7 @@ public class Prod_ScInFragment1 extends BaseFragment {
             @Override
             public void onFocusChange(View v, boolean hasFocus) {
                 if(hasFocus) {
-                    linFocus1.setBackgroundResource(R.drawable.back_style_red);
+                    linFocus1.setBackgroundResource(R.drawable.back_style_red_focus);
                 } else {
                     linFocus1.setBackgroundResource(R.drawable.back_style_gray4);
                 }
@@ -809,7 +808,8 @@ public class Prod_ScInFragment1 extends BaseFragment {
                 String result = body.string();
                 LogUtil.e("run_save --> onResponse", result);
                 if (!JsonUtil.isSuccess(result)) {
-                    mHandler.sendEmptyMessage(UNSUCC1);
+                    Message msg = mHandler.obtainMessage(UNSUCC1, result);
+                    mHandler.sendMessage(msg);
                     return;
                 }
                 Message msg = mHandler.obtainMessage(SUCC1, result);

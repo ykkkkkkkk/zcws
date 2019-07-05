@@ -96,6 +96,7 @@ public class SeoutStock implements Serializable {
 
     /* 临时字段,不存表 */
     private int tempEmpId;
+    private String expressNo; // 扫码的快递单号
 
     public String getFbrno() {
         return fbrno;
@@ -433,21 +434,12 @@ public class SeoutStock implements Serializable {
         this.tempEmpId = tempEmpId;
     }
 
-    @Override
-    public String toString() {
-        return "SeoutStock [fbrno=" + fbrno + ", finterid=" + finterid + ", fbillno=" + fbillno + ", ftrantype="
-                + ftrantype + ", fsaltype=" + fsaltype + ", fcustid=" + fcustid + ", fdate=" + fdate + ", fstockid="
-                + fstockid + ", fadd=" + fadd + ", fnote=" + fnote + ", fempid=" + fempid + ", fcheckerid=" + fcheckerid
-                + ", fbillerid=" + fbillerid + ", fmanagerid=" + fmanagerid + ", fclosed=" + fclosed
-                + ", finvoiceclosed=" + finvoiceclosed + ", fdeptid=" + fdeptid + ", fsettleid=" + fsettleid
-                + ", ftranstatus=" + ftranstatus + ", fexchangerate=" + fexchangerate + ", fcurrencyid=" + fcurrencyid
-                + ", fstatus=" + fstatus + ", fcancellation=" + fcancellation + ", fcurchecklevel=" + fcurchecklevel
-                + ", frelatebrid=" + frelatebrid + ", fcheckdate=" + fcheckdate + ", fexplanation=" + fexplanation
-                + ", ffetchadd=" + ffetchadd + ", fseltrantype=" + fseltrantype + ", fchildren=" + fchildren
-                + ", fbrid=" + fbrid + ", fareaps=" + fareaps + ", fmanagetype=" + fmanagetype + ", fexchangeratetype="
-                + fexchangeratetype + ", fheadselfs0238=" + fheadselfs0238 + ", fheadselfs0239=" + fheadselfs0239
-                + ", fheadselfs0243=" + fheadselfs0243 + ", department=" + department + ", emp=" + emp + ", customer="
-                + customer + ", logcompany=" + logcompany + "]";
+    public String getExpressNo() {
+        return expressNo;
+    }
+
+    public void setExpressNo(String expressNo) {
+        this.expressNo = expressNo;
     }
 
 }
