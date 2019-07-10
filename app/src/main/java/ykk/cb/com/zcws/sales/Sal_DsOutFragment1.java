@@ -30,7 +30,6 @@ import java.util.concurrent.TimeUnit;
 
 import butterknife.BindView;
 import butterknife.OnClick;
-import butterknife.OnFocusChange;
 import okhttp3.Call;
 import okhttp3.Callback;
 import okhttp3.FormBody;
@@ -344,7 +343,7 @@ public class Sal_DsOutFragment1 extends BaseFragment {
 
                 break;
             case R.id.btn_save: // 保存
-                hideKeyboard(mContext.getCurrentFocus());
+//                hideKeyboard(mContext.getCurrentFocus());
                 if (!saveBefore()) {
                     return;
                 }
@@ -361,7 +360,7 @@ public class Sal_DsOutFragment1 extends BaseFragment {
 
                 break;
             case R.id.btn_clone: // 重置
-                hideKeyboard(mContext.getCurrentFocus());
+//                hideKeyboard(mContext.getCurrentFocus());
                 if (checkDatas != null && checkDatas.size() > 0) {
                     AlertDialog.Builder build = new AlertDialog.Builder(mContext);
                     build.setIcon(R.drawable.caution);
@@ -422,11 +421,6 @@ public class Sal_DsOutFragment1 extends BaseFragment {
             }
         }
         return isBool;
-    }
-
-    @OnFocusChange({R.id.et_expressCode, R.id.et_mtlCode})
-    public void onViewFocusChange(View v, boolean hasFocus) {
-        if (hasFocus) hideKeyboard(v);
     }
 
     @Override

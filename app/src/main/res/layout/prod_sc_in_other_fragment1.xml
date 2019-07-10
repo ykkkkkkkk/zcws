@@ -92,19 +92,28 @@
             android:textColor="#000000"
             android:textSize="14sp" />
 
-        <Button
-            android:id="@+id/btn_search"
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_marginLeft="@dimen/_3dp"
+            android:ems="2"
+            android:gravity="center"
+            android:text="仓库"
+            android:textColor="#000000"
+            android:textSize="12sp" />
+
+        <TextView
+            android:id="@+id/tv_stockSel"
             android:layout_width="0dp"
             android:layout_height="match_parent"
-            android:layout_gravity="center"
-            android:layout_marginLeft="10dp"
-            android:layout_weight="0.8"
-            android:background="@drawable/btn_blue_selector"
-            android:text="查询"
-            android:textColor="#ffffff"
-            android:textSize="16sp"
-            android:textStyle="bold" />
-
+            android:layout_weight="1"
+            android:background="@drawable/back_style_blue"
+            android:drawableRight="@drawable/xiala3"
+            android:hint="用于保存的仓库"
+            android:gravity="center"
+            android:textColor="@color/black"
+            android:textSize="@dimen/_14sp" />
     </LinearLayout>
 
     <HorizontalScrollView
@@ -165,10 +174,10 @@
                     android:textSize="12sp" />
 
                 <TextView
-                    android:layout_width="120dp"
+                    android:layout_width="100dp"
                     android:layout_height="match_parent"
                     android:gravity="center"
-                    android:text="仓库/库位"
+                    android:text="仓库"
                     android:textColor="#000000"
                     android:textSize="12sp" />
 

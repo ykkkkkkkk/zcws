@@ -48,7 +48,7 @@ public class SeOrder implements Serializable {
 
 	private String fnote;/* 备注 */
 
-	private Short fclosed;/* 是否关闭 */
+	private int fclosed;/* 是否关闭 */
 
 	private Integer ftrantype;/* 单据类型 */
 
@@ -296,11 +296,11 @@ public class SeOrder implements Serializable {
 		this.fnote = fnote == null ? null : fnote.trim();
 	}
 
-	public Short getFclosed() {
+	public int getFclosed() {
 		return fclosed;
 	}
 
-	public void setFclosed(Short fclosed) {
+	public void setFclosed(int fclosed) {
 		this.fclosed = fclosed;
 	}
 

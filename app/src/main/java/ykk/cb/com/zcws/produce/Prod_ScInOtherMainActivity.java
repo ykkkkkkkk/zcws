@@ -81,6 +81,7 @@ public class Prod_ScInOtherMainActivity extends BaseActivity {
     private static final int PRINTER_COMMAND_ERROR = 0x008; // 使用打印机指令错误
     private static final int CONN_PRINTER = 0x12;
 //    private Customer customer; // 客户
+    private Prod_ScInOtherFragment1 fragment1 = new Prod_ScInOtherFragment1();
 
     @Override
     public int setLayoutResID() {
@@ -100,7 +101,7 @@ public class Prod_ScInOtherMainActivity extends BaseActivity {
 //        bundle2.putSerializable("customer", customer);
 //        fragment1.setArguments(bundle2); // 传参数
 //        fragment2.setArguments(bundle2); // 传参数
-        Prod_ScInOtherFragment1 fragment1 = new Prod_ScInOtherFragment1();
+//        Prod_ScInOtherFragment1 fragment1 = new Prod_ScInOtherFragment1();
 //        Sal_OutFragment2 fragment2 = new Sal_OutFragment2();
 //        Sal_OutFragment3 fragment3 = new Sal_OutFragment3();
 
@@ -152,7 +153,7 @@ public class Prod_ScInOtherMainActivity extends BaseActivity {
         }
     }
 
-    @OnClick({R.id.btn_close, R.id.btn_print, R.id.lin_tab1, R.id.lin_tab2, R.id.lin_tab3})
+    @OnClick({R.id.btn_close, R.id.btn_search, R.id.lin_tab1, R.id.lin_tab2, R.id.lin_tab3})
     public void onViewClicked(View view) {
         // setCurrentItem第二个参数控制页面切换动画
         //  true:打开/false:关闭
@@ -179,8 +180,8 @@ public class Prod_ScInOtherMainActivity extends BaseActivity {
 //                }
 
                 break;
-            case R.id.btn_print: // 打印
-                show(PrintMainActivity.class,null);
+            case R.id.btn_search: // 查询
+                fragment1.findFun();
 
                 break;
             case R.id.lin_tab1:

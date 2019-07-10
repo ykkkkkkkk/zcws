@@ -46,6 +46,7 @@ public class ScanningRecord implements Serializable {
 
     // 临时字段，不存表
     private Stock stock; // 仓库
+    private int stockId; // 仓库id
     private StockPosition stockPos; // 库位
     private ICItem icItem; // 物料
     private char isUniqueness; // 条码是否唯一：Y是，N否
@@ -416,5 +417,13 @@ public class ScanningRecord implements Serializable {
 
     public void setEntryId(int entryId) {
         this.entryId = entryId;
+    }
+
+    public int getStockId() {
+        return stockId;
+    }
+
+    public void setStockId(int stockId) {
+        this.stockId = stockId;
     }
 }

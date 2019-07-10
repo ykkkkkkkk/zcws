@@ -30,7 +30,6 @@ import java.util.concurrent.TimeUnit;
 
 import butterknife.BindView;
 import butterknife.OnClick;
-import butterknife.OnFocusChange;
 import okhttp3.Call;
 import okhttp3.Callback;
 import okhttp3.FormBody;
@@ -347,7 +346,7 @@ public class Pur_ScInFragment1 extends BaseFragment {
 
                 break;
             case R.id.btn_save: // 保存
-                hideKeyboard(mContext.getCurrentFocus());
+//                hideKeyboard(mContext.getCurrentFocus());
                 if(!saveBefore(false)) {
                     return;
                 }
@@ -365,7 +364,7 @@ public class Pur_ScInFragment1 extends BaseFragment {
 
                 break;
             case R.id.btn_clone: // 重置
-                hideKeyboard(mContext.getCurrentFocus());
+//                hideKeyboard(mContext.getCurrentFocus());
                 if (checkDatas != null && checkDatas.size() > 0) {
                     AlertDialog.Builder build = new AlertDialog.Builder(mContext);
                     build.setIcon(R.drawable.caution);
@@ -436,11 +435,6 @@ public class Pur_ScInFragment1 extends BaseFragment {
         }
     }
 
-    @OnFocusChange({R.id.et_mtlCode})
-    public void onViewFocusChange(View v, boolean hasFocus) {
-        if (hasFocus) hideKeyboard(v);
-    }
-
     @Override
     public void setListener() {
         View.OnClickListener click = new View.OnClickListener() {
@@ -487,8 +481,8 @@ public class Pur_ScInFragment1 extends BaseFragment {
             public void onFocusChange(View v, boolean hasFocus) {
                 if(hasFocus) {
                     linFocus1.setBackgroundResource(R.drawable.back_style_red_focus);
-                } else {
-                    linFocus1.setBackgroundResource(R.drawable.back_style_gray4);
+//                } else {
+//                    linFocus1.setBackgroundResource(R.drawable.back_style_gray4);
                 }
             }
         });

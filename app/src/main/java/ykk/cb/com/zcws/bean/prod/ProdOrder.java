@@ -60,6 +60,8 @@ public class ProdOrder implements Serializable {
     private ICItem icItem;
     private Organization cust; // 客户对象
     private Department department; // 部门对象
+    /*订单产品类型*/
+    private int goodsType;
 
     // 临时字段，不存表
     private int isCheck; // 是否选中
@@ -303,15 +305,13 @@ public class ProdOrder implements Serializable {
         this.barcodeCreateDate = barcodeCreateDate;
     }
 
-    @Override
-    public String toString() {
-        return "ProdOrder [prodId=" + prodId + ", prodNo=" + prodNo + ", workShopId=" + workShopId + ", deptNumber="
-                + deptNumber + ", deptName=" + deptName + ", icItemId=" + icItemId + ", icItemNumber=" + icItemNumber
-                + ", icItemName=" + icItemName + ", unitId=" + unitId + ", unitNumber=" + unitNumber + ", unitName="
-                + unitName + ", fqty=" + fqty + ", salOrderEntryId=" + salOrderEntryId + ", salOrderId=" + salOrderId
-                + ", salOrderNo=" + salOrderNo + ", prodNote=" + prodNote + ", prodBillDate=" + prodBillDate
-                + ", custId=" + custId + ", custNumber=" + custNumber + ", custName=" + custName + ", prodStatus="
-                + prodStatus + ", prodClosed=" + prodClosed + ", icItem=" + icItem + "]";
+    public int getGoodsType() {
+        return goodsType;
     }
+
+    public void setGoodsType(int goodsType) {
+        this.goodsType = goodsType;
+    }
+
 
 }

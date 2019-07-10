@@ -30,7 +30,6 @@ import java.util.concurrent.TimeUnit;
 
 import butterknife.BindView;
 import butterknife.OnClick;
-import butterknife.OnFocusChange;
 import okhttp3.Call;
 import okhttp3.Callback;
 import okhttp3.FormBody;
@@ -72,6 +71,8 @@ public class Prod_ScInFragment1 extends BaseFragment {
     EditText etCode;
     @BindView(R.id.btn_scan)
     Button btnScan;
+    @BindView(R.id.tv_stockSel)
+    TextView tvStockSel;
     @BindView(R.id.recyclerView)
     RecyclerView recyclerView;
     @BindView(R.id.btn_save)
@@ -84,12 +85,12 @@ public class Prod_ScInFragment1 extends BaseFragment {
     TextView tvOkNum;
 
     private Prod_ScInFragment1 context = this;
-    private static final int SEL_STOCK = 10, SEL_STOCKPOS = 11;
+    private static final int SEL_STOCK1 = 10, SEL_STOCK = 11, SEL_STOCKPOS = 12;
     private static final int SUCC1 = 200, UNSUCC1 = 500, SUCC2 = 201, UNSUCC2 = 501, SUCC3 = 202, UNSUCC3 = 502, PASS = 203, UNPASS = 503;
     private static final int SETFOCUS = 1, RESULT_NUM = 2, SAOMA = 3, WRITE_CODE = 4, DELAYED_CLICK = 5;
     private Prod_ScInFragment1Adapter mAdapter;
     private List<ScanningRecord> checkDatas = new ArrayList<>();
-    private Stock stock;
+    private Stock stock1, stock;
     private StockPosition stockPos;
     private String barcode; // 对应的条码号
     private char curViewFlag = '1'; // 1：仓库，2：库位， 3：车间， 4：物料 ，箱码
@@ -260,11 +261,11 @@ public class Prod_ScInFragment1 extends BaseFragment {
                 showInputDialog("入库数", showInfo, String.valueOf(useableQty), "0.0", RESULT_NUM);
             }
 
-            @Override
-            public void onClick_selStock(View v, ScanningRecord entity, int position) {
-                curPos = position;
-                showForResult(Stock_DialogActivity.class, SEL_STOCK, null);
-            }
+//            @Override
+//            public void onClick_selStock(View v, ScanningRecord entity, int position) {
+//                curPos = position;
+//                showForResult(Stock_DialogActivity.class, SEL_STOCK, null);
+//            }
 
         });
     }
@@ -300,7 +301,7 @@ public class Prod_ScInFragment1 extends BaseFragment {
         mHandler.sendEmptyMessageDelayed(SETFOCUS, 200);
     }
 
-    @OnClick({R.id.btn_scan, R.id.btn_save, R.id.btn_pass, R.id.btn_clone })
+    @OnClick({R.id.btn_scan, R.id.tv_stockSel, R.id.btn_save, R.id.btn_pass, R.id.btn_clone })
     public void onViewClicked(View view) {
         if(isClickButton && view.getId() == R.id.btn_save) {
             isClickButton = false;
@@ -329,8 +330,12 @@ public class Prod_ScInFragment1 extends BaseFragment {
                 showForResult(CaptureActivity.class, CAMERA_SCAN, null);
 
                 break;
+            case R.id.tv_stockSel: // 选择仓库
+                showForResult(Stock_DialogActivity.class, SEL_STOCK1, null);
+
+                break;
             case R.id.btn_save: // 保存
-                hideKeyboard(mContext.getCurrentFocus());
+//                hideKeyboard(mContext.getCurrentFocus());
                 if(!saveBefore()) {
                     return;
                 }
@@ -347,7 +352,7 @@ public class Prod_ScInFragment1 extends BaseFragment {
 
                 break;
             case R.id.btn_clone: // 重置
-                hideKeyboard(mContext.getCurrentFocus());
+//                hideKeyboard(mContext.getCurrentFocus());
                 if (checkDatas != null && checkDatas.size() > 0) {
                     AlertDialog.Builder build = new AlertDialog.Builder(mContext);
                     build.setIcon(R.drawable.caution);
@@ -393,11 +398,6 @@ public class Prod_ScInFragment1 extends BaseFragment {
             }
         }
         return true;
-    }
-
-    @OnFocusChange({R.id.et_code})
-    public void onViewFocusChange(View v, boolean hasFocus) {
-        if (hasFocus) hideKeyboard(v);
     }
 
     @Override
@@ -446,8 +446,8 @@ public class Prod_ScInFragment1 extends BaseFragment {
             public void onFocusChange(View v, boolean hasFocus) {
                 if(hasFocus) {
                     linFocus1.setBackgroundResource(R.drawable.back_style_red_focus);
-                } else {
-                    linFocus1.setBackgroundResource(R.drawable.back_style_gray4);
+//                } else {
+//                    linFocus1.setBackgroundResource(R.drawable.back_style_gray4);
                 }
             }
         });
@@ -476,6 +476,24 @@ public class Prod_ScInFragment1 extends BaseFragment {
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         switch (requestCode) {
+            case SEL_STOCK1: //选择仓库	返回
+                if (resultCode == Activity.RESULT_OK) {
+                    stock1 = (Stock) data.getSerializableExtra("obj");
+                    if(checkDatas != null && checkDatas.size() > 0) {
+                        for(int i=0; i<checkDatas.size(); i++) {
+                            ScanningRecord sr2 = checkDatas.get(i);
+                            sr2.setStock(stock1);
+                            sr2.setStockNumber(stock1.getFnumber());
+                            sr2.setStockName(stock1.getFname());
+                            sr2.setStockPositionNumber("");
+                            sr2.setStockPositionName("");
+                        }
+                        mAdapter.notifyDataSetChanged();
+                    }
+                    tvStockSel.setText(stock1.getFname());
+                }
+
+                break;
             case SEL_STOCK: //行事件选择仓库	返回
                 if (resultCode == Activity.RESULT_OK) {
                     stock = (Stock) data.getSerializableExtra("obj");
@@ -620,18 +638,43 @@ public class Prod_ScInFragment1 extends BaseFragment {
             sr.setDeptNumber(department.getDepartmentNumber());
             sr.setDeptName(department.getDepartmentName());
         }
-        Stock stock = icItem.getStock();
-        if(stock != null) {
+//        Stock stock = icItem.getStock();
+//        if(stock != null) {
+//            sr.setStock(stock);
+//            sr.setStockNumber(stock.getFnumber());
+//            sr.setStockName(stock.getFname());
+//        }
+        if(stock1 != null) {
+            sr.setStock(stock1);
+            sr.setStockNumber(stock1.getFnumber());
+            sr.setStockName(stock1.getFname());
+
+        } else if(prodOrder.getGoodsType() == 990168) { // 990168代表非定制，990169代表定制
+            Stock stock = new Stock();
+            stock.setFitemId(254);
+            stock.setFnumber("CC.01.01");
+            stock.setFname("忠诚卫士成品仓");
+
+            sr.setStock(stock);
+            sr.setStockNumber(stock.getFnumber());
+            sr.setStockName(stock.getFname());
+
+        } else { // 定制990169
+            Stock stock = new Stock();
+            stock.setFitemId(38263);
+            stock.setFnumber("CC.01.05");
+            stock.setFname("定制产品仓");
+
             sr.setStock(stock);
             sr.setStockNumber(stock.getFnumber());
             sr.setStockName(stock.getFname());
         }
-        StockPosition stockPos = icItem.getStockPos();
-        if(stockPos != null && stockPos.getFspId() > 0) {
-            sr.setStockPos(stockPos);
-            sr.setStockPositionNumber(stockPos.getFnumber());
-            sr.setStockPositionName(stockPos.getFname());
-        }
+//        StockPosition stockPos = icItem.getStockPos();
+//        if(stockPos != null && stockPos.getFspId() > 0) {
+//            sr.setStockPos(stockPos);
+//            sr.setStockPositionNumber(stockPos.getFnumber());
+//            sr.setStockPositionName(stockPos.getFname());
+//        }
         sr.setDeliveryWay("");
         sr.setSourceQty(prodOrder.getFqty());
         sr.setUseableQty(prodOrder.getUseableQty());
