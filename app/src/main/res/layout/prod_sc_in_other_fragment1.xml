@@ -101,7 +101,8 @@
             android:gravity="center"
             android:text="仓库"
             android:textColor="#000000"
-            android:textSize="12sp" />
+            android:textSize="12sp"
+            android:visibility="gone" />
 
         <TextView
             android:id="@+id/tv_stockSel"
@@ -110,10 +111,11 @@
             android:layout_weight="1"
             android:background="@drawable/back_style_blue"
             android:drawableRight="@drawable/xiala3"
-            android:hint="用于保存的仓库"
             android:gravity="center"
+            android:hint="用于保存的仓库"
             android:textColor="@color/black"
-            android:textSize="@dimen/_14sp" />
+            android:textSize="@dimen/_14sp"
+            android:visibility="gone" />
     </LinearLayout>
 
     <HorizontalScrollView

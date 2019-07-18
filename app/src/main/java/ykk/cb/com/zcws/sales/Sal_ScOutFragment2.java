@@ -50,6 +50,7 @@ import ykk.cb.com.zcws.bean.k3Bean.SeoutStockEntry;
 import ykk.cb.com.zcws.comm.BaseFragment;
 import ykk.cb.com.zcws.comm.Comm;
 import ykk.cb.com.zcws.sales.adapter.Sal_ScOutFragment2Adapter;
+import ykk.cb.com.zcws.util.BigdecimalUtil;
 import ykk.cb.com.zcws.util.JsonUtil;
 import ykk.cb.com.zcws.util.LogUtil;
 import ykk.cb.com.zcws.util.zxing.android.CaptureActivity;
@@ -500,7 +501,9 @@ public class Sal_ScOutFragment2 extends BaseFragment {
                     linFocus1.setBackgroundResource(R.drawable.back_style_red_focus);
                     linFocus2.setBackgroundResource(R.drawable.back_style_gray4);
                 } else {
-                    linFocus1.setBackgroundResource(R.drawable.back_style_gray4);
+                    if(linFocus1 != null) {
+                        linFocus1.setBackgroundResource(R.drawable.back_style_gray4);
+                    }
                 }
             }
         });
@@ -512,7 +515,9 @@ public class Sal_ScOutFragment2 extends BaseFragment {
                     linFocus1.setBackgroundResource(R.drawable.back_style_gray4);
                     linFocus2.setBackgroundResource(R.drawable.back_style_red_focus);
                 } else {
-                    linFocus2.setBackgroundResource(R.drawable.back_style_gray4);
+                    if(linFocus2 != null) {
+                        linFocus2.setBackgroundResource(R.drawable.back_style_gray4);
+                    }
                 }
             }
         });
@@ -765,8 +770,8 @@ public class Sal_ScOutFragment2 extends BaseFragment {
         double okNum = 0;
         for(int i=0; i<checkDatas.size(); i++) {
             ScanningRecord sc = checkDatas.get(i);
-            needNum += sc.getUseableQty();
-            okNum += sc.getRealQty();
+            needNum = BigdecimalUtil.add(needNum, sc.getUseableQty());
+            okNum = BigdecimalUtil.add(okNum, sc.getRealQty());
         }
         tvNeedNum.setText(df.format(needNum));
         tvOkNum.setText(df.format(okNum));
@@ -851,6 +856,7 @@ public class Sal_ScOutFragment2 extends BaseFragment {
         }
         FormBody formBody = new FormBody.Builder()
                 .add("expressNo", expressNo)
+                .add("logWay", "WL") // 发货方式：物流
                 .add("barcode", barcode)
                 .add("strCaseId", strCaseId)
                 .add("sourceType", "11") // 1：电商销售出库，10：生产产品入库，11：发货通知单销售出库

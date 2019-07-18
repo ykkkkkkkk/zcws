@@ -51,6 +51,7 @@ import ykk.cb.com.zcws.bean.k3Bean.SeOrderEntry;
 import ykk.cb.com.zcws.comm.BaseFragment;
 import ykk.cb.com.zcws.comm.Comm;
 import ykk.cb.com.zcws.sales.adapter.Sal_DsOutFragment1Adapter;
+import ykk.cb.com.zcws.util.BigdecimalUtil;
 import ykk.cb.com.zcws.util.JsonUtil;
 import ykk.cb.com.zcws.util.LogUtil;
 import ykk.cb.com.zcws.util.zxing.android.CaptureActivity;
@@ -509,7 +510,9 @@ public class Sal_DsOutFragment1 extends BaseFragment {
                     linFocus1.setBackgroundResource(R.drawable.back_style_red_focus);
                     linFocus2.setBackgroundResource(R.drawable.back_style_gray4);
                 } else {
-                    linFocus1.setBackgroundResource(R.drawable.back_style_gray4);
+                    if(linFocus1 != null) {
+                        linFocus1.setBackgroundResource(R.drawable.back_style_gray4);
+                    }
                 }
             }
         });
@@ -521,7 +524,9 @@ public class Sal_DsOutFragment1 extends BaseFragment {
                     linFocus1.setBackgroundResource(R.drawable.back_style_gray4);
                     linFocus2.setBackgroundResource(R.drawable.back_style_red_focus);
                 } else {
-                    linFocus2.setBackgroundResource(R.drawable.back_style_gray4);
+                    if(linFocus2 != null) {
+                        linFocus2.setBackgroundResource(R.drawable.back_style_gray4);
+                    }
                 }
             }
         });
@@ -767,8 +772,8 @@ public class Sal_DsOutFragment1 extends BaseFragment {
         double okNum = 0;
         for (int i = 0; i < checkDatas.size(); i++) {
             ScanningRecord sc = checkDatas.get(i);
-            needNum += sc.getSourceQty();
-            okNum += sc.getRealQty();
+            needNum = BigdecimalUtil.add(needNum, sc.getSourceQty());
+            okNum = BigdecimalUtil.add(okNum, sc.getRealQty());
         }
         tvNeedNum.setText(df.format(needNum));
         tvOkNum.setText(df.format(okNum));

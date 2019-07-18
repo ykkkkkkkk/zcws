@@ -54,6 +54,7 @@ import ykk.cb.com.zcws.bean.pur.POOrderEntry;
 import ykk.cb.com.zcws.comm.BaseFragment;
 import ykk.cb.com.zcws.comm.Comm;
 import ykk.cb.com.zcws.purchase.adapter.Pur_ScInFragment1Adapter;
+import ykk.cb.com.zcws.util.BigdecimalUtil;
 import ykk.cb.com.zcws.util.JsonUtil;
 import ykk.cb.com.zcws.util.LogUtil;
 import ykk.cb.com.zcws.util.basehelper.BaseRecyclerAdapter;
@@ -481,8 +482,10 @@ public class Pur_ScInFragment1 extends BaseFragment {
             public void onFocusChange(View v, boolean hasFocus) {
                 if(hasFocus) {
                     linFocus1.setBackgroundResource(R.drawable.back_style_red_focus);
-//                } else {
-//                    linFocus1.setBackgroundResource(R.drawable.back_style_gray4);
+                } else {
+                    if(linFocus1 != null) {
+                        linFocus1.setBackgroundResource(R.drawable.back_style_gray4);
+                    }
                 }
             }
         });
@@ -798,8 +801,8 @@ public class Pur_ScInFragment1 extends BaseFragment {
         double okNum = 0;
         for(int i=0; i<checkDatas.size(); i++) {
             ScanningRecord sc = checkDatas.get(i);
-            needNum += sc.getUseableQty();
-            okNum += sc.getRealQty();
+            needNum = BigdecimalUtil.add(needNum, sc.getUseableQty());
+            okNum = BigdecimalUtil.add(okNum, sc.getRealQty());
         }
         tvNeedNum.setText(df.format(needNum));
         tvOkNum.setText(df.format(okNum));

@@ -52,6 +52,7 @@ import ykk.cb.com.zcws.bean.k3Bean.ReturnReason;
 import ykk.cb.com.zcws.comm.BaseFragment;
 import ykk.cb.com.zcws.comm.Comm;
 import ykk.cb.com.zcws.sales.adapter.Sal_NxOutReturnFragment1Adapter;
+import ykk.cb.com.zcws.util.BigdecimalUtil;
 import ykk.cb.com.zcws.util.JsonUtil;
 import ykk.cb.com.zcws.util.LogUtil;
 import ykk.cb.com.zcws.util.zxing.android.CaptureActivity;
@@ -65,10 +66,16 @@ public class Sal_NxOutReturnFragment1 extends BaseFragment {
     EditText etGetFocus;
     @BindView(R.id.lin_focus1)
     LinearLayout linFocus1;
+    @BindView(R.id.lin_focus2)
+    LinearLayout linFocus2;
     @BindView(R.id.et_mtlCode)
     EditText etMtlCode;
+    @BindView(R.id.et_expressCode)
+    EditText etExpressCode;
     @BindView(R.id.btn_scan)
     Button btnScan;
+    @BindView(R.id.btn_scan2)
+    Button btnScan2;
     @BindView(R.id.tv_custInfo)
     TextView tvCustInfo;
     @BindView(R.id.recyclerView)
@@ -82,7 +89,7 @@ public class Sal_NxOutReturnFragment1 extends BaseFragment {
 
     private Sal_NxOutReturnFragment1 context = this;
     private static final int SUCC1 = 200, UNSUCC1 = 500, SUCC2 = 201, UNSUCC2 = 501, SUCC3 = 202, UNSUCC3 = 502, PASS = 203, UNPASS = 503;
-    private static final int SETFOCUS = 1, RESULT_NUM = 2, SAOMA = 3, PRICE = 4, RETURN_REASON = 5, WRITE_CODE = 6, DELAYED_CLICK = 7;
+    private static final int SETFOCUS = 1, RESULT_NUM = 2, SAOMA = 3, PRICE = 4, RETURN_REASON = 5, WRITE_CODE = 6, WRITE_CODE2 = 7, DELAYED_CLICK = 8;
     private Sal_NxOutReturnFragment1Adapter mAdapter;
     private List<ScanningRecord> checkDatas = new ArrayList<>();
     private String mtlBarcode; // 对应的条码号
@@ -124,7 +131,9 @@ public class Sal_NxOutReturnFragment1 extends BaseFragment {
                         m.strK3Number = JsonUtil.strToString(msgObj);
 
                         m.setEnables(m.etMtlCode, R.drawable.back_style_gray3, false);
+                        m.setEnables(m.etExpressCode, R.drawable.back_style_gray3, false);
                         m.btnScan.setVisibility(View.GONE);
+                        m.btnScan2.setVisibility(View.GONE);
                         m.btnSave.setVisibility(View.GONE);
                         m.btnPass.setVisibility(View.VISIBLE);
                         Comm.showWarnDialog(m.mContext,"保存成功，请点击“审核按钮”！");
@@ -308,6 +317,7 @@ public class Sal_NxOutReturnFragment1 extends BaseFragment {
         }
 
         hideSoftInputMode(mContext, etMtlCode);
+        hideSoftInputMode(mContext, etExpressCode);
         getUserInfo();
         timesTamp = user.getId()+"-"+Comm.randomUUID();
     }
@@ -327,7 +337,7 @@ public class Sal_NxOutReturnFragment1 extends BaseFragment {
         mHandler.sendEmptyMessageDelayed(SETFOCUS, 200);
     }
 
-    @OnClick({R.id.btn_scan, R.id.btn_save, R.id.btn_pass, R.id.btn_clone, R.id.btn_batchAdd })
+    @OnClick({R.id.btn_scan, R.id.btn_scan2, R.id.btn_save, R.id.btn_pass, R.id.btn_clone, R.id.btn_batchAdd })
     public void onViewClicked(View view) {
         if(isClickButton && view.getId() == R.id.btn_save) {
             isClickButton = false;
@@ -351,6 +361,11 @@ public class Sal_NxOutReturnFragment1 extends BaseFragment {
         Bundle bundle = null;
         switch (view.getId()) {
             case R.id.btn_scan: // 调用摄像头扫描（物料）
+                curViewFlag = '2';
+                showForResult(CaptureActivity.class, CAMERA_SCAN, null);
+
+                break;
+            case R.id.btn_scan2: // 调用摄像头扫描（快递单）
                 curViewFlag = '1';
                 showForResult(CaptureActivity.class, CAMERA_SCAN, null);
 
@@ -382,8 +397,26 @@ public class Sal_NxOutReturnFragment1 extends BaseFragment {
                 if(!saveBefore()) {
                     return;
                 }
+                String expressCode = getValues(etExpressCode).trim();
+                if(expressCode.length() == 0) {
+                    AlertDialog.Builder build = new AlertDialog.Builder(mContext);
+                    build.setIcon(R.drawable.caution);
+                    build.setTitle("系统提示");
+                    build.setMessage("当前快递单为空，是否继续保存？");
+                    build.setPositiveButton("是", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            run_save();
+                        }
+                    });
+                    build.setNegativeButton("否", null);
+                    build.setCancelable(false);
+                    build.show();
+
+                } else {
 //                run_findInStockSum();
-                run_save();
+                    run_save();
+                }
 
                 break;
             case R.id.btn_pass: // 审核
@@ -427,10 +460,11 @@ public class Sal_NxOutReturnFragment1 extends BaseFragment {
             Comm.showWarnDialog(mContext,"请扫描有效条码！");
             return false;
         }
-
+        String expressCode = getValues(etExpressCode).trim();
         // 检查数据
         for (int i = 0, size = checkDatas.size(); i < size; i++) {
             ScanningRecord sr = checkDatas.get(i);
+            sr.setExpressNo(expressCode); // 赋值快递单
             if(sr.getReturnReasonId() == 0) {
                 Comm.showWarnDialog(mContext,"第（"+(i+1)+"）行，请选择退货理由！");
                 return false;
@@ -453,10 +487,14 @@ public class Sal_NxOutReturnFragment1 extends BaseFragment {
                     case R.id.et_mtlCode:
                         setFocusable(etMtlCode);
                         break;
+                    case R.id.et_expressCode:
+                        setFocusable(etExpressCode);
+                        break;
                 }
             }
         };
         etMtlCode.setOnClickListener(click);
+        etExpressCode.setOnClickListener(click);
 
         // 物料
         etMtlCode.addTextChangedListener(new TextWatcher() {
@@ -479,7 +517,16 @@ public class Sal_NxOutReturnFragment1 extends BaseFragment {
         etMtlCode.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
             public boolean onLongClick(View v) {
-                showInputDialog("输入条码", "", "none", WRITE_CODE);
+                showInputDialog("输入条码", "", "none", WRITE_CODE2);
+                return true;
+            }
+        });
+
+        // 长按输入条码
+        etExpressCode.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+                showInputDialog("输入快递号", "", "none", WRITE_CODE);
                 return true;
             }
         });
@@ -489,8 +536,25 @@ public class Sal_NxOutReturnFragment1 extends BaseFragment {
             public void onFocusChange(View v, boolean hasFocus) {
                 if(hasFocus) {
                     linFocus1.setBackgroundResource(R.drawable.back_style_red_focus);
-//                } else {
-//                    linFocus1.setBackgroundResource(R.drawable.back_style_gray4);
+                    linFocus2.setBackgroundResource(R.drawable.back_style_gray4);
+                } else {
+                    if(linFocus1 != null) {
+                        linFocus1.setBackgroundResource(R.drawable.back_style_gray4);
+                    }
+                }
+            }
+        });
+
+        etExpressCode.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+            @Override
+            public void onFocusChange(View v, boolean hasFocus) {
+                if(hasFocus) {
+                    linFocus2.setBackgroundResource(R.drawable.back_style_red_focus);
+                    linFocus1.setBackgroundResource(R.drawable.back_style_gray4);
+                } else {
+                    if(linFocus2 != null) {
+                        linFocus2.setBackgroundResource(R.drawable.back_style_gray4);
+                    }
                 }
             }
         });
@@ -502,7 +566,9 @@ public class Sal_NxOutReturnFragment1 extends BaseFragment {
         cust = null;
         tvCustInfo.setText("客户：");
         setEnables(etMtlCode, R.color.transparent, true);
+        setEnables(etExpressCode, R.color.transparent, true);
         btnScan.setVisibility(View.VISIBLE);
+        btnScan2.setVisibility(View.VISIBLE);
         strK3Number = null;
         etMtlCode.setText(""); // 物料
         btnSave.setVisibility(View.VISIBLE);
@@ -536,6 +602,16 @@ public class Sal_NxOutReturnFragment1 extends BaseFragment {
 
                 break;
             case WRITE_CODE: // 输入条码返回
+                if (resultCode == Activity.RESULT_OK) {
+                    Bundle bundle = data.getExtras();
+                    if (bundle != null) {
+                        String value = bundle.getString("resultValue", "");
+                        etExpressCode.setText(value.toUpperCase());
+                    }
+                }
+
+                break;
+            case WRITE_CODE2: // 输入条码返回
                 if (resultCode == Activity.RESULT_OK) {
                     Bundle bundle = data.getExtras();
                     if (bundle != null) {
@@ -576,12 +652,16 @@ public class Sal_NxOutReturnFragment1 extends BaseFragment {
                     if (bundle != null) {
                         String code = bundle.getString(DECODED_CONTENT_KEY, "");
                         switch (curViewFlag) {
-                            case '1': // 物料
+                            case '1': // 快递单
+                                setTexts(etExpressCode, code);
+                                break;
+                            case '2': // 物料
                                 setTexts(etMtlCode, code);
                                 break;
                         }
                     }
                 }
+
                 break;
         }
         mHandler.sendEmptyMessageDelayed(SETFOCUS, 300);
@@ -750,7 +830,7 @@ public class Sal_NxOutReturnFragment1 extends BaseFragment {
         double okNum = 0;
         for(int i=0; i<checkDatas.size(); i++) {
             ScanningRecord sc = checkDatas.get(i);
-            okNum += sc.getRealQty();
+            okNum = BigdecimalUtil.add(okNum, sc.getRealQty());
         }
         tvOkNum.setText(df.format(okNum));
     }

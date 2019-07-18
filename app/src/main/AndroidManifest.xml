@@ -112,6 +112,9 @@
         <activity
             android:name=".produce.Prod_ScInOtherMainActivity"
             android:windowSoftInputMode="adjustResize|stateHidden" />
+        <activity
+            android:name=".produce.Mtl_SmSearchMainActivity"
+            android:windowSoftInputMode="adjustResize|stateHidden" />
 
         <!-- 销售模块 -->
         <activity

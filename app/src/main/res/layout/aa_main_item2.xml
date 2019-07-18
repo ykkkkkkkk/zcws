@@ -91,14 +91,14 @@
             android:layout_weight="1"
             android:clickable="true"
             android:gravity="center"
-            android:visibility="invisible">
+            >
 
             <TextView
                 android:id="@+id/tvImg3"
                 android:layout_width="@dimen/_60dp"
                 android:layout_height="@dimen/_60dp"
                 android:layout_centerHorizontal="true"
-                android:background="@drawable/aa_ico2a_3" />
+                android:background="@drawable/aa_ico2a_9" />
 
             <TextView
                 android:id="@+id/tab3"
@@ -107,7 +107,7 @@
                 android:layout_below="@+id/tvImg3"
                 android:layout_centerHorizontal="true"
                 android:layout_marginTop="@dimen/_3dp"
-                android:text="工艺查看"
+                android:text="物料查询"
                 android:textColor="@color/black"
                 android:textSize="@dimen/_18sp" />
 

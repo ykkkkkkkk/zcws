@@ -47,6 +47,7 @@ import ykk.cb.com.zcws.bean.k3Bean.ReturnReason;
 import ykk.cb.com.zcws.comm.BaseFragment;
 import ykk.cb.com.zcws.comm.Comm;
 import ykk.cb.com.zcws.sales.adapter.Sal_DsBToRFromPurchaseInStockFragment1Adapter;
+import ykk.cb.com.zcws.util.BigdecimalUtil;
 import ykk.cb.com.zcws.util.JsonUtil;
 import ykk.cb.com.zcws.util.LogUtil;
 import ykk.cb.com.zcws.util.zxing.android.CaptureActivity;
@@ -461,8 +462,10 @@ public class Sal_DsBToRFromPurchaseInStockFragment1 extends BaseFragment {
             public void onFocusChange(View v, boolean hasFocus) {
                 if(hasFocus) {
                     linFocus1.setBackgroundResource(R.drawable.back_style_red_focus);
-//                } else {
-//                    linFocus1.setBackgroundResource(R.drawable.back_style_gray4);
+                } else {
+                    if(linFocus1 != null) {
+                        linFocus1.setBackgroundResource(R.drawable.back_style_gray4);
+                    }
                 }
             }
         });
@@ -684,7 +687,7 @@ public class Sal_DsBToRFromPurchaseInStockFragment1 extends BaseFragment {
         double okNum = 0;
         for(int i=0; i<checkDatas.size(); i++) {
             ScanningRecord sc = checkDatas.get(i);
-            okNum += sc.getRealQty();
+            okNum = BigdecimalUtil.add(okNum, sc.getRealQty());
         }
         tvOkNum.setText(df.format(okNum));
     }

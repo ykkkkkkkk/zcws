@@ -1,4 +1,4 @@
-package ykk.cb.com.zcws.warehouse;
+package ykk.cb.com.zcws.produce;
 
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -11,6 +11,7 @@ import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.Editable;
+import android.text.Html;
 import android.text.TextWatcher;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -19,11 +20,14 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
+import android.widget.TextView;
 
 import java.io.IOException;
 import java.lang.ref.WeakReference;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 import butterknife.BindView;
@@ -36,82 +40,97 @@ import okhttp3.Request;
 import okhttp3.Response;
 import okhttp3.ResponseBody;
 import ykk.cb.com.zcws.R;
+import ykk.cb.com.zcws.basics.StockPos_DialogActivity;
+import ykk.cb.com.zcws.basics.Stock_DialogActivity;
+import ykk.cb.com.zcws.bean.BarCodeTable;
+import ykk.cb.com.zcws.bean.Department;
+import ykk.cb.com.zcws.bean.Organization;
+import ykk.cb.com.zcws.bean.ScanningRecord;
+import ykk.cb.com.zcws.bean.Stock;
+import ykk.cb.com.zcws.bean.StockPosition;
 import ykk.cb.com.zcws.bean.User;
-import ykk.cb.com.zcws.bean.k3Bean.Icstockbillentry;
+import ykk.cb.com.zcws.bean.k3Bean.ICItem;
+import ykk.cb.com.zcws.bean.prod.ProdOrder;
 import ykk.cb.com.zcws.comm.BaseFragment;
 import ykk.cb.com.zcws.comm.Comm;
+import ykk.cb.com.zcws.produce.adapter.Prod_ScInFragment1Adapter;
+import ykk.cb.com.zcws.util.BigdecimalUtil;
 import ykk.cb.com.zcws.util.JsonUtil;
 import ykk.cb.com.zcws.util.LogUtil;
 import ykk.cb.com.zcws.util.zxing.android.CaptureActivity;
-import ykk.cb.com.zcws.warehouse.adapter.Ds_PurInStockPassFragment1Adapter;
 
 /**
- * 销售订单出库
+ * 物料扫码查询
  */
-public class Ds_PurInStockPassFragment1 extends BaseFragment {
+public class Mtl_SmSearchFragment1 extends BaseFragment {
 
     @BindView(R.id.et_getFocus)
     EditText etGetFocus;
     @BindView(R.id.lin_focus1)
     LinearLayout linFocus1;
+    @BindView(R.id.lin_view)
+    LinearLayout linView;
     @BindView(R.id.et_code)
     EditText etCode;
-    @BindView(R.id.btn_scan)
-    Button btnScan;
-    @BindView(R.id.recyclerView)
-    RecyclerView recyclerView;
 
-    private Ds_PurInStockPassFragment1 context = this;
-    private static final int SUCC1 = 200, UNSUCC1 = 500, SUCC2 = 201, UNSUCC2 = 501, SUCC3 = 202, UNSUCC3 = 502, PASS = 203, UNPASS = 503;
+    @BindView(R.id.tv_mtlName)
+    TextView tv_mtlName;
+    @BindView(R.id.tv_oldMtlName)
+    TextView tv_oldMtlName;
+    @BindView(R.id.tv_suitVehicleType)
+    TextView tv_suitVehicleType;
+    @BindView(R.id.tv_functionDescription)
+    TextView tv_functionDescription;
+    @BindView(R.id.tv_fsecinv)
+    TextView tv_fsecinv;
+    @BindView(R.id.tv_DSInvQty)
+    TextView tv_DSInvQty;
+    @BindView(R.id.tv_SCInvQty)
+    TextView tv_SCInvQty;
+    @BindView(R.id.tv_icmoQty)
+    TextView tv_icmoQty;
+
+    private Mtl_SmSearchFragment1 context = this;
+    private static final int SUCC1 = 200, UNSUCC1 = 500;
     private static final int SETFOCUS = 1, RESULT_NUM = 2, SAOMA = 3, WRITE_CODE = 4;
-    private Ds_PurInStockPassFragment1Adapter mAdapter;
-    private List<Icstockbillentry> checkDatas = new ArrayList<>();
-    private OkHttpClient okHttpClient = null;
-    private User user;
-    private Activity mContext;
-    private Ds_PurInStockPassMainActivity parent;
-    private String strK3Number; // 保存k3返回的单号
+    private Prod_ScInFragment1Adapter mAdapter;
+    private List<ScanningRecord> checkDatas = new ArrayList<>();
     private String barcode; // 对应的条码号
+    private OkHttpClient okHttpClient = null;
+    private Activity mContext;
+    private Mtl_SmSearchMainActivity parent;
     private boolean isTextChange; // 是否进入TextChange事件
+    private DecimalFormat df = new DecimalFormat("#.####");
 
     // 消息处理
-    private MyHandler mHandler = new MyHandler(this);
+    private Mtl_SmSearchFragment1.MyHandler mHandler = new Mtl_SmSearchFragment1.MyHandler(this);
     private static class MyHandler extends Handler {
-        private final WeakReference<Ds_PurInStockPassFragment1> mActivity;
+        private final WeakReference<Mtl_SmSearchFragment1> mActivity;
 
-        public MyHandler(Ds_PurInStockPassFragment1 activity) {
-            mActivity = new WeakReference<Ds_PurInStockPassFragment1>(activity);
+        public MyHandler(Mtl_SmSearchFragment1 activity) {
+            mActivity = new WeakReference<Mtl_SmSearchFragment1>(activity);
         }
 
         public void handleMessage(Message msg) {
-            Ds_PurInStockPassFragment1 m = mActivity.get();
+            Mtl_SmSearchFragment1 m = mActivity.get();
             if (m != null) {
                 m.hideLoadDialog();
 
                 String errMsg = null;
-                String msgObj = (String) msg.obj;
+                String msgObj = null;
+                if(msg.obj instanceof String) {
+                    msgObj = (String) msg.obj;
+                }
                 switch (msg.what) {
-                    case PASS: // 审核成功 返回
-                        m.reset();
-                        m.toasts("审核成功✔");
+                    case SUCC1: // 扫码成功后进入
+                        Map<String, Object> datas = JsonUtil.strToObject(msgObj, Map.class);
+                        m.linView.setVisibility(View.VISIBLE);
+                        m.getScanAfterData_1(datas);
 
                         break;
-                    case UNPASS: // 审核失败 返回
-                        errMsg = JsonUtil.strToString(msgObj);
-                        if(m.isNULLS(errMsg).length() == 0) errMsg = "服务器忙，请稍候再试！";
-                        Comm.showWarnDialog(m.mContext, errMsg);
-
-                        break;
-                    case SUCC2: // 扫码成功后进入
-                        List<Icstockbillentry> list = JsonUtil.strToList(msgObj, Icstockbillentry.class);
-                        m.parent.isChange = true;
-                        m.checkDatas.addAll(list);
-                        m.mAdapter.notifyDataSetChanged();
-
-                        break;
-                    case UNSUCC2:
-                        m.mAdapter.notifyDataSetChanged();
-                        errMsg = JsonUtil.strToString(msgObj);
+                    case UNSUCC1:
+                        m.linView.setVisibility(View.GONE);
+                        errMsg = JsonUtil.strToString((String)msg.obj);
                         if(m.isNULLS(errMsg).length() == 0) errMsg = "很抱歉，没能找到数据！";
                         Comm.showWarnDialog(m.mContext, errMsg);
 
@@ -131,7 +150,7 @@ public class Ds_PurInStockPassFragment1 extends BaseFragment {
                         } else m.barcode = etName;
                         m.setTexts(m.etCode, m.barcode);
                         // 执行查询方法
-                        m.run_smGetDatas();
+                        m.run_smGetDatas(m.barcode);
 
                         break;
                 }
@@ -141,20 +160,14 @@ public class Ds_PurInStockPassFragment1 extends BaseFragment {
 
     @Override
     public View setLayoutResID(LayoutInflater inflater, ViewGroup container) {
-        return inflater.inflate(R.layout.ware_ds_instock_pass_fragment1, container, false);
+        return inflater.inflate(R.layout.mtl_sm_search_fragment1, container, false);
     }
 
     @Override
     public void initView() {
         mContext = getActivity();
-        parent = (Ds_PurInStockPassMainActivity) mContext;
+        parent = (Mtl_SmSearchMainActivity) mContext;
 
-        recyclerView.addItemDecoration(new DividerItemDecoration(mContext, DividerItemDecoration.VERTICAL));
-        recyclerView.setLayoutManager(new LinearLayoutManager(mContext));
-        mAdapter = new Ds_PurInStockPassFragment1Adapter(mContext, checkDatas);
-        recyclerView.setAdapter(mAdapter);
-        // 设值listview空间失去焦点
-        recyclerView.setFocusable(false);
     }
 
     @Override
@@ -167,56 +180,33 @@ public class Ds_PurInStockPassFragment1 extends BaseFragment {
                     .build();
         }
 
-        getUserInfo();
+        hideSoftInputMode(mContext, etCode);
     }
 
     @Override
     public void setUserVisibleHint(boolean isVisibleToUser) {
         super.setUserVisibleHint(isVisibleToUser);
+        LogUtil.e("setUserVisibleHint", "冒泡麻婆。。。。。");
         if(isVisibleToUser) {
             mHandler.sendEmptyMessageDelayed(SETFOCUS, 200);
         }
     }
 
-    @OnClick({R.id.btn_scan, R.id.btn_save, R.id.btn_pass, R.id.btn_clone })
+    @Override
+    public void onResume() {
+        super.onResume();
+        mHandler.sendEmptyMessageDelayed(SETFOCUS, 200);
+    }
+
+    @OnClick({R.id.btn_scan })
     public void onViewClicked(View view) {
-        Bundle bundle = null;
         switch (view.getId()) {
-            case R.id.btn_scan: // 调用摄像头扫描（快递单）
+            case R.id.btn_scan: // 调用摄像头扫描（物料）
                 showForResult(CaptureActivity.class, CAMERA_SCAN, null);
 
                 break;
-            case R.id.btn_pass: // 审核
-                if(checkDatas == null || checkDatas.size() == 0) {
-                    Comm.showWarnDialog(mContext,"请扫描出库单！");
-                    return;
-                }
-                run_passDS();
-
-                break;
-            case R.id.btn_clone: // 重置
-//                hideKeyboard(mContext.getCurrentFocus());
-                if (checkDatas != null && checkDatas.size() > 0) {
-                    AlertDialog.Builder build = new AlertDialog.Builder(mContext);
-                    build.setIcon(R.drawable.caution);
-                    build.setTitle("系统提示");
-                    build.setMessage("您有未保存的数据，继续重置吗？");
-                    build.setPositiveButton("是", new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            reset();
-                        }
-                    });
-                    build.setNegativeButton("否", null);
-                    build.setCancelable(false);
-                    build.show();
-                    return;
-                } else {
-                    reset();
-                }
-
-                break;
         }
+
     }
 
     @Override
@@ -234,8 +224,7 @@ public class Ds_PurInStockPassFragment1 extends BaseFragment {
         };
         etCode.setOnClickListener(click);
 
-
-        // 物料
+        // 生产条码
         etCode.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
@@ -255,7 +244,7 @@ public class Ds_PurInStockPassFragment1 extends BaseFragment {
         etCode.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
             public boolean onLongClick(View v) {
-                showInputDialog("输入单号", "", "none", WRITE_CODE);
+                showInputDialog("输入条码", "", "none", WRITE_CODE);
                 return true;
             }
         });
@@ -274,31 +263,10 @@ public class Ds_PurInStockPassFragment1 extends BaseFragment {
         });
     }
 
-    private void reset() {
-        setEnables(etCode, R.color.transparent, true);
-        etCode.setText("");
-        barcode = null;
-        btnScan.setVisibility(View.VISIBLE);
-        strK3Number = null;
-        checkDatas.clear();
-        mHandler.sendEmptyMessageDelayed(SETFOCUS, 200);
-
-        mAdapter.notifyDataSetChanged();
-    }
-
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         switch (requestCode) {
-            case CAMERA_SCAN: // 扫一扫成功  返回
-                if (resultCode == Activity.RESULT_OK) {
-                    Bundle bundle = data.getExtras();
-                    if (bundle != null) {
-                        String code = bundle.getString(DECODED_CONTENT_KEY, "");
-                        setTexts(etCode, code);
-                    }
-                }
-                break;
             case WRITE_CODE: // 输入条码返回
                 if (resultCode == Activity.RESULT_OK) {
                     Bundle bundle = data.getExtras();
@@ -309,24 +277,57 @@ public class Ds_PurInStockPassFragment1 extends BaseFragment {
                 }
 
                 break;
+            case CAMERA_SCAN: // 扫一扫成功  返回
+                if (resultCode == Activity.RESULT_OK) {
+                    Bundle bundle = data.getExtras();
+                    if (bundle != null) {
+                        String code = bundle.getString(DECODED_CONTENT_KEY, "");
+                        setTexts(etCode, code);
+                    }
+                }
+
+                break;
         }
         mHandler.sendEmptyMessageDelayed(SETFOCUS, 300);
     }
 
     /**
+     * 得到扫码的数据
+     */
+    private void getScanAfterData_1(Map<String, Object> param) {
+        String mtlName = Comm.isNULLS(param.get("fName"));
+        String oldItemName = Comm.isNULLS(param.get("oldItemName"));
+        String suitVehicleType = Comm.isNULLS(param.get("suitVehicleType"));
+        String functionDescription = Comm.isNULLS(param.get("functionDescription"));
+        double fsecinv = Comm.parseDouble(param.get("fsecinv"));
+        double SCInvQty = Comm.parseDouble(param.get("SCInvQty"));
+        double DSInvQty = Comm.parseDouble(param.get("DSInvQty"));
+        double icmoQty = Comm.parseDouble(param.get("icmoQty"));
+
+        tv_mtlName.setText(Html.fromHtml("新名称：<font color='#000000'>"+ mtlName +"</font>"));
+        tv_oldMtlName.setText(Html.fromHtml("旧名称：<font color='#000000'>"+ oldItemName +"</font>"));
+        tv_suitVehicleType.setText(Html.fromHtml("车型：<font color='#000000'>"+ suitVehicleType +"</font>"));
+        tv_functionDescription.setText(Html.fromHtml("功能：<font color='#000000'>"+ functionDescription +"</font>"));
+        tv_fsecinv.setText(Html.fromHtml("安全库存：<font color='#000000'>"+ df.format(fsecinv) +"</font>"));
+        tv_DSInvQty.setText(Html.fromHtml("即时库存：<font color='#000000'>"+ df.format(DSInvQty) +"</font>"));
+        tv_SCInvQty.setText(Html.fromHtml("即时库存：<font color='#000000'>"+ df.format(SCInvQty) +"</font>"));
+        tv_icmoQty.setText(Html.fromHtml("排产数量：<font color='#000000'>"+ df.format(icmoQty) +"</font>"));
+    }
+
+    /**
      * 扫码查询对应的方法
      */
-    private void run_smGetDatas() {
+    private void run_smGetDatas(String val) {
         isTextChange = false;
-        if(checkDatas.size() > 0) {
-            Comm.showWarnDialog(mContext,"请先审核当前入库单！");
+        if(val.length() == 0) {
+            Comm.showWarnDialog(mContext,"请对准条码！");
             return;
         }
         showLoadDialog("加载中...",false);
-        String mUrl = getURL("stockBill/findEntryByBarcodeDS");
+        String mUrl = getURL("selectIcItemInfo/select");;
+        String barcode = this.barcode;
         FormBody formBody = new FormBody.Builder()
-                .add("barcode2", barcode) // 生产账号--销售出库单号
-                .add("fstatus", "0") // 0：未审核，1：审核，3：结案
+                .add("barcode", barcode)
                 .build();
 
         Request request = new Request.Builder()
@@ -339,7 +340,7 @@ public class Ds_PurInStockPassFragment1 extends BaseFragment {
         call.enqueue(new Callback() {
             @Override
             public void onFailure(Call call, IOException e) {
-                mHandler.sendEmptyMessage(UNSUCC2);
+                mHandler.sendEmptyMessage(UNSUCC1);
             }
 
             @Override
@@ -348,73 +349,14 @@ public class Ds_PurInStockPassFragment1 extends BaseFragment {
                 String result = body.string();
                 LogUtil.e("run_smGetDatas --> onResponse", result);
                 if (!JsonUtil.isSuccess(result)) {
-                    Message msg = mHandler.obtainMessage(UNSUCC2, result);
+                    Message msg = mHandler.obtainMessage(UNSUCC1, result);
                     mHandler.sendMessage(msg);
                     return;
                 }
-                Message msg = mHandler.obtainMessage(SUCC2, result);
+                Message msg = mHandler.obtainMessage(SUCC1, result);
                 mHandler.sendMessage(msg);
             }
         });
-    }
-
-    /**
-     * 电商账号审核
-     */
-    private void run_passDS() {
-        showLoadDialog("正在审核...", false);
-
-        StringBuilder strK3Number = new StringBuilder();
-        for(int i=0; i<checkDatas.size(); i++) {
-            Icstockbillentry entry = checkDatas.get(i);
-            if(strK3Number.indexOf(entry.getFbillNo()) == -1) {
-                strK3Number.append(entry.getFbillNo()+",");
-            }
-        }
-        // 删除最后一个，
-        if(strK3Number.length() > 0) strK3Number.delete(strK3Number.length()-1, strK3Number.length());
-
-        String mUrl = getURL("stockBill/passDS");
-        getUserInfo();
-        FormBody formBody = new FormBody.Builder()
-                .add("strFbillNo", strK3Number.toString())
-                .add("empId", user != null ? String.valueOf(user.getEmpId()) : "0")
-                .build();
-
-        Request request = new Request.Builder()
-                .addHeader("cookie", getSession())
-                .url(mUrl)
-                .post(formBody)
-                .build();
-
-        Call call = okHttpClient.newCall(request);
-        call.enqueue(new Callback() {
-            @Override
-            public void onFailure(Call call, IOException e) {
-                mHandler.sendEmptyMessage(UNPASS);
-            }
-
-            @Override
-            public void onResponse(Call call, Response response) throws IOException {
-                ResponseBody body = response.body();
-                String result = body.string();
-                if (!JsonUtil.isSuccess(result)) {
-                    Message msg = mHandler.obtainMessage(UNPASS, result);
-                    mHandler.sendMessage(msg);
-                    return;
-                }
-                Message msg = mHandler.obtainMessage(PASS, result);
-                Log.e("run_passDS --> onResponse", result);
-                mHandler.sendMessage(msg);
-            }
-        });
-    }
-
-    /**
-     *  得到用户对象
-     */
-    private void getUserInfo() {
-        if(user == null) user = showUserByXml();
     }
 
     @Override

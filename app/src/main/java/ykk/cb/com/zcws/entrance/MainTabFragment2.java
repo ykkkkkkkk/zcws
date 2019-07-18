@@ -8,6 +8,7 @@ import android.view.ViewGroup;
 import butterknife.OnClick;
 import ykk.cb.com.zcws.R;
 import ykk.cb.com.zcws.comm.BaseFragment;
+import ykk.cb.com.zcws.produce.Mtl_SmSearchMainActivity;
 import ykk.cb.com.zcws.produce.Prod_ScInMainActivity;
 import ykk.cb.com.zcws.produce.Prod_ScInOtherMainActivity;
 
@@ -33,7 +34,7 @@ public class MainTabFragment2 extends BaseFragment {
 
                 break;
             case R.id.relative3: // 工艺查看
-//                show(Prod_ProcessSearchActivity.class,null);
+                show(Mtl_SmSearchMainActivity.class,null);
 
                 break;
             case R.id.relative4: // 工序汇报

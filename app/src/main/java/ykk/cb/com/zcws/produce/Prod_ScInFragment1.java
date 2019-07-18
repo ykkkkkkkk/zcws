@@ -52,6 +52,7 @@ import ykk.cb.com.zcws.bean.prod.ProdOrder;
 import ykk.cb.com.zcws.comm.BaseFragment;
 import ykk.cb.com.zcws.comm.Comm;
 import ykk.cb.com.zcws.produce.adapter.Prod_ScInFragment1Adapter;
+import ykk.cb.com.zcws.util.BigdecimalUtil;
 import ykk.cb.com.zcws.util.JsonUtil;
 import ykk.cb.com.zcws.util.LogUtil;
 import ykk.cb.com.zcws.util.zxing.android.CaptureActivity;
@@ -446,8 +447,10 @@ public class Prod_ScInFragment1 extends BaseFragment {
             public void onFocusChange(View v, boolean hasFocus) {
                 if(hasFocus) {
                     linFocus1.setBackgroundResource(R.drawable.back_style_red_focus);
-//                } else {
-//                    linFocus1.setBackgroundResource(R.drawable.back_style_gray4);
+                } else {
+                    if(linFocus1 != null) {
+                        linFocus1.setBackgroundResource(R.drawable.back_style_gray4);
+                    }
                 }
             }
         });
@@ -467,6 +470,8 @@ public class Prod_ScInFragment1 extends BaseFragment {
         barcode = null;
         tvNeedNum.setText("0");
         tvOkNum.setText("0");
+        stock1 = null;
+        tvStockSel.setText("");
 
         mAdapter.notifyDataSetChanged();
         mHandler.sendEmptyMessageDelayed(SETFOCUS, 200);
@@ -638,43 +643,57 @@ public class Prod_ScInFragment1 extends BaseFragment {
             sr.setDeptNumber(department.getDepartmentNumber());
             sr.setDeptName(department.getDepartmentName());
         }
-//        Stock stock = icItem.getStock();
-//        if(stock != null) {
+        // 用物料默认的仓库
+        Stock stock = icItem.getStock();
+        if(stock != null) {
+            sr.setStock(stock);
+            sr.setStockNumber(stock.getFnumber());
+            sr.setStockName(stock.getFname());
+        } else {
+            Stock stock2 = new Stock();
+            stock2.setFitemId(254);
+            stock2.setFnumber("CC.01.01");
+            stock2.setFname("忠诚卫士成品仓");
+
+            sr.setStock(stock2);
+            sr.setStockNumber(stock2.getFnumber());
+            sr.setStockName(stock2.getFname());
+        }
+        // 默认的仓位
+        StockPosition stockPos = icItem.getStockPos();
+        if(stockPos != null && stockPos.getFspId() > 0) {
+            sr.setStockPos(stockPos);
+            sr.setStockPositionNumber(stockPos.getFnumber());
+            sr.setStockPositionName(stockPos.getFname());
+        }
+
+        // 用选择的仓库
+//        if(stock1 != null) {
+//            sr.setStock(stock1);
+//            sr.setStockNumber(stock1.getFnumber());
+//            sr.setStockName(stock1.getFname());
+//
+//        } else if(prodOrder.getGoodsType() == 990169) { // 990168代表非定制，990169代表定制
+//            Stock stock = new Stock();
+//            stock.setFitemId(38263);
+//            stock.setFnumber("CC.01.05");
+//            stock.setFname("定制产品仓");
+//
+//            sr.setStock(stock);
+//            sr.setStockNumber(stock.getFnumber());
+//            sr.setStockName(stock.getFname());
+//
+//        } else { // 990168代表非定制
+//            Stock stock = new Stock();
+//            stock.setFitemId(254);
+//            stock.setFnumber("CC.01.01");
+//            stock.setFname("忠诚卫士成品仓");
+//
 //            sr.setStock(stock);
 //            sr.setStockNumber(stock.getFnumber());
 //            sr.setStockName(stock.getFname());
 //        }
-        if(stock1 != null) {
-            sr.setStock(stock1);
-            sr.setStockNumber(stock1.getFnumber());
-            sr.setStockName(stock1.getFname());
 
-        } else if(prodOrder.getGoodsType() == 990168) { // 990168代表非定制，990169代表定制
-            Stock stock = new Stock();
-            stock.setFitemId(254);
-            stock.setFnumber("CC.01.01");
-            stock.setFname("忠诚卫士成品仓");
-
-            sr.setStock(stock);
-            sr.setStockNumber(stock.getFnumber());
-            sr.setStockName(stock.getFname());
-
-        } else { // 定制990169
-            Stock stock = new Stock();
-            stock.setFitemId(38263);
-            stock.setFnumber("CC.01.05");
-            stock.setFname("定制产品仓");
-
-            sr.setStock(stock);
-            sr.setStockNumber(stock.getFnumber());
-            sr.setStockName(stock.getFname());
-        }
-//        StockPosition stockPos = icItem.getStockPos();
-//        if(stockPos != null && stockPos.getFspId() > 0) {
-//            sr.setStockPos(stockPos);
-//            sr.setStockPositionNumber(stockPos.getFnumber());
-//            sr.setStockPositionName(stockPos.getFname());
-//        }
         sr.setDeliveryWay("");
         sr.setSourceQty(prodOrder.getFqty());
         sr.setUseableQty(prodOrder.getUseableQty());
@@ -814,8 +833,8 @@ public class Prod_ScInFragment1 extends BaseFragment {
         double okNum = 0;
         for(int i=0; i<checkDatas.size(); i++) {
             ScanningRecord sc = checkDatas.get(i);
-            needNum += sc.getUseableQty();
-            okNum += sc.getRealQty();
+            needNum = BigdecimalUtil.add(needNum, sc.getUseableQty());
+            okNum = BigdecimalUtil.add(okNum, sc.getRealQty());
         }
         tvNeedNum.setText(df.format(needNum));
         tvOkNum.setText(df.format(okNum));
