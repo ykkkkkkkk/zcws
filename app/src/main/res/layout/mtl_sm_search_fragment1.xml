@@ -64,6 +64,7 @@
 
     <ScrollView
         android:layout_width="match_parent"
+        android:scrollbars="none"
         android:layout_height="wrap_content">
 
         <LinearLayout
@@ -138,10 +139,18 @@
                 android:textSize="@dimen/_14sp" />
 
             <TextView
-                android:id="@+id/tv_SCInvQty"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="即时库存："
+                android:textColor="@color/c_666666"
+                android:textSize="@dimen/_14sp" />
+
+            <TextView
+                android:id="@+id/tv_SCInvQty"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="@dimen/_50dp"
+                android:text="忠诚卫士仓 --- 10086"
                 android:textColor="@color/c_666666"
                 android:textSize="@dimen/_14sp" />
 
@@ -150,6 +159,14 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="排产数量："
+                android:textColor="@color/c_666666"
+                android:textSize="@dimen/_14sp" />
+
+            <TextView
+                android:id="@+id/tv_onPassageQty"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="在途数量："
                 android:textColor="@color/c_666666"
                 android:textSize="@dimen/_14sp" />
 

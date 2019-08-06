@@ -53,8 +53,6 @@ public class Mtl_SmSearchMainActivity extends BaseActivity {
     View viewRadio1;
     @BindView(R.id.viewRadio2)
     View viewRadio2;
-    @BindView(R.id.viewRadio3)
-    View viewRadio3;
     @BindView(R.id.btn_close)
     Button btnClose;
     @BindView(R.id.viewPager)
@@ -65,7 +63,7 @@ public class Mtl_SmSearchMainActivity extends BaseActivity {
     TextView tvConnState;
 
     private Mtl_SmSearchMainActivity context = this;
-    private static final String TAG = "Sal_OutMainActivity";
+    private static final String TAG = "Mtl_SmSearchMainActivity";
     private View curRadio;
     public boolean isChange; // 返回的时候是否需要判断数据是否保存了
     public boolean isKeyboard; // 是否使用软键盘
@@ -101,17 +99,17 @@ public class Mtl_SmSearchMainActivity extends BaseActivity {
 //        fragment1.setArguments(bundle2); // 传参数
 //        fragment2.setArguments(bundle2); // 传参数
         Mtl_SmSearchFragment1 fragment1 = new Mtl_SmSearchFragment1();
-//        Sal_OutFragment2 fragment2 = new Sal_OutFragment2();
+        Mtl_SmSearchFragment2 fragment2 = new Mtl_SmSearchFragment2();
 //        Sal_OutFragment3 fragment3 = new Sal_OutFragment3();
 
         listFragment.add(fragment1);
-//        listFragment.add(fragment2);
+        listFragment.add(fragment2);
 //        listFragment.add(fragment3);
 //        viewPager.setScanScroll(false); // 禁止左右滑动
         //ViewPager设置适配器
         viewPager.setAdapter(new BaseFragmentAdapter(getSupportFragmentManager(), listFragment));
         //ViewPager显示第一个Fragment
-        viewPager.setCurrentItem(1);
+        viewPager.setCurrentItem(0);
 
         //ViewPager页面切换监听
         viewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
@@ -124,15 +122,11 @@ public class Mtl_SmSearchMainActivity extends BaseActivity {
             public void onPageSelected(int position) {
                 switch (position) {
                     case 0:
-                        tabChange(viewRadio1, "销售出库--销售订单", 0);
+                        tabChange(viewRadio1, "物料查询", 0);
 
                         break;
                     case 1:
-                        tabChange(viewRadio2, "销售出库--箱码", 1);
-
-                        break;
-                    case 2:
-                        tabChange(viewRadio3, "销售出库--拣货单", 2);
+                        tabChange(viewRadio2, "BOM子项查询", 1);
 
                         break;
                 }
@@ -152,7 +146,7 @@ public class Mtl_SmSearchMainActivity extends BaseActivity {
         }
     }
 
-    @OnClick({R.id.btn_close, R.id.btn_print, R.id.lin_tab1, R.id.lin_tab2, R.id.lin_tab3})
+    @OnClick({R.id.btn_close, R.id.btn_print, R.id.lin_tab1, R.id.lin_tab2})
     public void onViewClicked(View view) {
         // setCurrentItem第二个参数控制页面切换动画
         //  true:打开/false:关闭
@@ -184,15 +178,11 @@ public class Mtl_SmSearchMainActivity extends BaseActivity {
 
                 break;
             case R.id.lin_tab1:
-                tabChange(viewRadio1, "销售出库--销售订单", 0);
+                tabChange(viewRadio1, "物料查询", 0);
 
                 break;
             case R.id.lin_tab2:
-                tabChange(viewRadio2, "销售出库--箱码", 1);
-
-                break;
-            case R.id.lin_tab3:
-                tabChange(viewRadio3, "销售出库--拣货单", 2);
+                tabChange(viewRadio2, "BOM子项查询", 1);
 
                 break;
         }

@@ -5,19 +5,22 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.support.v7.widget.DividerItemDecoration;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.text.Editable;
-import android.text.Html;
 import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.LinearLayout;
-import android.widget.TextView;
 
 import java.io.IOException;
 import java.lang.ref.WeakReference;
 import java.text.DecimalFormat;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
@@ -31,48 +34,33 @@ import okhttp3.Request;
 import okhttp3.Response;
 import okhttp3.ResponseBody;
 import ykk.cb.com.zcws.R;
+import ykk.cb.com.zcws.bean.k3Bean.ICItem;
 import ykk.cb.com.zcws.comm.BaseFragment;
 import ykk.cb.com.zcws.comm.Comm;
+import ykk.cb.com.zcws.produce.adapter.Mtl_SmSearchFragment2Adapter;
 import ykk.cb.com.zcws.util.JsonUtil;
 import ykk.cb.com.zcws.util.LogUtil;
 import ykk.cb.com.zcws.util.zxing.android.CaptureActivity;
 
 /**
- * 物料扫码查询
+ * BOM子项查询
  */
-public class Mtl_SmSearchFragment1 extends BaseFragment {
+public class Mtl_SmSearchFragment2 extends BaseFragment {
 
     @BindView(R.id.et_getFocus)
     EditText etGetFocus;
     @BindView(R.id.lin_focus1)
     LinearLayout linFocus1;
-    @BindView(R.id.lin_view)
-    LinearLayout linView;
     @BindView(R.id.et_code)
     EditText etCode;
+    @BindView(R.id.recyclerView)
+    RecyclerView recyclerView;
 
-    @BindView(R.id.tv_mtlName)
-    TextView tv_mtlName;
-    @BindView(R.id.tv_oldMtlName)
-    TextView tv_oldMtlName;
-    @BindView(R.id.tv_suitVehicleType)
-    TextView tv_suitVehicleType;
-    @BindView(R.id.tv_functionDescription)
-    TextView tv_functionDescription;
-    @BindView(R.id.tv_fsecinv)
-    TextView tv_fsecinv;
-    @BindView(R.id.tv_DSInvQty)
-    TextView tv_DSInvQty;
-    @BindView(R.id.tv_SCInvQty)
-    TextView tv_SCInvQty;
-    @BindView(R.id.tv_icmoQty)
-    TextView tv_icmoQty;
-    @BindView(R.id.tv_onPassageQty)
-    TextView tv_onPassageQty;
-
-    private Mtl_SmSearchFragment1 context = this;
+    private Mtl_SmSearchFragment2 context = this;
     private static final int SUCC1 = 200, UNSUCC1 = 500;
     private static final int SETFOCUS = 1, RESULT_NUM = 2, SAOMA = 3, WRITE_CODE = 4;
+    private Mtl_SmSearchFragment2Adapter mAdapter;
+    private List<ICItem> listDatas = new ArrayList<>();
     private String barcode; // 对应的条码号
     private OkHttpClient okHttpClient = null;
     private Activity mContext;
@@ -81,16 +69,16 @@ public class Mtl_SmSearchFragment1 extends BaseFragment {
     private DecimalFormat df = new DecimalFormat("#.####");
 
     // 消息处理
-    private Mtl_SmSearchFragment1.MyHandler mHandler = new Mtl_SmSearchFragment1.MyHandler(this);
+    private Mtl_SmSearchFragment2.MyHandler mHandler = new Mtl_SmSearchFragment2.MyHandler(this);
     private static class MyHandler extends Handler {
-        private final WeakReference<Mtl_SmSearchFragment1> mActivity;
+        private final WeakReference<Mtl_SmSearchFragment2> mActivity;
 
-        public MyHandler(Mtl_SmSearchFragment1 activity) {
-            mActivity = new WeakReference<Mtl_SmSearchFragment1>(activity);
+        public MyHandler(Mtl_SmSearchFragment2 activity) {
+            mActivity = new WeakReference<Mtl_SmSearchFragment2>(activity);
         }
 
         public void handleMessage(Message msg) {
-            Mtl_SmSearchFragment1 m = mActivity.get();
+            Mtl_SmSearchFragment2 m = mActivity.get();
             if (m != null) {
                 m.hideLoadDialog();
 
@@ -101,13 +89,15 @@ public class Mtl_SmSearchFragment1 extends BaseFragment {
                 }
                 switch (msg.what) {
                     case SUCC1: // 扫码成功后进入
-                        Map<String, Object> datas = JsonUtil.strToObject(msgObj, Map.class);
-                        m.linView.setVisibility(View.VISIBLE);
-                        m.getScanAfterData_1(datas);
+                        m.listDatas.clear();
+                        List<ICItem> list = JsonUtil.strToList(msgObj, ICItem.class);
+                        m.listDatas.addAll(list);
+                        m.mAdapter.notifyDataSetChanged();
 
                         break;
                     case UNSUCC1:
-                        m.linView.setVisibility(View.GONE);
+                        m.listDatas.clear();
+                        m.mAdapter.notifyDataSetChanged();
                         errMsg = JsonUtil.strToString((String)msg.obj);
                         if(m.isNULLS(errMsg).length() == 0) errMsg = "很抱歉，没能找到数据！";
                         Comm.showWarnDialog(m.mContext, errMsg);
@@ -138,7 +128,7 @@ public class Mtl_SmSearchFragment1 extends BaseFragment {
 
     @Override
     public View setLayoutResID(LayoutInflater inflater, ViewGroup container) {
-        return inflater.inflate(R.layout.mtl_sm_search_fragment1, container, false);
+        return inflater.inflate(R.layout.mtl_sm_search_fragment2, container, false);
     }
 
     @Override
@@ -146,6 +136,12 @@ public class Mtl_SmSearchFragment1 extends BaseFragment {
         mContext = getActivity();
         parent = (Mtl_SmSearchMainActivity) mContext;
 
+        recyclerView.addItemDecoration(new DividerItemDecoration(mContext, DividerItemDecoration.VERTICAL));
+        recyclerView.setLayoutManager(new LinearLayoutManager(mContext));
+        mAdapter = new Mtl_SmSearchFragment2Adapter(mContext, listDatas);
+        recyclerView.setAdapter(mAdapter);
+        // 设值listview空间失去焦点
+        recyclerView.setFocusable(false);
     }
 
     @Override
@@ -270,32 +266,6 @@ public class Mtl_SmSearchFragment1 extends BaseFragment {
     }
 
     /**
-     * 得到扫码的数据
-     */
-    private void getScanAfterData_1(Map<String, Object> param) {
-        String mtlName = Comm.isNULLS(param.get("fName"));
-        String oldItemName = Comm.isNULLS(param.get("oldItemName"));
-        String suitVehicleType = Comm.isNULLS(param.get("suitVehicleType"));
-        String functionDescription = Comm.isNULLS(param.get("functionDescription"));
-        double fsecinv = Comm.parseDouble(param.get("fsecinv"));
-        double DSInvQty = Comm.parseDouble(param.get("DSInvQty"));
-        //        double SCInvQty = Comm.parseDouble(param.get("SCInvQty"));
-        String strSCInvQty = Comm.isNULLS(param.get("strSCInvQty"));
-        double icmoQty = Comm.parseDouble(param.get("icmoQty"));
-        double onPassageQty = Comm.parseDouble(param.get("onPassageQty"));
-
-        tv_mtlName.setText(Html.fromHtml("新名称：<font color='#000000'>"+ mtlName +"</font>"));
-        tv_oldMtlName.setText(Html.fromHtml("旧名称：<font color='#000000'>"+ oldItemName +"</font>"));
-        tv_suitVehicleType.setText(Html.fromHtml("车型：<font color='#000000'>"+ suitVehicleType +"</font>"));
-        tv_functionDescription.setText(Html.fromHtml("功能：<font color='#000000'>"+ functionDescription +"</font>"));
-        tv_fsecinv.setText(Html.fromHtml("安全库存：<font color='#000000'>"+ df.format(fsecinv) +"</font>"));
-        tv_DSInvQty.setText(Html.fromHtml("即时库存：<font color='#000000'>"+ df.format(DSInvQty) +"</font>"));
-        tv_SCInvQty.setText(Html.fromHtml("<font color='#000000'>"+ strSCInvQty +"</font>"));
-        tv_icmoQty.setText(Html.fromHtml("排产数量：<font color='#000000'>"+ df.format(icmoQty) +"</font>"));
-        tv_onPassageQty.setText(Html.fromHtml("在途数量：<font color='#000000'>"+ df.format(onPassageQty) +"</font>"));
-    }
-
-    /**
      * 扫码查询对应的方法
      */
     private void run_smGetDatas(String val) {
@@ -305,7 +275,7 @@ public class Mtl_SmSearchFragment1 extends BaseFragment {
             return;
         }
         showLoadDialog("加载中...",false);
-        String mUrl = getURL("selectIcItemInfo/select");;
+        String mUrl = getURL("bomInventory/getProdRawMaterialFromSC_app");
         String barcode = this.barcode;
         FormBody formBody = new FormBody.Builder()
                 .add("barcode", barcode)
