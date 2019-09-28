@@ -46,6 +46,9 @@ import ykk.cb.com.zcws.util.JsonUtil;
 
 import static android.os.Process.killProcess;
 
+/**
+ * 采购
+ */
 public class MainTabFragment1 extends BaseFragment implements IDownloadContract.View {
 
     private MainTabFragment1 context = this;

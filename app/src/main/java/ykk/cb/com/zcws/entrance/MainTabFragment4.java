@@ -11,6 +11,9 @@ import ykk.cb.com.zcws.comm.BaseFragment;
 import ykk.cb.com.zcws.warehouse.Ds_PurInStockPassMainActivity;
 import ykk.cb.com.zcws.warehouse.Sc_ProdInStockPassMainActivity;
 
+/**
+ * 仓库
+ */
 public class MainTabFragment4 extends BaseFragment {
 
 

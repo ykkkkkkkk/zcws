@@ -267,6 +267,8 @@ public class Icstockbillentry implements Serializable {
     private int returnReasonId;
     /* (生产帐号)退货理由id */
     private int fentryselfb0185;
+    /* 客户销售单价 */
+    private double custSalesPrice;
 
     private IcStockBill stockBill;
     private ICItem icItem;
@@ -1390,6 +1392,14 @@ public class Icstockbillentry implements Serializable {
 
     public void setFentryselfb0185(int fentryselfb0185) {
         this.fentryselfb0185 = fentryselfb0185;
+    }
+
+    public double getCustSalesPrice() {
+        return custSalesPrice;
+    }
+
+    public void setCustSalesPrice(double custSalesPrice) {
+        this.custSalesPrice = custSalesPrice;
     }
 
     @Override

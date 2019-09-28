@@ -12,6 +12,9 @@ import ykk.cb.com.zcws.produce.Mtl_SmSearchMainActivity;
 import ykk.cb.com.zcws.produce.Prod_ScInMainActivity;
 import ykk.cb.com.zcws.produce.Prod_ScInOtherMainActivity;
 
+/**
+ * 生产
+ */
 public class MainTabFragment2 extends BaseFragment {
 
     public MainTabFragment2() {

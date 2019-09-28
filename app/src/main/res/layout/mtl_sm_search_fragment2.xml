@@ -90,7 +90,7 @@
                     android:textSize="@dimen/_12sp" />
 
                 <TextView
-                    android:layout_width="130dp"
+                    android:layout_width="160dp"
                     android:layout_height="match_parent"
                     android:gravity="center"
                     android:text="物料名称"

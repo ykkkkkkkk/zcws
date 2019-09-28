@@ -40,6 +40,8 @@ public class MainTabFragmentActivity extends BaseActivity {
     RelativeLayout relative4;
     @BindView(R.id.relative5)
     RelativeLayout relative5;
+    @BindView(R.id.relative6)
+    RelativeLayout relative6;
 
     @BindView(R.id.radio1)
     RadioButton radio1;
@@ -51,6 +53,8 @@ public class MainTabFragmentActivity extends BaseActivity {
     RadioButton radio4;
     @BindView(R.id.radio5)
     RadioButton radio5;
+    @BindView(R.id.radio6)
+    RadioButton radio6;
 
     @BindView(R.id.tab1)
     TextView tab1;
@@ -62,6 +66,8 @@ public class MainTabFragmentActivity extends BaseActivity {
     TextView tab4;
     @BindView(R.id.tab5)
     TextView tab5;
+    @BindView(R.id.tab6)
+    TextView tab6;
 
     @BindView(R.id.viewPager)
     ViewPager viewPager;
@@ -91,6 +97,7 @@ public class MainTabFragmentActivity extends BaseActivity {
         listFragment.add(new MainTabFragment3());
         listFragment.add(new MainTabFragment4());
         listFragment.add(new MainTabFragment5());
+        listFragment.add(new MainTabFragment6());
         //ViewPager设置适配器
         viewPager.setAdapter(new BaseFragmentAdapter(getSupportFragmentManager(), listFragment));
         //ViewPager显示第一个Fragment
@@ -120,6 +127,9 @@ public class MainTabFragmentActivity extends BaseActivity {
                     case 4:
                         tabChange(relative5, tab5, radio5, 4);
                         break;
+                    case 5:
+                        tabChange(relative6, tab6, radio6, 5);
+                        break;
                 }
             }
 
@@ -130,8 +140,8 @@ public class MainTabFragmentActivity extends BaseActivity {
         });
     }
 
-    @OnClick({R.id.btn_close, R.id.btn_print, R.id.relative1, R.id.relative2, R.id.relative3, R.id.relative4, R.id.relative5,
-            R.id.radio1, R.id.radio2, R.id.radio3, R.id.radio4, R.id.radio5})
+    @OnClick({R.id.btn_close, R.id.btn_print, R.id.relative1, R.id.relative2, R.id.relative3, R.id.relative4, R.id.relative5, R.id.relative6,
+            R.id.radio1, R.id.radio2, R.id.radio3, R.id.radio4, R.id.radio5, R.id.radio6})
     public void onViewClicked(View view) {
         // setCurrentItem第二个参数控制页面切换动画
         //  true:打开/false:关闭
@@ -175,7 +185,10 @@ public class MainTabFragmentActivity extends BaseActivity {
             case R.id.relative5:
                 tabChange(relative5, tab5, radio5, 4);
                 break;
-
+            case R.id.relative6:
+                tabChange(relative6, tab6, radio6, 5);
+                break;
+                // --------------------------------------------
             case R.id.radio1: // RadioButton
                 tabChange(relative1, tab1, radio1, 0);
                 break;
@@ -188,8 +201,11 @@ public class MainTabFragmentActivity extends BaseActivity {
             case R.id.radio4:
                 tabChange(relative4, tab4, radio4, 3);
                 break;
-            case R.id.radio5: // RadioButton
+            case R.id.radio5:
                 tabChange(relative5, tab5, radio5, 4);
+                break;
+            case R.id.radio6:
+                tabChange(relative6, tab6, radio6, 5);
                 break;
         }
     }

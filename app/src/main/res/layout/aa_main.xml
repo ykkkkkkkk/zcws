@@ -61,7 +61,7 @@
                 android:layout_centerHorizontal="true"
                 android:background="@drawable/btn_tabradio1_selector"
                 android:button="@null"
-                android:checked="false" />
+                android:checked="true" />
 
             <TextView
                 android:id="@+id/tab1"
@@ -70,7 +70,7 @@
                 android:layout_below="@+id/radio1"
                 android:layout_centerHorizontal="true"
                 android:text="采购"
-                android:textColor="@color/black"
+                android:textColor="@color/c_6a5acd"
                 android:textSize="@dimen/_14sp" />
 
         </RelativeLayout>
@@ -171,7 +171,7 @@
                 android:layout_width="@dimen/_28dp"
                 android:layout_height="@dimen/_28dp"
                 android:layout_centerHorizontal="true"
-                android:background="@drawable/btn_tabradio5_selector"
+                android:background="@drawable/btn_tabradio6_selector"
                 android:button="@null"
                 android:checked="false" />
 
@@ -180,6 +180,34 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_below="@+id/radio5"
+                android:layout_centerHorizontal="true"
+                android:text="图表"
+                android:textColor="@color/black"
+                android:textSize="@dimen/_14sp" />
+
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:id="@+id/relative6"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_margin="@dimen/_2dp"
+            android:layout_weight="1">
+
+            <RadioButton
+                android:id="@+id/radio6"
+                android:layout_width="@dimen/_28dp"
+                android:layout_height="@dimen/_28dp"
+                android:layout_centerHorizontal="true"
+                android:background="@drawable/btn_tabradio4_selector"
+                android:button="@null"
+                android:checked="false" />
+
+            <TextView
+                android:id="@+id/tab6"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/radio6"
                 android:layout_centerHorizontal="true"
                 android:text="设置"
                 android:textColor="@color/black"

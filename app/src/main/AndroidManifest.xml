@@ -133,6 +133,11 @@
             android:name=".sales.Sal_DsBToRFromPurchaseInStockMainActivity"
             android:windowSoftInputMode="adjustResize|stateHidden" />
 
+        <!-- 图表 -->
+        <activity
+            android:name=".chart.OrderSearchMainActivity"
+            android:windowSoftInputMode="adjustResize|stateHidden" />
+
 
         <!-- 扫一扫界面 -->
         <activity

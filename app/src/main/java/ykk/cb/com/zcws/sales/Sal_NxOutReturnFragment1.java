@@ -78,6 +78,8 @@ public class Sal_NxOutReturnFragment1 extends BaseFragment {
     Button btnScan2;
     @BindView(R.id.tv_custInfo)
     TextView tvCustInfo;
+    @BindView(R.id.tv_deliCustInfo)
+    TextView tvDeliCustInfo;
     @BindView(R.id.recyclerView)
     RecyclerView recyclerView;
     @BindView(R.id.btn_save)
@@ -168,18 +170,20 @@ public class Sal_NxOutReturnFragment1 extends BaseFragment {
                                 List<Icstockbillentry> list = JsonUtil.strToList(msgObj, Icstockbillentry.class);
                                 Icstockbillentry stockBillEntry = list.get(0);
                                 IcStockBill stockOrder = stockBillEntry.getStockBill();
-                                Organization tempCust = stockOrder.getCust();
-                                if(tempCust != null && tempCust.getFitemId() == 33067) {
+                                Organization cust = stockOrder.getCust();
+                                Organization deliCust = stockOrder.getDeliCust();
+                                if(cust != null && cust.getFitemId() == 33067) {
                                     Comm.showWarnDialog(m.mContext,"该条码对应的客户是电商客户，请在电商退货页面操作！");
                                     return;
                                 }
                                 // 显示客户
-                                if(m.cust != null && !(m.cust.getfNumber().equals(tempCust.getfNumber()))) {
+                                if(m.cust != null && !(m.cust.getfNumber().equals(cust.getfNumber()))) {
                                     Comm.showWarnDialog(m.mContext,"扫描的客户不一致，请检查！");
                                     return;
                                 }
-                                m.cust = tempCust;
-                                m.tvCustInfo.setText(Html.fromHtml("客户：<font color='#000000'>"+tempCust.getfName()+"</font>"));
+                                m.cust = cust;
+                                m.tvCustInfo.setText(Html.fromHtml("客户：<font color='#000000'>"+cust.getfName()+"</font>"));
+                                m.tvDeliCustInfo.setText(Html.fromHtml("发货客户：<font color='#000000'>"+deliCust.getfName()+"</font>"));
 //                                m.getScanAfterData_1(list);
                                 // 填充数据
                                 int size = m.checkDatas.size();
@@ -565,6 +569,7 @@ public class Sal_NxOutReturnFragment1 extends BaseFragment {
         timesTamp = user.getId()+"-"+Comm.randomUUID();
         cust = null;
         tvCustInfo.setText("客户：");
+        tvDeliCustInfo.setText("发货客户：");
         setEnables(etMtlCode, R.color.transparent, true);
         setEnables(etExpressCode, R.color.transparent, true);
         btnScan.setVisibility(View.VISIBLE);
@@ -715,7 +720,8 @@ public class Sal_NxOutReturnFragment1 extends BaseFragment {
             sr.setSourceQty(stockBillEntry.getFqtymust());
             sr.setUseableQty(stockBillEntry.getUseableQty());
             sr.setRealQty(stockBillEntry.getFqty());
-            sr.setPrice(stockBillEntry.getFprice());
+//            sr.setPrice(stockBillEntry.getFprice());
+            sr.setPrice(stockBillEntry.getCustSalesPrice());
             sr.setCreateUserId(user.getId());
             sr.setEmpId(user.getEmpId());
             sr.setCreateUserName(user.getUsername());

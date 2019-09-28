@@ -14,6 +14,9 @@ import ykk.cb.com.zcws.sales.Sal_DsOutReturnMainActivity;
 import ykk.cb.com.zcws.sales.Sal_NxOutReturnMainActivity;
 import ykk.cb.com.zcws.sales.Sal_ScOutMainActivity;
 
+/**
+ * 销售
+ */
 public class MainTabFragment3 extends BaseFragment {
 
     public MainTabFragment3() {

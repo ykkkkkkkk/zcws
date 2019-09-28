@@ -127,6 +127,7 @@ public class IcStockBill implements Serializable {
     /* 部门 */
     private Department department;
     private Organization cust; // 客户对象
+    private Organization deliCust; // 发货客户对象
     /* 业务员 */
     private Emp emp;
     private Icstockbillentry icstockBillEntry;
@@ -607,6 +608,13 @@ public class IcStockBill implements Serializable {
 
     public void setExpressNo(String expressNo) {
         this.expressNo = expressNo;
+    }
+
+    public Organization getDeliCust() {
+        return deliCust;
+    }
+    public void setDeliCust(Organization deliCust) {
+        this.deliCust = deliCust;
     }
 
     @Override
