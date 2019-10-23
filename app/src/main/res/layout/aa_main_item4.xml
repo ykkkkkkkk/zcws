@@ -76,8 +76,7 @@
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
-            android:gravity="center"
-            android:visibility="invisible">
+            android:gravity="center">
 
             <ImageView
                 android:id="@+id/imgView3"
@@ -85,7 +84,7 @@
                 android:layout_height="@dimen/_60dp"
                 android:layout_centerHorizontal="true"
                 android:scaleType="fitXY"
-                android:src="@drawable/aa_ico4a_2" />
+                android:src="@drawable/aa_ico4a_9" />
 
             <TextView
                 android:id="@+id/tvMenu3"
@@ -94,7 +93,7 @@
                 android:layout_below="@+id/imgView3"
                 android:layout_centerHorizontal="true"
                 android:layout_marginTop="@dimen/_3dp"
-                android:text="调拨"
+                android:text="盘点"
                 android:textColor="@color/black"
                 android:textSize="@dimen/_18sp" />
 

@@ -21,7 +21,6 @@ import java.lang.ref.WeakReference;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 import butterknife.BindView;

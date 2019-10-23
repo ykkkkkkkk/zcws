@@ -37,7 +37,6 @@ import okhttp3.Response;
 import okhttp3.ResponseBody;
 import ykk.cb.com.zcws.R;
 import ykk.cb.com.zcws.bean.AppInfo;
-import ykk.cb.com.zcws.bean.MsgCount;
 import ykk.cb.com.zcws.comm.BaseFragment;
 import ykk.cb.com.zcws.purchase.Pur_ScInMainActivity;
 import ykk.cb.com.zcws.util.IDownloadContract;

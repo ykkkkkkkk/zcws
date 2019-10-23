@@ -99,6 +99,17 @@
         <activity
             android:name=".warehouse.Ds_PurInStockPassMainActivity"
             android:windowSoftInputMode="stateHidden|adjustResize" />
+        <activity
+            android:name=".warehouse.Sc_ICInvBackupMainActivity"
+            android:windowSoftInputMode="stateHidden|adjustResize" />
+        <activity
+            android:name=".warehouse.ICStockCheckProcess_DialogActivity"
+            android:theme="@style/dialogStyle"
+            android:windowSoftInputMode="stateHidden|adjustResize" />
+        <activity
+            android:name=".warehouse.ICInvBackup_Material_DialogActivity"
+            android:theme="@style/dialogStyle"
+            android:windowSoftInputMode="stateHidden|adjustResize" />
 
         <!-- 采购模块 -->
         <activity

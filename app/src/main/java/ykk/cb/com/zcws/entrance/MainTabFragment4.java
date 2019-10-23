@@ -9,6 +9,7 @@ import butterknife.OnClick;
 import ykk.cb.com.zcws.R;
 import ykk.cb.com.zcws.comm.BaseFragment;
 import ykk.cb.com.zcws.warehouse.Ds_PurInStockPassMainActivity;
+import ykk.cb.com.zcws.warehouse.Sc_ICInvBackupMainActivity;
 import ykk.cb.com.zcws.warehouse.Sc_ProdInStockPassMainActivity;
 
 /**
@@ -36,8 +37,9 @@ public class MainTabFragment4 extends BaseFragment {
                 show(Ds_PurInStockPassMainActivity.class, null);
 
                 break;
-            case R.id.relative3:
-                showLoadDialog("连接服务器...");
+            case R.id.relative3: // 盘点
+                show(Sc_ICInvBackupMainActivity.class, null);
+
                 break;
             case R.id.relative4:
                 showLoadDialog("连接服务器...");
