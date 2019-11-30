@@ -7,7 +7,7 @@ import android.support.v4.view.ViewPager
 import android.view.KeyEvent
 import android.view.View
 import butterknife.OnClick
-import kotlinx.android.synthetic.main.ware_sc_icinvbackup_main.*
+import kotlinx.android.synthetic.main.ware_sc_other_out_in_stock_main.*
 import ykk.cb.com.zcws.R
 import ykk.cb.com.zcws.comm.BaseActivity
 import ykk.cb.com.zcws.util.adapter.BaseFragmentAdapter
@@ -16,24 +16,27 @@ import java.util.*
 
 /**
  * 日期：2019-10-16 09:14
- * 描述：
+ * 描述：其它出入库
  * 作者：ykk
  */
-class Sc_ICInvBackupMainActivity : BaseActivity() {
+class Sc_OtherOutInStockMainActivity : BaseActivity() {
 
     private val context = this
-    private val TAG = "Sc_ICInvBackupMainActivity"
+    private val TAG = "Sc_OtherOutInStockMainActivity"
     private var curRadio: View? = null
     var isChange: Boolean = false // 返回的时候是否需要判断数据是否保存了
     private val listMaps = ArrayList<Map<String, Any>>()
     private val df = DecimalFormat("#.####")
-    private val fragment1 = Sc_ICInvBackupFragment1()
+    private var pageId:Int? = null // 上个页面传来要显示的页面
+    private val fragment1 = Sc_OtherInStockFragment1()
+    private val fragment2 = Sc_OtherOutInStockFragment2()
 
     override fun setLayoutResID(): Int {
-        return R.layout.ware_sc_icinvbackup_main;
+        return R.layout.ware_sc_other_out_in_stock_main;
     }
 
     override fun initData() {
+        bundle()
         curRadio = viewRadio1
         val listFragment = ArrayList<Fragment>()
 //        Bundle bundle2 = new Bundle();
@@ -45,13 +48,14 @@ class Sc_ICInvBackupMainActivity : BaseActivity() {
 //        Sal_OutFragment3 fragment3 = new Sal_OutFragment3();
 
         listFragment.add(fragment1)
-//        listFragment.add(fragment2);
+        listFragment.add(fragment2);
 //        listFragment.add(fragment3);
-//        viewPager.setScanScroll(false); // 禁止左右滑动
+        viewPager.setScanScroll(false); // 禁止左右滑动
         //ViewPager设置适配器
         viewPager.setAdapter(BaseFragmentAdapter(supportFragmentManager, listFragment))
         //ViewPager显示第一个Fragment
-        viewPager!!.setCurrentItem(0)
+//        viewPager!!.setCurrentItem(0)
+        viewPager!!.setCurrentItem(pageId!!)
 
         //ViewPager页面切换监听
         viewPager!!.addOnPageChangeListener(object : ViewPager.OnPageChangeListener {
@@ -61,9 +65,8 @@ class Sc_ICInvBackupMainActivity : BaseActivity() {
 
             override fun onPageSelected(position: Int) {
                 when (position) {
-                    0 -> tabChange(viewRadio1!!, "销售出库--销售订单", 0)
-                    1 -> tabChange(viewRadio2!!, "销售出库--箱码", 1)
-                    2 -> tabChange(viewRadio3!!, "销售出库--拣货单", 2)
+                    0 -> tabChange(viewRadio1!!, "其它入库", 0)
+                    1 -> tabChange(viewRadio2!!, "其它出库", 1)
                 }
             }
 
@@ -76,11 +79,15 @@ class Sc_ICInvBackupMainActivity : BaseActivity() {
     private fun bundle() {
         val bundle = context.intent.extras
         if (bundle != null) {
-
+            pageId = bundle.getInt("pageId",0)
+            when (pageId) {
+                0 -> tv_title.text = "其它入库"
+                1 -> tv_title.text = "其它出库"
+            }
         }
     }
 
-    @OnClick(R.id.btn_close, R.id.lin_tab1, R.id.lin_tab2, R.id.lin_tab3)
+    @OnClick(R.id.btn_close, R.id.lin_tab1, R.id.lin_tab2, R.id.btn_search)
     fun onViewClicked(view: View) {
         // setCurrentItem第二个参数控制页面切换动画
         //  true:打开/false:关闭
@@ -107,16 +114,18 @@ class Sc_ICInvBackupMainActivity : BaseActivity() {
                     context.finish()
                 }
             }
-//            R.id.lin_tab1 -> {
-//                tabChange(viewRadio1!!, "销售出库--销售订单", 0)
-//            }
-//            R.id.lin_tab2 -> {
-//                tabChange(viewRadio2!!, "销售出库--箱码", 1)
-//            }
-//            R.id.lin_tab3 -> {
-//                tabChange(viewRadio3!!, "销售出库--拣货单", 2)
-//            }
-        }//                }
+            R.id.btn_search // 查询
+            -> {
+//                fragment1.findFun()
+            }
+
+            R.id.lin_tab1 -> {
+                tabChange(viewRadio1!!, "其它入库", 0)
+            }
+            R.id.lin_tab2 -> {
+                tabChange(viewRadio2!!, "其它出库", 1)
+            }
+        }
     }
 
     /**

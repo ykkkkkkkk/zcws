@@ -13,6 +13,7 @@ public class ICInvBackup implements Serializable {
 	private double fauxQty; // 账存数
 	private double fauxQtyAct; // 实存数
 	private double fauxCheckQty; // 盘点数
+	private double realQty; // 当时盘点的输入的数
 	private String createDate; // 创建日期
 	private int createUserId; // 创建人
 	private int toK3; // 是否提交到K3  1: 未提交	3:已提交
@@ -24,9 +25,9 @@ public class ICInvBackup implements Serializable {
 	private String unitName; // 单位名称
 	private String fmodel; // 物料规格
 	private String fbatchNo; // 物料批次
-	private double realQty; // 当时盘点的输入的数
+
 	private boolean check; // 是否选中
-	
+
 	public ICInvBackup() {
 		super();
 	}
@@ -174,6 +175,6 @@ public class ICInvBackup implements Serializable {
 	public void setToK3(int toK3) {
 		this.toK3 = toK3;
 	}
-	
-	
+
+
 }

@@ -18,6 +18,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -58,7 +59,7 @@ import ykk.cb.com.zcws.util.LogUtil;
 import ykk.cb.com.zcws.util.zxing.android.CaptureActivity;
 
 /**
- * 销售订单出库
+ * 电商退货
  */
 public class Sal_DsOutReturnFragment1 extends BaseFragment {
 
@@ -86,6 +87,9 @@ public class Sal_DsOutReturnFragment1 extends BaseFragment {
     Button btnPass;
     @BindView(R.id.tv_okNum)
     TextView tvOkNum;
+    @BindView(R.id.cb_saoMaNext)
+    CheckBox cbSaoMaNext;
+
 
     private Sal_DsOutReturnFragment1 context = this;
     private static final int SUCC1 = 200, UNSUCC1 = 500, SUCC2 = 201, UNSUCC2 = 501, SUCC3 = 202, UNSUCC3 = 502, PASS = 203, UNPASS = 503;
@@ -187,6 +191,11 @@ public class Sal_DsOutReturnFragment1 extends BaseFragment {
                                     m.getScanAfterData_1(stockBillEntry);
                                 } else {
                                     m.getMtlAfter(stockBillEntry);
+                                }
+                                // 如果点击了自动跳到快递单，就把焦点跳到快递单
+                                if(m.cbSaoMaNext.isChecked()) {
+                                    m.setFocusable(m.etGetFocus);
+                                    m.setFocusable(m.etExpressCode);
                                 }
 
                                 break;

@@ -855,7 +855,7 @@ public class Sal_ScOutFragment1 extends BaseFragment {
         }
         FormBody formBody = new FormBody.Builder()
                 .add("barcode", barcode)
-                .add("logWay", "ZT") // 发货方式：自提
+//                .add("logWay", "ZT") // 发货方式：自提
                 .add("strCaseId", strCaseId)
                 .add("sourceType", "11") // 1：电商销售出库，10：生产产品入库，11：发货通知单销售出库
                 .build();

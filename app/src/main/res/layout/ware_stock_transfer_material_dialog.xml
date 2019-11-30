@@ -106,6 +106,14 @@
             android:textColor="#000000"
             android:textSize="12sp" />
 
+        <TextView
+            android:layout_width="@dimen/_58dp"
+            android:layout_height="match_parent"
+            android:gravity="center"
+            android:text="库存"
+            android:textColor="#000000"
+            android:textSize="12sp" />
+
     </LinearLayout>
 
     <LinearLayout

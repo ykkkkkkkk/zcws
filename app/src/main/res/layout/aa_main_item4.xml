@@ -108,8 +108,7 @@
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
         android:layout_marginTop="30dp"
-        android:orientation="horizontal"
-        android:visibility="invisible">
+        android:orientation="horizontal">
 
         <RelativeLayout
             android:id="@+id/relative4"
@@ -119,14 +118,14 @@
             android:clickable="true"
             android:gravity="center">
 
+
             <ImageView
                 android:id="@+id/imgView4"
                 android:layout_width="@dimen/_60dp"
                 android:layout_height="@dimen/_60dp"
                 android:layout_centerHorizontal="true"
                 android:scaleType="fitXY"
-                android:src="@drawable/aa_ico4a_3" />
-
+                android:src="@drawable/aa_ico4a_2" />
 
             <TextView
                 android:id="@+id/tvMenu4"
@@ -135,7 +134,7 @@
                 android:layout_below="@+id/imgView4"
                 android:layout_centerHorizontal="true"
                 android:layout_marginTop="@dimen/_3dp"
-                android:text="其他入库"
+                android:text="调拨"
                 android:textColor="@color/black"
                 android:textSize="@dimen/_18sp" />
 
@@ -155,7 +154,7 @@
                 android:layout_height="@dimen/_60dp"
                 android:layout_centerHorizontal="true"
                 android:scaleType="fitXY"
-                android:src="@drawable/aa_ico4a_4" />
+                android:src="@drawable/aa_ico4a_3" />
 
             <TextView
                 android:id="@+id/tvMenu5"
@@ -164,7 +163,7 @@
                 android:layout_below="@+id/imgView5"
                 android:layout_centerHorizontal="true"
                 android:layout_marginTop="@dimen/_3dp"
-                android:text="其他出库"
+                android:text="其它入库"
                 android:textColor="@color/black"
                 android:textSize="@dimen/_18sp" />
 
@@ -183,7 +182,8 @@
                 android:layout_height="@dimen/_60dp"
                 android:layout_centerHorizontal="true"
                 android:scaleType="fitXY"
-                android:src="@drawable/aa_ico3a_4" />
+                android:src="@drawable/aa_ico4a_4" />
+
 
             <TextView
                 android:id="@+id/tvMenu6"
@@ -192,7 +192,7 @@
                 android:layout_below="@+id/imgView6"
                 android:layout_centerHorizontal="true"
                 android:layout_marginTop="@dimen/_3dp"
-                android:text="调拨拣货"
+                android:text="其它出库"
                 android:textColor="@color/black"
                 android:textSize="@dimen/_18sp" />
 

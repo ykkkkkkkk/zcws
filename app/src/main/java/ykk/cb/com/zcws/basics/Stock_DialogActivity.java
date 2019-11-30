@@ -54,6 +54,7 @@ public class Stock_DialogActivity extends BaseDialogActivity implements XRecycle
     private OkHttpClient okHttpClient = new OkHttpClient();
     private int limit = 1;
     private boolean isRefresh, isLoadMore, isNextPage;
+    private String accountType; // 账号类型（DS：电商，SC：生产）
 
     // 消息处理
     private MyHandler mHandler = new MyHandler(this);
@@ -127,6 +128,7 @@ public class Stock_DialogActivity extends BaseDialogActivity implements XRecycle
     public void initData() {
         Bundle bundle = context.getIntent().getExtras();
         if(bundle != null) {
+            accountType = bundle.getString("accountType");
         }
 
         initLoadDatas();
@@ -162,6 +164,7 @@ public class Stock_DialogActivity extends BaseDialogActivity implements XRecycle
         String mUrl = getURL("stock/findStockListByParam");
         FormBody formBody = new FormBody.Builder()
                 .add("fnumberOrName", getValues(etSearch).trim())
+                .add("accountType", isNULL2(accountType, "SC"))
                 .add("limit", String.valueOf(limit))
                 .add("pageSize", "30")
                 .build();

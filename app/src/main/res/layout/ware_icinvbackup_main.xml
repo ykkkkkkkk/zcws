@@ -20,32 +20,21 @@
             android:layout_height="match_parent"
             android:layout_weight="1"
             android:gravity="center"
-            android:text="线下出库"
+            android:text="盘点"
             android:textColor="@android:color/white"
             android:textSize="18sp" />
 
+
         <Button
-            android:id="@+id/btn_print"
-            android:layout_width="42dp"
+            android:id="@+id/btn_search"
+            android:layout_width="@dimen/_50dp"
             android:layout_height="match_parent"
-            android:layout_marginLeft="@dimen/_4dp"
-            android:layout_marginRight="@dimen/_4dp"
-            android:background="@drawable/aa_ico5a_5b"
+            android:background="@drawable/btn_blue2_selector"
+            android:text="历史\n记录"
             android:textColor="#ffffff"
-            android:textSize="14sp"
-            android:visibility="invisible" />
+            android:textSize="14sp" />
     </LinearLayout>
 
-    <TextView
-        android:id="@+id/tv_connState"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:gravity="center"
-        android:padding="@dimen/_2dp"
-        android:text="@string/str_conn_state_disconnect"
-        android:textColor="@color/c_666666"
-        android:textSize="12sp"
-        android:visibility="gone" />
 
     <LinearLayout
         android:id="@+id/lin_tabs"
@@ -73,7 +62,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:gravity="center"
-                android:text="自提出库"
+                android:text="位置报工"
                 android:textColor="@android:color/black"
                 android:textSize="14sp" />
 
@@ -97,7 +86,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:gravity="center"
-                android:text="快递单出库"
+                android:text="按套报工"
                 android:textColor="@android:color/black"
                 android:textSize="14sp" />
 
@@ -109,8 +98,7 @@
             android:layout_height="match_parent"
             android:layout_weight="1"
             android:gravity="center"
-            android:orientation="horizontal"
-            android:visibility="gone">
+            android:orientation="horizontal">
 
             <View
                 android:id="@+id/viewRadio3"
@@ -122,7 +110,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:gravity="center"
-                android:text="拣货单"
+                android:text="计时报工"
                 android:textColor="@android:color/black"
                 android:textSize="14sp" />
 
@@ -130,9 +118,19 @@
 
     </LinearLayout>
 
+    <TextView
+        android:id="@+id/tv_connState"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:padding="@dimen/_2dp"
+        android:text="@string/str_conn_state_disconnect"
+        android:textColor="@color/c_666666"
+        android:textSize="12sp"
+        android:visibility="gone" />
+
     <ykk.cb.com.zcws.util.MyViewPager
         android:id="@+id/viewPager"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
-
 </LinearLayout>

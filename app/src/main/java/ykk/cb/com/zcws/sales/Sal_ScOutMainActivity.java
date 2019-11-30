@@ -99,18 +99,16 @@ public class Sal_ScOutMainActivity extends BaseActivity {
 //        fragment1.setArguments(bundle2); // 传参数
 //        fragment2.setArguments(bundle2); // 传参数
         Sal_ScOutFragment1 fragment1 = new Sal_ScOutFragment1();
-        Sal_ScOutFragment2 fragment2 = new Sal_ScOutFragment2();
-//        Sal_OutFragment2 fragment2 = new Sal_OutFragment2();
-//        Sal_OutFragment3 fragment3 = new Sal_OutFragment3();
+//        Sal_ScOutFragment2 fragment2 = new Sal_ScOutFragment2(); // 通过快递单查询的暂时不用
 
         listFragment.add(fragment1);
-        listFragment.add(fragment2);
+//        listFragment.add(fragment2);
 //        listFragment.add(fragment3);
 //        viewPager.setScanScroll(false); // 禁止左右滑动
         //ViewPager设置适配器
         viewPager.setAdapter(new BaseFragmentAdapter(getSupportFragmentManager(), listFragment));
         //设置ViewPage缓存界面数，默认为1
-        viewPager.setOffscreenPageLimit(2);
+//        viewPager.setOffscreenPageLimit(2);
         //ViewPager显示第一个Fragment
         viewPager.setCurrentItem(0);
 

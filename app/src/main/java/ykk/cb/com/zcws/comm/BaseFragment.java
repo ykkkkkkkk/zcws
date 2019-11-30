@@ -72,6 +72,7 @@ public abstract class BaseFragment extends Fragment {
 		return view;
 	}
 
+	// 因为使用了Kotlin的原因，ButterKnife注解不用写了，需要以下这种写法，他们才能得到值
 	@Override
 	public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
 		super.onViewCreated(view, savedInstanceState);

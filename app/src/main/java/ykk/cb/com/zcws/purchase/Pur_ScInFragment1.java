@@ -61,7 +61,7 @@ import ykk.cb.com.zcws.util.basehelper.BaseRecyclerAdapter;
 import ykk.cb.com.zcws.util.zxing.android.CaptureActivity;
 
 /**
- * 销售订单出库
+ * 生产入库
  */
 public class Pur_ScInFragment1 extends BaseFragment {
 
@@ -114,7 +114,7 @@ public class Pur_ScInFragment1 extends BaseFragment {
     private boolean isClickButton; // 是否点击了按钮
 
     // 消息处理
-    private Pur_ScInFragment1.MyHandler mHandler = new Pur_ScInFragment1.MyHandler(this);
+    private MyHandler mHandler = new MyHandler(this);
     private static class MyHandler extends Handler {
         private final WeakReference<Pur_ScInFragment1> mActivity;
 

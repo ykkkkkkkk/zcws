@@ -55,6 +55,7 @@ public class StockPos_DialogActivity extends BaseDialogActivity implements XRecy
     private int fspGroupId; // 仓位组id
     private int limit = 1;
     private boolean isRefresh, isLoadMore, isNextPage;
+    private String accountType; // 账号类型（DS：电商，SC：生产）
 
     // 消息处理
     private MyHandler mHandler = new MyHandler(this);
@@ -133,6 +134,7 @@ public class StockPos_DialogActivity extends BaseDialogActivity implements XRecy
         Bundle bundle = context.getIntent().getExtras();
         if (bundle != null) {
             fspGroupId = bundle.getInt("fspGroupId");
+            accountType = bundle.getString("accountType");
         }
     }
 
@@ -166,7 +168,8 @@ public class StockPos_DialogActivity extends BaseDialogActivity implements XRecy
         String mUrl = getURL("stockPosition/findStockPositionListByParam");
         FormBody formBody = new FormBody.Builder()
                 .add("fnumberOrName", getValues(etSearch).trim())
-                .add("fspGroupId", String.valueOf(fspGroupId))
+                .add("FSPGroupId", String.valueOf(fspGroupId))
+                .add("accountType", accountType)
                 .add("limit", String.valueOf(limit))
                 .add("pageSize", "30")
                 .build();
