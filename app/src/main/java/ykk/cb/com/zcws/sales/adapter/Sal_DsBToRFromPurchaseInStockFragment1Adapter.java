@@ -11,9 +11,6 @@ import java.util.List;
 import ykk.cb.com.zcws.R;
 import ykk.cb.com.zcws.bean.ScanningRecord;
 import ykk.cb.com.zcws.bean.k3Bean.ICItem;
-import ykk.cb.com.zcws.bean.k3Bean.IcStockBill;
-import ykk.cb.com.zcws.bean.k3Bean.Icstockbillentry;
-import ykk.cb.com.zcws.util.JsonUtil;
 import ykk.cb.com.zcws.util.basehelper.BaseArrayRecyclerAdapter;
 
 public class Sal_DsBToRFromPurchaseInStockFragment1Adapter extends BaseArrayRecyclerAdapter<ScanningRecord> {

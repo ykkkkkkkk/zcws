@@ -37,7 +37,7 @@ import okhttp3.Response;
 import okhttp3.ResponseBody;
 import ykk.cb.com.zcws.R;
 import ykk.cb.com.zcws.bean.User;
-import ykk.cb.com.zcws.bean.k3Bean.Icstockbillentry;
+import ykk.cb.com.zcws.bean.k3Bean.ICStockBillEntry_K3;
 import ykk.cb.com.zcws.comm.BaseFragment;
 import ykk.cb.com.zcws.comm.Comm;
 import ykk.cb.com.zcws.util.JsonUtil;
@@ -65,7 +65,7 @@ public class Sc_ProdInStockPassFragment1 extends BaseFragment {
     private static final int SUCC1 = 200, UNSUCC1 = 500, SUCC2 = 201, UNSUCC2 = 501, SUCC3 = 202, UNSUCC3 = 502, PASS = 203, UNPASS = 503;
     private static final int SETFOCUS = 1, RESULT_NUM = 2, SAOMA = 3, WRITE_CODE = 4;
     private Sc_ProdInStockPassFragment1Adapter mAdapter;
-    private List<Icstockbillentry> checkDatas = new ArrayList<>();
+    private List<ICStockBillEntry_K3> checkDatas = new ArrayList<>();
     private OkHttpClient okHttpClient = null;
     private User user;
     private Activity mContext;
@@ -103,7 +103,7 @@ public class Sc_ProdInStockPassFragment1 extends BaseFragment {
 
                         break;
                     case SUCC2: // 扫码成功后进入
-                        List<Icstockbillentry> list = JsonUtil.strToList(msgObj, Icstockbillentry.class);
+                        List<ICStockBillEntry_K3> list = JsonUtil.strToList(msgObj, ICStockBillEntry_K3.class);
                         m.parent.isChange = true;
                         m.checkDatas.addAll(list);
                         m.mAdapter.notifyDataSetChanged();

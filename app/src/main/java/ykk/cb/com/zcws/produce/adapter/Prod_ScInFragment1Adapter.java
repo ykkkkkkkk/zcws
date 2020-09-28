@@ -59,14 +59,13 @@ public class Prod_ScInFragment1Adapter extends BaseArrayRecyclerAdapter<Scanning
             tv_nums.setBackgroundResource(R.drawable.back_style_blue2);
         }
         tv_nums.setText(Html.fromHtml(df.format(entity.getUseableQty())+"<br><font color='#009900'>"+df.format(entity.getRealQty())+"</font>"));
-        tv_stockAP.setText(Comm.isNULLS(entity.getStockName()));
-//        if(entity.getStockPos() != null) {
-//            tv_stockAP.setText(Html.fromHtml(entity.getStock().getFname()+"<br><font color='#6a5acd'>"+entity.getStockPos().getFname()+"</font>"));
-//        } else if(entity.getStock() != null) {
-//            tv_stockAP.setText(entity.getStock().getFname());
-//        } else {
-//            tv_stockAP.setText("");
-//        }
+        if(entity.getStockPos() != null) {
+            tv_stockAP.setText(Html.fromHtml(entity.getStock().getFname()+"<br><font color='#6a5acd'>"+entity.getStockPos().getFname()+"</font>"));
+        } else if(entity.getStock() != null) {
+            tv_stockAP.setText(entity.getStock().getFname());
+        } else {
+            tv_stockAP.setText("");
+        }
 
         View.OnClickListener click = new View.OnClickListener() {
             @Override
@@ -78,17 +77,17 @@ public class Prod_ScInFragment1Adapter extends BaseArrayRecyclerAdapter<Scanning
                         }
 
                         break;
-//                    case R.id.tv_stockAP: // 选择仓库
-//                        if(callBack != null) {
-//                            callBack.onClick_selStock(v, entity, pos);
-//                        }
-//
-//                        break;
+                    case R.id.tv_stockAP: // 选择仓库
+                        if(callBack != null) {
+                            callBack.onClick_selStock(v, entity, pos);
+                        }
+
+                        break;
                 }
             }
         };
         tv_nums.setOnClickListener(click);
-//        tv_stockAP.setOnClickListener(click);
+        tv_stockAP.setOnClickListener(click);
     }
 
     public void setCallBack(MyCallBack callBack) {
@@ -97,36 +96,7 @@ public class Prod_ScInFragment1Adapter extends BaseArrayRecyclerAdapter<Scanning
 
     public interface MyCallBack {
         void onClick_num(View v, ScanningRecord entity, int position);
-//        void onClick_selStock(View v, ScanningRecord entity, int position);
+        void onClick_selStock(View v, ScanningRecord entity, int position);
     }
-
-    /*之下的方法都是为了方便操作，并不是必须的*/
-
-    //在指定位置插入，原位置的向后移动一格
-//    public boolean addItem(int position, String msg) {
-//        if (position < datas.size() && position >= 0) {
-//            datas.add(position, msg);
-//            notifyItemInserted(position);
-//            return true;
-//        }
-//        return false;
-//    }
-//
-//    //去除指定位置的子项
-//    public boolean removeItem(int position) {
-//        if (position < datas.size() && position >= 0) {
-//            datas.remove(position);
-//            notifyItemRemoved(position);
-//            return true;
-//        }
-//        return false;
-//    }
-
-    //清空显示数据
-//    public void clearAll() {
-//        datas.clear();
-//        notifyDataSetChanged();
-//    }
-
 
 }

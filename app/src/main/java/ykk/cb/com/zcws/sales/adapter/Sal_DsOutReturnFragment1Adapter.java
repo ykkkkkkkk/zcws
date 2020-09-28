@@ -11,8 +11,8 @@ import java.util.List;
 import ykk.cb.com.zcws.R;
 import ykk.cb.com.zcws.bean.ScanningRecord;
 import ykk.cb.com.zcws.bean.k3Bean.ICItem;
-import ykk.cb.com.zcws.bean.k3Bean.IcStockBill;
-import ykk.cb.com.zcws.bean.k3Bean.Icstockbillentry;
+import ykk.cb.com.zcws.bean.k3Bean.ICStockBill_K3;
+import ykk.cb.com.zcws.bean.k3Bean.ICStockBillEntry_K3;
 import ykk.cb.com.zcws.util.JsonUtil;
 import ykk.cb.com.zcws.util.basehelper.BaseArrayRecyclerAdapter;
 
@@ -43,8 +43,8 @@ public class Sal_DsOutReturnFragment1Adapter extends BaseArrayRecyclerAdapter<Sc
         TextView tv_delRow = holder.obtainView(R.id.tv_delRow);
 
         // 赋值
-        Icstockbillentry stockbillentry = JsonUtil.stringToObject(entity.getSourceObj(), Icstockbillentry.class);
-        IcStockBill stockBill = stockbillentry.getStockBill();
+        ICStockBillEntry_K3 stockbillentry = JsonUtil.stringToObject(entity.getSourceObj(), ICStockBillEntry_K3.class);
+        ICStockBill_K3 stockBill = stockbillentry.getStockBill();
         ICItem icItem = stockbillentry.getIcItem();
 
         tv_row.setText(String.valueOf(pos + 1));

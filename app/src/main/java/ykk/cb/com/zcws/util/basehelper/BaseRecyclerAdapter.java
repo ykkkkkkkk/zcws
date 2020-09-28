@@ -12,7 +12,6 @@ import android.widget.TextView;
  */
 public abstract class BaseRecyclerAdapter extends RecyclerView.Adapter<BaseRecyclerAdapter.RecyclerHolder> {
 
-
     public BaseRecyclerAdapter() {
     }
 
@@ -54,13 +53,11 @@ public abstract class BaseRecyclerAdapter extends RecyclerView.Adapter<BaseRecyc
             return (T) view;
         }
 
-
         public <T> T obtainView(int id, Class<T> viewClazz) {
             View view = obtainView(id);
             if (null == view) return null;
             return (T) view;
         }
-
 
         public boolean bindChildClick(int id) {
             View view = obtainView(id);
@@ -82,7 +79,6 @@ public abstract class BaseRecyclerAdapter extends RecyclerView.Adapter<BaseRecyc
             v.setOnClickListener(this);
             return true;
         }
-
 
         public boolean bindChildLongClick(int id) {
             View view = obtainView(id);
@@ -111,7 +107,6 @@ public abstract class BaseRecyclerAdapter extends RecyclerView.Adapter<BaseRecyc
                 ((TextView) view).setText(text);
             }
         }
-
 
         @Override
         public boolean onLongClick(View v) {
@@ -145,7 +140,6 @@ public abstract class BaseRecyclerAdapter extends RecyclerView.Adapter<BaseRecyc
         this.onItemClickListener = onItemClickListener;
     }
 
-
     protected OnItemLongClickListener onItemLongClickListener;
 
     public OnItemLongClickListener getOnItemLongClickListener() {
@@ -156,7 +150,6 @@ public abstract class BaseRecyclerAdapter extends RecyclerView.Adapter<BaseRecyc
         this.onItemLongClickListener = onItemLongClickListener;
     }
 
-
     public interface OnItemClickListener {
         void onItemClick(BaseRecyclerAdapter adapter, RecyclerHolder holder, View view, int position);
     }
@@ -165,7 +158,6 @@ public abstract class BaseRecyclerAdapter extends RecyclerView.Adapter<BaseRecyc
         void onItemLongClick(BaseRecyclerAdapter adapter, RecyclerHolder holder, View view, int position);
     }
 
-
     public interface OnItemChildClickListener {
         void onItemChildClick(BaseRecyclerAdapter adapter, RecyclerHolder holder, View view, int position);
     }
@@ -173,7 +165,6 @@ public abstract class BaseRecyclerAdapter extends RecyclerView.Adapter<BaseRecyc
     public interface OnItemChildLongClickListener {
         void onItemChildLongClick(BaseRecyclerAdapter adapter, RecyclerHolder holder, View view, int position);
     }
-
 
     protected OnItemChildClickListener onItemChildClickListener;
     protected OnItemChildLongClickListener onItemChildLongClickListener;

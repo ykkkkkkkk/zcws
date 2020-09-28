@@ -61,7 +61,9 @@ public class Sal_ScOutFragment1Adapter extends BaseArrayRecyclerAdapter<Scanning
             tv_nums.setBackgroundResource(R.drawable.back_style_blue2);
         }
         tv_nums.setText(Html.fromHtml(df.format(entity.getUseableQty()) + "<br><font color='#009900'>" + df.format(entity.getRealQty()) + "</font>"));
-        if (entity.getStock() != null) {
+        if(entity.getStockPos() != null) {
+            tv_stockAP.setText(Html.fromHtml(entity.getStock().getFname()+"<br><font color='#6a5acd'>"+entity.getStockPos().getFname()+"</font>"));
+        } else if(entity.getStock() != null) {
             tv_stockAP.setText(entity.getStock().getFname());
         } else {
             tv_stockAP.setText("");
@@ -77,10 +79,17 @@ public class Sal_ScOutFragment1Adapter extends BaseArrayRecyclerAdapter<Scanning
                         }
 
                         break;
+                    case R.id.tv_stockAP: // 选择仓库
+                        if(callBack != null) {
+                            callBack.onClick_selStock(v, entity, pos);
+                        }
+
+                        break;
                 }
             }
         };
         tv_nums.setOnClickListener(click);
+        tv_stockAP.setOnClickListener(click);
     }
 
     public void setCallBack(MyCallBack callBack) {
@@ -89,6 +98,7 @@ public class Sal_ScOutFragment1Adapter extends BaseArrayRecyclerAdapter<Scanning
 
     public interface MyCallBack {
         void onClick_num(View v, ScanningRecord entity, int position);
+        void onClick_selStock(View v, ScanningRecord entity, int position);
     }
 
 }

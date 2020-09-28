@@ -136,17 +136,6 @@
             android:textColor="#666666"
             android:textSize="14sp" />
 
-        <TextView
-            android:id="@+id/tv_deliCustInfo"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="@dimen/_6dp"
-            android:layout_marginRight="@dimen/_6dp"
-            android:gravity="center"
-            android:padding="@dimen/_2dp"
-            android:text="发货客户："
-            android:textColor="#666666"
-            android:textSize="14sp" />
     </LinearLayout>
 
     <HorizontalScrollView

@@ -156,7 +156,10 @@ class StockTransferFragment1_DS : BaseFragment() {
                         }
                     }
                     m.SAOMA -> { // 扫码之后
-                        if(!m.checkSelStockPos()) return
+                        if(!m.checkSelStockPos()) {
+                            m.isTextChange = false
+                            return
+                        }
                         // 执行查询方法
                         m.run_smDatas()
                     }
@@ -219,11 +222,13 @@ class StockTransferFragment1_DS : BaseFragment() {
             R.id.tv_outStockSel -> { // 选择调出仓库
                 bundle = Bundle()
                 bundle.putString("accountType", "DS");
+                bundle.putInt("unDisable", 1) // 只显示未禁用的数据
                 showForResult(Stock_DialogActivity::class.java, SEL_OUTSTOCK, bundle)
             }
             R.id.tv_inStockSel -> { // 选择调入仓库
                 bundle = Bundle()
                 bundle.putString("accountType", "DS");
+                bundle.putInt("unDisable", 1) // 只显示未禁用的数据
                 showForResult(Stock_DialogActivity::class.java, SEL_INSTOCK, bundle)
             }
             R.id.btn_outStockPosSel -> { // 选择调出库位
@@ -246,7 +251,7 @@ class StockTransferFragment1_DS : BaseFragment() {
                 smqFlag = '3'
                 if(!checkSelStockPos()) return;
                 bundle = Bundle()
-                bundle.putInt("fStockId", outStock!!.fitemId)
+                bundle.putInt("fStockID", outStock!!.fitemId)
                 bundle.putInt("fStockPlaceID", if(outStockPos != null) outStockPos!!.fspId else 0)
                 bundle.putString("accountType", "DS");
                 showForResult(StockTransfer_Material_DialogActivity::class.java, SEL_MTL, bundle)
@@ -485,6 +490,7 @@ class StockTransferFragment1_DS : BaseFragment() {
                         lin_outStockPos.visibility = View.VISIBLE
                         var bundle = Bundle()
                         bundle.putInt("fspGroupId", outStock!!.fspGroupId);
+                        bundle.putString("accountType", "DS");
                         showForResult(StockPos_DialogActivity::class.java, SEL_OUTSTOCKPOS, bundle)
                     } else {
                         lin_outStockPos.visibility = View.GONE
@@ -507,6 +513,7 @@ class StockTransferFragment1_DS : BaseFragment() {
                         lin_inStockPos.visibility = View.VISIBLE
                         var bundle = Bundle()
                         bundle.putInt("fspGroupId", inStock!!.fspGroupId);
+                        bundle.putString("accountType", "DS");
                         showForResult(StockPos_DialogActivity::class.java, SEL_INSTOCKPOS, bundle)
                     } else {
                         lin_inStockPos.visibility = View.GONE
@@ -527,45 +534,51 @@ class StockTransferFragment1_DS : BaseFragment() {
                     tv_inStockPosName.text = inStockPos!!.fname
                 }
             }
-            SEL_MTL //查询物料	返回
-            -> if (resultCode == Activity.RESULT_OK) {
-                val list = data!!.getSerializableExtra("obj") as List<ICInventory>
+            SEL_MTL -> {//查询物料	返回
+                if (resultCode == Activity.RESULT_OK) {
+                    val list = data!!.getSerializableExtra("obj") as List<ICInventory>
 
-                getMtlAfter(list)
+                    getMtlAfter(list)
+                }
             }
-
-            BaseFragment.CAMERA_SCAN // 扫一扫成功  返回
-            -> if (resultCode == Activity.RESULT_OK) {
-                val bundle = data!!.extras
-                if (bundle != null) {
-                    val code = bundle.getString(BaseFragment.DECODED_CONTENT_KEY, "")
-                    when (smqFlag) {
-                        '1' -> setTexts(et_outStockPos, code)
-                        '2' -> setTexts(et_inStockPos, code)
-                        '3' -> setTexts(et_code, code)
+            BaseFragment.CAMERA_SCAN -> {// 扫一扫成功  返回
+                if (resultCode == Activity.RESULT_OK) {
+                    val bundle = data!!.extras
+                    if (bundle != null) {
+                        val code = bundle.getString(BaseFragment.DECODED_CONTENT_KEY, "")
+                        when (smqFlag) {
+                            '1' -> setTexts(et_outStockPos, code)
+                            '2' -> setTexts(et_inStockPos, code)
+                            '3' -> setTexts(et_code, code)
+                        }
                     }
                 }
             }
-            WRITE_CODE // 输入条码返回
-            -> if (resultCode == Activity.RESULT_OK) {
-                val bundle = data!!.extras
-                if (bundle != null) {
-                    val value = bundle.getString("resultValue", "")
-                    et_code!!.setText(value.toUpperCase())
+            WRITE_CODE -> {// 输入条码返回
+                if (resultCode == Activity.RESULT_OK) {
+                    val bundle = data!!.extras
+                    if (bundle != null) {
+                        val value = bundle.getString("resultValue", "")
+                        et_code!!.setText(value.toUpperCase())
+                    }
                 }
             }
-            RESULT_NUM // 数量
-            -> if (resultCode == Activity.RESULT_OK) {
-                val bundle = data!!.getExtras()
-                if (bundle != null) {
-                    val value = bundle.getString("resultValue", "")
-                    val num = parseDouble(value)
-                    checkDatas[curPos].realQty = num
-                    countNum()
-                    mAdapter!!.notifyDataSetChanged()
+            RESULT_NUM -> {// 数量
+                if (resultCode == Activity.RESULT_OK) {
+                    val bundle = data!!.getExtras()
+                    if (bundle != null) {
+                        val value = bundle.getString("resultValue", "")
+                        val num = parseDouble(value)
+                        if(num > checkDatas[curPos].getfQty()) {
+                            Comm.showWarnDialog(mContext,"调拨数不能大于库存数！")
+                            return
+                        }
+                        checkDatas[curPos].realQty = num
+                        countNum()
+                        mAdapter!!.notifyDataSetChanged()
+                    }
                 }
             }
-
         }
         mHandler.sendEmptyMessageDelayed(SETFOCUS, 300)
     }
@@ -599,8 +612,12 @@ class StockTransferFragment1_DS : BaseFragment() {
 
             } else {
                 // 已有相同物料行，就叠加数量
-                val fqty = checkDatas[curPosition].realQty
-                val addVal = BigdecimalUtil.add(fqty, 1.0);
+                val realQty = checkDatas[curPosition].realQty
+                val addVal = BigdecimalUtil.add(realQty, 1.0);
+                if(addVal > checkDatas[curPosition].getfQty()) {
+                    Comm.showWarnDialog(mContext,"调拨数不能大于库存数！")
+                    return
+                }
                 checkDatas[curPosition].realQty = addVal
             }
         }
@@ -643,9 +660,10 @@ class StockTransferFragment1_DS : BaseFragment() {
             }
         }
         val formBody = FormBody.Builder()
-                .add("fStockId", outStock!!.fitemId.toString())
+                .add("fStockID", outStock!!.fitemId.toString())
                 .add("fStockPlaceID", if(outStockPos != null) outStockPos!!.fspId.toString() else "")
                 .add("FSPGroupId", outStock!!.fspGroupId.toString())
+                .add("accountType", "DS")
                 .add("barcode", barcode)
                 .build()
 

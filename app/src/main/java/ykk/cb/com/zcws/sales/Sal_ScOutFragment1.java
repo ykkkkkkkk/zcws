@@ -25,7 +25,9 @@ import java.io.IOException;
 import java.lang.ref.WeakReference;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 import butterknife.BindView;
@@ -38,11 +40,13 @@ import okhttp3.Request;
 import okhttp3.Response;
 import okhttp3.ResponseBody;
 import ykk.cb.com.zcws.R;
+import ykk.cb.com.zcws.basics.Stock_GroupDialogActivity;
 import ykk.cb.com.zcws.bean.BarCodeTable;
 import ykk.cb.com.zcws.bean.Customer;
 import ykk.cb.com.zcws.bean.Department;
 import ykk.cb.com.zcws.bean.ScanningRecord;
 import ykk.cb.com.zcws.bean.Stock;
+import ykk.cb.com.zcws.bean.StockPosition;
 import ykk.cb.com.zcws.bean.User;
 import ykk.cb.com.zcws.bean.k3Bean.ICItem;
 import ykk.cb.com.zcws.bean.k3Bean.SeoutStock;
@@ -86,7 +90,8 @@ public class Sal_ScOutFragment1 extends BaseFragment {
     TextView tvOkNum;
 
     private Sal_ScOutFragment1 context = this;
-    private static final int SUCC1 = 200, UNSUCC1 = 500, SUCC2 = 201, UNSUCC2 = 501, SUCC3 = 202, UNSUCC3 = 502, PASS = 203, UNPASS = 503;
+    private static final int SEL_STOCKPOS = 60;
+    private static final int SUCC1 = 200, UNSUCC1 = 500, SUCC2 = 201, UNSUCC2 = 501, SUCC3 = 202, UNSUCC3 = 502, PASS = 203, UNPASS = 503, CHECK_DATA = 204, UNCHECK_DATA = 504;
     private static final int SETFOCUS = 1, RESULT_NUM = 2, SAOMA = 3, WRITE_CODE = 4, WRITE_CODE2 = 5, DELAYED_CLICK = 6;
     private Sal_ScOutFragment1Adapter mAdapter;
     private List<ScanningRecord> checkDatas = new ArrayList<>();
@@ -193,6 +198,19 @@ public class Sal_ScOutFragment1 extends BaseFragment {
                         m.run_save(true);
 
                         break;
+                    case CHECK_DATA: // 判断K3是否修改了发货通知单数据    成功
+                        List<SeoutStockEntry> list = JsonUtil.strToList(msgObj, SeoutStockEntry.class);
+                        if(!m.dataIsChange(list)) {
+                            m.run_save(true);
+                        }
+
+                        break;
+                    case UNCHECK_DATA: /// 判断K3是否修改了发货通知单数据    失败
+                        errMsg = JsonUtil.strToString(msgObj);
+                        if(m.isNULLS(errMsg).length() == 0) errMsg = "没有查询到发货通知单（可能原因：1.单据已出库。2.单据已关闭。3.单据不存在。）！！！";
+                        Comm.showWarnDialog(m.mContext, errMsg);
+
+                        break;
                     case SETFOCUS: // 当弹出其他窗口会抢夺焦点，需要跳转下，才能正常得到值
                         m.setFocusable(m.etGetFocus);
                         switch (m.curViewFlag) {
@@ -277,6 +295,11 @@ public class Sal_ScOutFragment1 extends BaseFragment {
                 String showInfo = "<font color='#666666'>可用数：</font>"+useableQty;
                 showInputDialog("拣货数", showInfo, String.valueOf(useableQty), "0.0", RESULT_NUM);
             }
+            @Override
+            public void onClick_selStock(View v, ScanningRecord entity, int position) {
+                curPos = position;
+                showForResult(Stock_GroupDialogActivity.class, SEL_STOCKPOS, null);
+            }
         });
     }
 
@@ -350,7 +373,8 @@ public class Sal_ScOutFragment1 extends BaseFragment {
                 }
                 isAutoSubmitDate = false;
 //                run_findInStockSum();
-                run_save(false);
+//                run_save(false);
+                run_findPortionByParam(String.valueOf(checkDatas.get(0).getSourceId()));
 
                 break;
             case R.id.btn_pass: // 审核
@@ -403,6 +427,14 @@ public class Sal_ScOutFragment1 extends BaseFragment {
 //                Comm.showWarnDialog(mContext,"第" + (i + 1) + "行货还没捡完货！");
 //                return false;
 //            }
+            if (isNULLS(sr.getStockName()).length() == 0) {
+                Comm.showWarnDialog(mContext,"第" + (i + 1) + "行，请选择（仓库）！");
+                return false;
+            }
+            if (isNULLS(sr.getStockName()).length() > 0 && sr.getStock().getFisStockMgr() == 1 && sr.getStockPos() == null) {
+                Comm.showWarnDialog(mContext,"第" + (i + 1) + "行，仓库启用了库位，请选择（库位）！");
+                return false;
+            }
             if (sr.getRealQty() > sr.getUseableQty()) {
                 Comm.showWarnDialog(mContext,"第" + (i + 1) + "行,拣货数不能大于可用数！");
                 return false;
@@ -554,6 +586,17 @@ public class Sal_ScOutFragment1 extends BaseFragment {
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         switch (requestCode) {
+            case SEL_STOCKPOS: //行事件选择库位	返回
+                if (resultCode == Activity.RESULT_OK) {
+                    Stock stock = (Stock) data.getSerializableExtra("stock");
+                    StockPosition stockPos = null;
+                    if (data.getSerializableExtra("stockPos") != null) {
+                        stockPos = (StockPosition) data.getSerializableExtra("stockPos");
+                    }
+                    stockAllFill(stock, stockPos);
+                }
+
+                break;
             case RESULT_NUM: // 数量
                 if (resultCode == Activity.RESULT_OK) {
                     Bundle bundle = data.getExtras();
@@ -567,8 +610,10 @@ public class Sal_ScOutFragment1 extends BaseFragment {
                         countNum();
                         // 自动检查数据是否可以保存
                         if (isFinish()) {
+                            if(!saveBefore()) return;
                             isAutoSubmitDate = true;
-                            run_save(true);
+//                            run_save(true);
+                            run_findPortionByParam(String.valueOf(checkDatas.get(0).getSourceId()));
                         }
                     }
                 }
@@ -615,6 +660,60 @@ public class Sal_ScOutFragment1 extends BaseFragment {
     }
 
     /**
+     * 仓库数据全部填充
+     */
+    private void stockAllFill(Stock stock, StockPosition stockPos) {
+        ScanningRecord sr = checkDatas.get(curPos);
+        sr.setStockNumber(stock.getFnumber());
+        sr.setStockName(stock.getFname());
+        sr.setStock(stock);
+        sr.setStockPos(null);
+        sr.setStockPositionNumber("");
+        sr.setStockPositionName("");
+        if(stockPos != null) {
+            sr.setStockPos(stockPos);
+            sr.setStockPositionNumber(stockPos.getFnumber());
+            sr.setStockPositionName(stockPos.getFname());
+        }
+        // 当行仓库没有值，就填充
+        for (ScanningRecord m : checkDatas) {
+            if(isNULLS(m.getStockName()).length() == 0) {
+                m.setStockNumber(stock.getFnumber());
+                m.setStockName(stock.getFname());
+                m.setStock(stock);
+                m.setStockPos(null);
+                m.setStockPositionNumber("");
+                m.setStockPositionName("");
+                if (stockPos != null) {
+                    m.setStockPos(stockPos);
+                    m.setStockPositionNumber(stockPos.getFnumber());
+                    m.setStockPositionName(stockPos.getFname());
+                }
+            }
+        }
+        mAdapter.notifyDataSetChanged();
+    }
+
+    /**
+     * 查询发货单是否在K3中有变动
+     */
+    private boolean dataIsChange(List<SeoutStockEntry> list) {
+        Map<String, Boolean> mapChange = new HashMap<>();
+        for (SeoutStockEntry m : list) {
+            mapChange.put(m.getFentryid() + "_" + m.getFitemid() + "_" + m.getFqty(), true);
+        }
+
+        for (int i=0; i<checkDatas.size(); i++) {
+            ScanningRecord m = checkDatas.get(i);
+            if (!mapChange.containsKey(m.getSourceEntryId() + "_" + m.getIcItemId() + "_" + m.getSourceQty())) {
+                Comm.showWarnDialog(mContext,"第"+(i+1)+"行在金蝶已经发生改变，请检查（建议点击重置，重新扫描）！");
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
      * 得到快递单号扫码的数据
      */
     private void getScanAfterData_1(List<SeoutStockEntry> list) {
@@ -649,8 +748,15 @@ public class Sal_ScOutFragment1 extends BaseFragment {
                 sr.setDeptName(department.getDepartmentName());
             }
             Stock stock = seoutStockEntry.getStock();
+            StockPosition stockPos = seoutStockEntry.getStockPos();
             if(stock != null) {
                 sr.setStock(stock);
+                sr.setStockId(stock.getFitemId());
+                sr.setStockNumber(stock.getFnumber());
+                sr.setStockName(stock.getFname());
+            }
+            if(stockPos != null) {
+                sr.setStockPos(stockPos);
                 sr.setStockNumber(stock.getFnumber());
                 sr.setStockName(stock.getFname());
             }
@@ -759,8 +865,10 @@ public class Sal_ScOutFragment1 extends BaseFragment {
         } else {
             // 自动检查数据是否可以保存
             if (isFinish()) {
+                if(!saveBefore()) return;
                 isAutoSubmitDate = true;
-                run_save(true);
+//                run_save(true);
+                run_findPortionByParam(String.valueOf(checkDatas.get(0).getSourceId()));
             }
         }
     }
@@ -980,6 +1088,45 @@ public class Sal_ScOutFragment1 extends BaseFragment {
                 }
                 Message msg = mHandler.obtainMessage(PASS, result);
                 Log.e("run_passSC --> onResponse", result);
+                mHandler.sendMessage(msg);
+            }
+        });
+    }
+
+    /**
+     * 查询客户类型为快递的发货通知单（部分字段数据）
+     */
+    private void run_findPortionByParam(String finterId) {
+        String mUrl = getURL("SEOutStock/findPortionByParam");
+        getUserInfo();
+        FormBody formBody = new FormBody.Builder()
+                .add("finterId", finterId)
+                .build();
+
+        Request request = new Request.Builder()
+                .addHeader("cookie", getSession())
+                .url(mUrl)
+                .post(formBody)
+                .build();
+
+        Call call = okHttpClient.newCall(request);
+        call.enqueue(new Callback() {
+            @Override
+            public void onFailure(Call call, IOException e) {
+                mHandler.sendEmptyMessage(UNCHECK_DATA);
+            }
+
+            @Override
+            public void onResponse(Call call, Response response) throws IOException {
+                ResponseBody body = response.body();
+                String result = body.string();
+                if (!JsonUtil.isSuccess(result)) {
+                    Message msg = mHandler.obtainMessage(UNCHECK_DATA, result);
+                    mHandler.sendMessage(msg);
+                    return;
+                }
+                Message msg = mHandler.obtainMessage(CHECK_DATA, result);
+                Log.e("run_findPortionByParam --> onResponse", result);
                 mHandler.sendMessage(msg);
             }
         });

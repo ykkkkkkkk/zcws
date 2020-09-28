@@ -146,7 +146,8 @@
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
-            android:gravity="center">
+            android:gravity="center"
+            android:visibility="visible">
 
             <ImageView
                 android:id="@+id/imgView5"
@@ -174,7 +175,8 @@
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
-            android:gravity="center">
+            android:gravity="center"
+            android:visibility="visible">
 
             <ImageView
                 android:id="@+id/imgView6"
@@ -207,8 +209,7 @@
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
         android:layout_marginTop="30dp"
-        android:orientation="horizontal"
-        android:visibility="invisible">
+        android:orientation="horizontal">
 
         <RelativeLayout
             android:id="@+id/relative7"
@@ -224,7 +225,7 @@
                 android:layout_height="@dimen/_60dp"
                 android:layout_centerHorizontal="true"
                 android:scaleType="fitXY"
-                android:src="@drawable/aa_ico4a_7" />
+                android:src="@drawable/aa_ico4a_2" />
 
 
             <TextView
@@ -234,7 +235,7 @@
                 android:layout_below="@+id/imgView7"
                 android:layout_centerHorizontal="true"
                 android:layout_marginTop="@dimen/_3dp"
-                android:text="库存查询"
+                android:text="调拨申请"
                 android:textColor="@color/black"
                 android:textSize="@dimen/_18sp" />
 
@@ -246,8 +247,7 @@
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
-            android:gravity="center"
-            android:visibility="invisible">
+            android:gravity="center">
 
             <ImageView
                 android:id="@+id/imgView8"
@@ -255,7 +255,7 @@
                 android:layout_height="@dimen/_60dp"
                 android:layout_centerHorizontal="true"
                 android:scaleType="fitXY"
-                android:src="@drawable/aa_ico4a_4" />
+                android:src="@drawable/aa_ico1a_1" />
 
             <TextView
                 android:id="@+id/tvMenu8"
@@ -264,7 +264,7 @@
                 android:layout_below="@+id/imgView8"
                 android:layout_centerHorizontal="true"
                 android:layout_marginTop="@dimen/_3dp"
-                android:text="其他出库"
+                android:text="调拨任务"
                 android:textColor="@color/black"
                 android:textSize="@dimen/_18sp" />
 
@@ -275,8 +275,7 @@
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
-            android:gravity="center"
-            android:visibility="invisible">
+            android:gravity="center">
 
             <ImageView
                 android:id="@+id/imgView9"
@@ -284,7 +283,7 @@
                 android:layout_height="@dimen/_60dp"
                 android:layout_centerHorizontal="true"
                 android:scaleType="fitXY"
-                android:src="@drawable/aa_ico3a_4" />
+                android:src="@drawable/upload" />
 
             <TextView
                 android:id="@+id/tvMenu9"
@@ -293,7 +292,7 @@
                 android:layout_below="@+id/imgView9"
                 android:layout_centerHorizontal="true"
                 android:layout_marginTop="@dimen/_3dp"
-                android:text="调拨拣货"
+                android:text="待上传"
                 android:textColor="@color/black"
                 android:textSize="@dimen/_18sp" />
 

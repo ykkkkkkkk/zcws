@@ -168,7 +168,7 @@ public class ReturnReason_DialogActivity extends BaseDialogActivity implements X
             mUrl = getURL("returnReason/findReturnReasonList_DS");
         } else if(flag != null && flag.equals("NX")) { // 内销账号数据
             mUrl = getURL("returnReason/findReturnReasonList_NX");
-        } else if(flag != null && flag.equals("SC")) { // 生产账号数据
+        } else if(flag != null && flag.equals("ZH")) { // 生产账号数据
             mUrl = getURL("returnReason/findReturnReasonList_SC");
         }
         FormBody formBody = new FormBody.Builder()

@@ -17,6 +17,10 @@ public class StockPosition implements Serializable {
     // 仓位组Id
     private int fspGroupId;
 
+    private Stock stock;
+
+    // 临时字段，不存表
+    private String className; // 前段用到的，请勿删除
 
     public StockPosition() {
         super();
@@ -72,12 +76,21 @@ public class StockPosition implements Serializable {
         this.fspGroupId = fspGroupId;
     }
 
-
-    @Override
-    public String toString() {
-        return "StockPosition [fspId=" + fspId + ", fnumber=" + fnumber + ", fname=" + fname + ", ffullName="
-                + ffullName + ", fspGroupId=" + fspGroupId + "]";
+    public String getClassName() {
+        return className;
     }
 
+    public void setClassName(String className) {
+        this.className = className;
+    }
+
+    public Stock getStock() {
+        return stock;
+    }
+
+
+    public void setStock(Stock stock) {
+        this.stock = stock;
+    }
 
 }

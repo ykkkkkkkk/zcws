@@ -1,6 +1,8 @@
 package ykk.cb.com.zcws.bean.k3Bean;
 
-public class Emp {
+import java.io.Serializable;
+
+public class Emp implements Serializable {
 
 	private int fitemId;
 

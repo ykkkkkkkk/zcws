@@ -46,8 +46,8 @@ import ykk.cb.com.zcws.bean.ScanningRecord;
 import ykk.cb.com.zcws.bean.Stock;
 import ykk.cb.com.zcws.bean.User;
 import ykk.cb.com.zcws.bean.k3Bean.ICItem;
-import ykk.cb.com.zcws.bean.k3Bean.IcStockBill;
-import ykk.cb.com.zcws.bean.k3Bean.Icstockbillentry;
+import ykk.cb.com.zcws.bean.k3Bean.ICStockBillEntry_K3;
+import ykk.cb.com.zcws.bean.k3Bean.ICStockBill_K3;
 import ykk.cb.com.zcws.bean.k3Bean.ReturnReason;
 import ykk.cb.com.zcws.comm.BaseFragment;
 import ykk.cb.com.zcws.comm.Comm;
@@ -78,8 +78,6 @@ public class Sal_NxOutReturnFragment1 extends BaseFragment {
     Button btnScan2;
     @BindView(R.id.tv_custInfo)
     TextView tvCustInfo;
-    @BindView(R.id.tv_deliCustInfo)
-    TextView tvDeliCustInfo;
     @BindView(R.id.recyclerView)
     RecyclerView recyclerView;
     @BindView(R.id.btn_save)
@@ -167,9 +165,9 @@ public class Sal_NxOutReturnFragment1 extends BaseFragment {
 
                         switch (m.curViewFlag) {
                             case '1': // 快递单
-                                List<Icstockbillentry> list = JsonUtil.strToList(msgObj, Icstockbillentry.class);
-                                Icstockbillentry stockBillEntry = list.get(0);
-                                IcStockBill stockOrder = stockBillEntry.getStockBill();
+                                List<ICStockBillEntry_K3> list = JsonUtil.strToList(msgObj, ICStockBillEntry_K3.class);
+                                ICStockBillEntry_K3 stockBillEntry = list.get(0);
+                                ICStockBill_K3 stockOrder = stockBillEntry.getStockBill();
                                 Organization cust = stockOrder.getCust();
                                 Organization deliCust = stockOrder.getDeliCust();
                                 if(cust != null && cust.getFitemId() == 33067) {
@@ -183,7 +181,6 @@ public class Sal_NxOutReturnFragment1 extends BaseFragment {
                                 }
                                 m.cust = cust;
                                 m.tvCustInfo.setText(Html.fromHtml("客户：<font color='#000000'>"+cust.getfName()+"</font>"));
-                                m.tvDeliCustInfo.setText(Html.fromHtml("发货客户：<font color='#000000'>"+deliCust.getfName()+"</font>"));
 //                                m.getScanAfterData_1(list);
                                 // 填充数据
                                 int size = m.checkDatas.size();
@@ -295,7 +292,7 @@ public class Sal_NxOutReturnFragment1 extends BaseFragment {
             public void sel_returnReason(View v, ScanningRecord entity, int position) {
                 curPos = position;
                 Bundle bundle = new Bundle();
-                bundle.putString("flag", "SC"); // 查询内销账号的数据
+                bundle.putString("flag", "ZH"); // 查询内销账号的数据
                 showForResult(ReturnReason_DialogActivity.class, RETURN_REASON, bundle);
             }
 
@@ -569,7 +566,6 @@ public class Sal_NxOutReturnFragment1 extends BaseFragment {
         timesTamp = user.getId()+"-"+Comm.randomUUID();
         cust = null;
         tvCustInfo.setText("客户：");
-        tvDeliCustInfo.setText("发货客户：");
         setEnables(etMtlCode, R.color.transparent, true);
         setEnables(etExpressCode, R.color.transparent, true);
         btnScan.setVisibility(View.VISIBLE);
@@ -675,11 +671,11 @@ public class Sal_NxOutReturnFragment1 extends BaseFragment {
     /**
      * 得到快递单号扫码的数据
      */
-    private void getScanAfterData_1(Icstockbillentry stockBillEntry) {
+    private void getScanAfterData_1(ICStockBillEntry_K3 stockBillEntry) {
 //        int size = list.size();
 //        for(int i=0; i<size; i++) {
 //            Icstockbillentry stockBillEntry = list.get(i);
-            IcStockBill stockOrder = stockBillEntry.getStockBill();
+            ICStockBill_K3 stockOrder = stockBillEntry.getStockBill();
             ICItem icItem = stockBillEntry.getIcItem();
             ScanningRecord sr = new ScanningRecord();
             sr.setId(stockBillEntry.getScanningRecordId()); // 这个值为了插入到退货记录表中
@@ -767,7 +763,7 @@ public class Sal_NxOutReturnFragment1 extends BaseFragment {
     /**
      * 得到扫码物料 数据
      */
-    private void getMtlAfter(Icstockbillentry stockBillEntry) {
+    private void getMtlAfter(ICStockBillEntry_K3 stockBillEntry) {
         ICItem tmpICItem = stockBillEntry.getIcItem();
 
         int size = checkDatas.size();

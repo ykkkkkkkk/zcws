@@ -163,12 +163,20 @@ public class Sal_DsOutFragment1 extends BaseFragment {
                         switch (m.curViewFlag) {
                             case '1': // 快递单
                                 List<SeOrderEntry> list = JsonUtil.strToList(msgObj, SeOrderEntry.class);
-                                m.getScanAfterData_1(list);
+                                if(list != null) {
+                                    m.getScanAfterData_1(list);
+                                } else {
+                                    Comm.showWarnDialog(m.mContext, "扫描的快递单数据异常！");
+                                }
 
                                 break;
                             case '2': // 物料
                                 bt = JsonUtil.strToObject(msgObj, BarCodeTable.class);
-                                m.getMtlAfter(bt);
+                                if(bt != null && m.isNULLS(bt.getRelationObj()).length() > 0) {
+                                    m.getMtlAfter(bt);
+                                } else {
+                                    Comm.showWarnDialog(m.mContext, "扫描的物料数据异常！！");
+                                }
 
                                 break;
                         }
@@ -704,7 +712,7 @@ public class Sal_DsOutFragment1 extends BaseFragment {
                 isFlag = true;
 
                 // 不是赠品，并启用序列号，批次号；    990156：启用批次号，990156：启用序列号
-                if (tmpICItem.getIsComplimentary() != 990160 && tmpICItem.getSnManager() == 990156 || tmpICItem.getBatchManager() == 990156) {
+                if (tmpICItem.getIsComplimentary() != 990160 && (tmpICItem.getSnManager() == 990156 || tmpICItem.getBatchManager() == 990156)) {
                     if (srBarcode.indexOf(bt.getBarcode()) > -1) {
                         Comm.showWarnDialog(mContext, "条码已经使用！");
                         return;
@@ -832,12 +840,11 @@ public class Sal_DsOutFragment1 extends BaseFragment {
         showLoadDialog("加载中...", false);
         String mUrl = null;
         String barcode = null;
-        String strCaseId = null;
+        String strCaseId = "";
         switch (curViewFlag) {
             case '1': // 快递单查询订单
                 mUrl = getURL("order/findBarcode");
                 barcode = expressBarcode;
-                strCaseId = "";
                 break;
             case '2': // 物料查询
                 mUrl = getURL("barCodeTable/findBarcode_DS");

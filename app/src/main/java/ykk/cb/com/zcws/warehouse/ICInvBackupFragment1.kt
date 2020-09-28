@@ -344,7 +344,7 @@ class ICInvBackupFragment1 : BaseFragment() {
             -> if (resultCode == Activity.RESULT_OK) {
                 val list = data!!.getSerializableExtra("obj") as List<ICInvBackup>
                 val icInvBackup = list[0]
-                tv_stockName.text = icInvBackup.stockName
+                tv_stockName.text = icInvBackup.stock.fname
 
                 getMtlAfter(list)
             }
@@ -394,7 +394,7 @@ class ICInvBackupFragment1 : BaseFragment() {
             for (i in 0 until size) {
                 val sr = checkDatas.get(i)
                 // 有相同的，就不新增了
-                if (sr.mtlId == icInvBackup.mtlId) {
+                if (sr.fitemId == icInvBackup.fitemId) {
                     curPosition = i
                     addRow = false
                     break

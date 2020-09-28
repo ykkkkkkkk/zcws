@@ -168,8 +168,8 @@ public class StockPos_DialogActivity extends BaseDialogActivity implements XRecy
         String mUrl = getURL("stockPosition/findStockPositionListByParam");
         FormBody formBody = new FormBody.Builder()
                 .add("fnumberOrName", getValues(etSearch).trim())
-                .add("FSPGroupId", String.valueOf(fspGroupId))
-                .add("accountType", accountType)
+                .add("fspGroupId", String.valueOf(fspGroupId))
+                .add("accountType", isNULL2(accountType, "ZH"))
                 .add("limit", String.valueOf(limit))
                 .add("pageSize", "30")
                 .build();

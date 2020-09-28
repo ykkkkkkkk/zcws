@@ -57,36 +57,6 @@
 
     </LinearLayout>
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="38dp"
-        android:layout_margin="@dimen/_6dp"
-        android:orientation="horizontal"
-        android:visibility="gone">
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:ems="2"
-            android:gravity="center"
-            android:text="仓库"
-            android:textColor="#000000"
-            android:textSize="12sp" />
-
-        <TextView
-            android:id="@+id/tv_stockSel"
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:background="@drawable/back_style_blue"
-            android:drawableRight="@drawable/xiala3"
-            android:gravity="center"
-            android:textColor="@color/black"
-            android:textSize="@dimen/_14sp" />
-
-    </LinearLayout>
-
-
     <HorizontalScrollView
         android:layout_width="wrap_content"
         android:layout_height="0dp"
@@ -145,7 +115,7 @@
                     android:textSize="12sp" />
 
                 <TextView
-                    android:layout_width="100dp"
+                    android:layout_width="120dp"
                     android:layout_height="match_parent"
                     android:gravity="center"
                     android:text="仓库"

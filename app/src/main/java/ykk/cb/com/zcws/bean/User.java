@@ -39,12 +39,21 @@ public class User implements Serializable {
     private String kdAcctName;
     /*所属数据库实例名称*/
     private String kdDBName;
-    /*所属职员id*/
+    /*所属职员id 对应职员表t_emp 中的FItemID*/
     private int empId;
     /*所属职员姓名*/
     private String empName;
     /*所属职员编码*/
     private String empNumber;
+    /*对应ERP里用户t_User表中的FUserID*/
+    private int erpUserId;
+    /*ERP用户名*/
+    private String erpUserName;
+    private int deptId;				// 生产部门id
+    private int managerStockId;  	// 管理的仓库
+
+    private Stock managerStock;		// 管理的对象
+    private Department dept;		// 生产部门对象
 
     public User() {
         super();
@@ -170,12 +179,52 @@ public class User implements Serializable {
         this.empNumber = empNumber;
     }
 
-    @Override
-    public String toString() {
-        return "User [id=" + id + ", username=" + username + ", password=" + password + ", sex=" + sex + ", truename="
-                + truename + ", createTime=" + createTime + ", createrId=" + createrId + ", createrName=" + createrName
-                + ", status=" + status + ", roles=" + roles + ", kdAcctName=" + kdAcctName + ", kdDBName=" + kdDBName
-                + ", empId=" + empId + ", empName=" + empName + ", empNumber=" + empNumber + "]";
+    public int getManagerStockId() {
+        return managerStockId;
+    }
+
+    public void setManagerStockId(int managerStockId) {
+        this.managerStockId = managerStockId;
+    }
+
+    public Stock getManagerStock() {
+        return managerStock;
+    }
+
+    public void setManagerStock(Stock managerStock) {
+        this.managerStock = managerStock;
+    }
+
+    public int getErpUserId() {
+        return erpUserId;
+    }
+
+    public void setErpUserId(int erpUserId) {
+        this.erpUserId = erpUserId;
+    }
+
+    public String getErpUserName() {
+        return erpUserName;
+    }
+
+    public void setErpUserName(String erpUserName) {
+        this.erpUserName = erpUserName;
+    }
+
+    public int getDeptId() {
+        return deptId;
+    }
+
+    public void setDeptId(int deptId) {
+        this.deptId = deptId;
+    }
+
+    public Department getDept() {
+        return dept;
+    }
+
+    public void setDept(Department dept) {
+        this.dept = dept;
     }
 
 }

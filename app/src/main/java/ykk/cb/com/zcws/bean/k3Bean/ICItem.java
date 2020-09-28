@@ -67,6 +67,13 @@ public class ICItem implements Serializable{
 	private Stock stock; // 仓库
 	private StockPosition stockPos; // 库位
 
+	// 临时字段，不加表
+	private double inventoryQty; // 即时库存
+	private String FHelpCode; //助记码
+	private boolean check; // 是否选中
+	private String smBatchCode; // 扫描的批次号
+	private String smSnCode; // 扫描的序列号
+
 	public ICItem() {
 		super();
 	}
@@ -265,15 +272,44 @@ public class ICItem implements Serializable{
 		this.stockPos = stockPos;
 	}
 
-	@Override
-	public String toString() {
-		return "ICItem [fitemid=" + fitemid + ", fmodel=" + fmodel + ", fname=" + fname + ", fdeleted=" + fdeleted
-				+ ", fnumber=" + fnumber + ", ferpclsid=" + ferpclsid + ", funitid=" + funitid + ", fqtydecimal="
-				+ fqtydecimal + ", flowlimit=" + flowlimit + ", fhighlimit=" + fhighlimit + ", fsecinv=" + fsecinv
-				+ ", ftypeid=" + ftypeid + ", batchManager=" + batchManager + ", snManager=" + snManager
-				+ ", isComplimentary=" + isComplimentary + ", oldItemNumber=" + oldItemNumber + ", oldItemName="
-				+ oldItemName + ", suitVehicleType=" + suitVehicleType + ", functionDescription=" + functionDescription
-				+ ", fbarcode=" + fbarcode + ", unitName=" + unitName + ", unitNumber=" + unitNumber + "]";
+	public double getInventoryQty() {
+		return inventoryQty;
+	}
+
+	public void setInventoryQty(double inventoryQty) {
+		this.inventoryQty = inventoryQty;
+	}
+
+	public String getFHelpCode() {
+		return FHelpCode;
+	}
+
+	public void setFHelpCode(String FHelpCode) {
+		this.FHelpCode = FHelpCode;
+	}
+
+	public boolean isCheck() {
+		return check;
+	}
+
+	public void setCheck(boolean check) {
+		this.check = check;
+	}
+
+	public String getSmBatchCode() {
+		return smBatchCode;
+	}
+
+	public void setSmBatchCode(String smBatchCode) {
+		this.smBatchCode = smBatchCode;
+	}
+
+	public String getSmSnCode() {
+		return smSnCode;
+	}
+
+	public void setSmSnCode(String smSnCode) {
+		this.smSnCode = smSnCode;
 	}
 
 

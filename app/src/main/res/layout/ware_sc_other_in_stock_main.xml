@@ -30,10 +30,9 @@
             android:layout_width="@dimen/_50dp"
             android:layout_height="match_parent"
             android:background="@drawable/btn_blue2_selector"
-            android:text="历史\n记录"
+            android:text="历史\n查询"
             android:textColor="#ffffff"
-            android:textSize="14sp"
-            android:visibility="invisible" />
+            android:textSize="14sp" />
     </LinearLayout>
 
 

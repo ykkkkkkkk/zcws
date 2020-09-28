@@ -76,11 +76,35 @@
             android:theme="@style/dialogStyle"
             android:windowSoftInputMode="adjustResize|stateHidden" />
         <activity
+            android:name=".basics.Stock_GroupDialogActivity"
+            android:theme="@style/dialogStyle"
+            android:windowSoftInputMode="adjustResize|stateHidden" />
+        <activity
             android:name=".basics.Supplier_DialogActivity"
             android:theme="@style/dialogStyle"
             android:windowSoftInputMode="adjustResize|stateHidden" />
         <activity
             android:name=".basics.ReturnReason_DialogActivity"
+            android:theme="@style/dialogStyle"
+            android:windowSoftInputMode="adjustResize|stateHidden" />
+        <activity
+            android:name=".basics.Emp_DialogActivity"
+            android:theme="@style/dialogStyle"
+            android:windowSoftInputMode="adjustResize|stateHidden" />
+        <activity
+            android:name=".basics.Mtl_DialogActivity"
+            android:theme="@style/dialogStyle"
+            android:windowSoftInputMode="adjustResize|stateHidden" />
+        <activity
+            android:name=".basics.Mtl_MoreDialogActivity"
+            android:theme="@style/dialogStyle"
+            android:windowSoftInputMode="adjustResize|stateHidden" />
+        <activity
+            android:name=".basics.Unit_DialogActivity"
+            android:theme="@style/dialogStyle"
+            android:windowSoftInputMode="adjustResize|stateHidden" />
+        <activity
+            android:name=".basics.Cust_DialogActivity"
             android:theme="@style/dialogStyle"
             android:windowSoftInputMode="adjustResize|stateHidden" />
 
@@ -118,15 +142,34 @@
             android:theme="@style/dialogStyle"
             android:windowSoftInputMode="stateHidden|adjustResize" />
         <activity
-            android:name=".warehouse.Sc_OtherOutInStockMainActivity"
+            android:name=".warehouse.OutInStockSearchMainActivity"
             android:windowSoftInputMode="stateHidden|adjustResize" />
         <activity
-            android:name=".warehouse.Sc_OtherInStockMainActivity"
+        android:name=".warehouse.Ware_Transfer_Apply_Activity"
+        android:windowSoftInputMode="stateHidden|adjustResize" />
+        <activity
+            android:name=".warehouse.MissionBillListActivity"
+            android:windowSoftInputMode="stateHidden|adjustResize" />
+        <activity
+            android:name=".warehouse.Transfer_PickingList_MainActivity"
+            android:windowSoftInputMode="stateHidden|adjustResize" />
+        <activity
+            android:name=".warehouse.OutInStock_Search_MainActivity"
+            android:windowSoftInputMode="stateHidden|adjustResize" />
+        <activity
+            android:name=".warehouse.ICInvBackup_MainActivity"
             android:windowSoftInputMode="stateHidden|adjustResize" />
 
         <!-- 采购模块 -->
         <activity
             android:name=".purchase.Pur_ScInMainActivity"
+            android:windowSoftInputMode="adjustResize|stateHidden" />
+        <activity
+            android:name=".purchase.Pur_Receive_InStock_MainActivity"
+            android:windowSoftInputMode="adjustResize|stateHidden" />
+        <activity
+            android:name=".purchase.Pur_Sel_ReceiveOrderList_DialogActivity"
+            android:theme="@style/dialogStyle"
             android:windowSoftInputMode="adjustResize|stateHidden" />
 
         <!-- 生产模块 -->
@@ -155,6 +198,11 @@
             android:windowSoftInputMode="adjustResize|stateHidden" />
         <activity
             android:name=".sales.Sal_DsBToRFromPurchaseInStockMainActivity"
+            android:windowSoftInputMode="adjustResize|stateHidden" />
+
+        <!-- 设置 -->
+        <activity
+            android:name=".set.Set_NetworkErrorData_MainActivity"
             android:windowSoftInputMode="adjustResize|stateHidden" />
 
         <!-- 图表 -->

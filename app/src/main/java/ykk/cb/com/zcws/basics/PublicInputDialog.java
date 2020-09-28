@@ -51,6 +51,7 @@ public class PublicInputDialog extends BaseDialogActivity {
 //    private EditText etInput;
     private String[] nums = {"1", "2", "3", "4", "5", "6", "7", "8", "9", "0", ".", "-"};
     private static final int SHOW_INPUT = 100;
+    private static final int HIDE_INPUT = 102;
     private String inputType = "0";
     private DecimalFormat df = new DecimalFormat("#.########");
 
@@ -72,7 +73,10 @@ public class PublicInputDialog extends BaseDialogActivity {
                         m.showKeyboard(m.etInput);
 
                         break;
+                    case HIDE_INPUT:
+                        m.hideKeyboard(m.etInput);
 
+                        break;
                 }
             }
         }
@@ -176,11 +180,12 @@ public class PublicInputDialog extends BaseDialogActivity {
     public void onViewClicked(View view) {
         switch (view.getId()) {
             case R.id.btn_close:
-
+                hideKeyboard(etInput);
                 context.finish();
 
                 break;
             case R.id.btn_confirm: // 确定按钮
+                hideKeyboard(etInput);
                 String inputName = getValues(etInput).trim();
                 if (inputType.equals("0") || inputType.equals("0.0")) {
                     double num = parseDouble(inputName);

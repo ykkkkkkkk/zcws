@@ -8,7 +8,7 @@ import java.io.Serializable;
 public class Department implements Serializable{
 
 	//K3部门id
-	private Integer fitemID;
+	private int fitemID;
 	//部门条码
 	private String barcode;
 	//K3部门编码
@@ -20,7 +20,7 @@ public class Department implements Serializable{
 	//部门属性 1070-车间,1071-非车间
 	private int departmentProperty;
 	//调入仓库
-	private Integer inStockId;
+	private int inStockId;
 	/*K3数据状态*/
 	private String dataStatus;
 	/*wms非物理删除标识*/
@@ -33,15 +33,18 @@ public class Department implements Serializable{
 	private String prefix;
 	//是否属于装卸部门，1属于，2不属于
 	private int isload;
+	private int dcStockId;			// 倒冲仓库id
+
+	private Stock dcStock;			// 倒冲仓库对象
 
 	public Department() {
 		super();
 	}
 
-	public Integer getFitemID() {
+	public int getFitemID() {
 		return fitemID;
 	}
-	public void setFitemID(Integer fitemID) {
+	public void setFitemID(int fitemID) {
 		this.fitemID = fitemID;
 	}
 	public String getBarcode() {
@@ -109,11 +112,11 @@ public class Department implements Serializable{
 		this.prefix = prefix;
 	}
 
-	public Integer getInStockId() {
+	public int getInStockId() {
 		return inStockId;
 	}
 
-	public void setInStockId(Integer inStockId) {
+	public void setInStockId(int inStockId) {
 		this.inStockId = inStockId;
 	}
 
@@ -125,13 +128,20 @@ public class Department implements Serializable{
 		this.isload = isload;
 	}
 
-	@Override
-	public String toString() {
-		return "Department [fitemID=" + fitemID + ", barcode=" + barcode + ", departmentNumber="
-				+ departmentNumber + ", departmentName=" + departmentName + ", departmentUseOrgId=" + departmentUseOrgId
-				+ ", departmentProperty=" + departmentProperty + ", inStockId=" + inStockId + ", dataStatus="
-				+ dataStatus + ", isDelete=" + isDelete + ", enabled=" + enabled + ", fModifyDate=" + fModifyDate
-				+ ", prefix=" + prefix + ", isload=" + isload + "]";
+	public int getDcStockId() {
+		return dcStockId;
+	}
+
+	public void setDcStockId(int dcStockId) {
+		this.dcStockId = dcStockId;
+	}
+
+	public Stock getDcStock() {
+		return dcStock;
+	}
+
+	public void setDcStock(Stock dcStock) {
+		this.dcStock = dcStock;
 	}
 
 }

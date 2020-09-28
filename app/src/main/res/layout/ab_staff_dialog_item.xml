@@ -15,16 +15,6 @@
         android:textSize="12sp" />
 
     <TextView
-        android:id="@+id/tv_deptName"
-        android:layout_width="0dp"
-        android:layout_height="38dp"
-        android:layout_weight="1"
-        android:gravity="center"
-        android:text="部门名称"
-        android:textColor="@color/c_FF4400"
-        android:textSize="12sp" />
-
-    <TextView
         android:id="@+id/tv_fnumber"
         android:layout_width="0dp"
         android:layout_height="38dp"
@@ -32,7 +22,7 @@
         android:gravity="center"
         android:text="员工代码"
         android:textColor="#000000"
-        android:textSize="12sp" />
+        android:textSize="14sp" />
 
     <TextView
         android:id="@+id/tv_fname"
@@ -42,12 +32,6 @@
         android:gravity="center"
         android:text="员工名称"
         android:textColor="#000000"
-        android:textSize="12sp" />
-
-    <TextView
-        android:id="@+id/tv_check"
-        android:layout_width="38dp"
-        android:layout_height="38dp"
-        android:background="@drawable/check_off2" />
+        android:textSize="14sp" />
 
 </LinearLayout>

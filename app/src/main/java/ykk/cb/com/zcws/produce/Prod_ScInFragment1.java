@@ -38,8 +38,7 @@ import okhttp3.Request;
 import okhttp3.Response;
 import okhttp3.ResponseBody;
 import ykk.cb.com.zcws.R;
-import ykk.cb.com.zcws.basics.StockPos_DialogActivity;
-import ykk.cb.com.zcws.basics.Stock_DialogActivity;
+import ykk.cb.com.zcws.basics.Stock_GroupDialogActivity;
 import ykk.cb.com.zcws.bean.BarCodeTable;
 import ykk.cb.com.zcws.bean.Department;
 import ykk.cb.com.zcws.bean.Organization;
@@ -72,8 +71,6 @@ public class Prod_ScInFragment1 extends BaseFragment {
     EditText etCode;
     @BindView(R.id.btn_scan)
     Button btnScan;
-    @BindView(R.id.tv_stockSel)
-    TextView tvStockSel;
     @BindView(R.id.recyclerView)
     RecyclerView recyclerView;
     @BindView(R.id.btn_save)
@@ -86,13 +83,11 @@ public class Prod_ScInFragment1 extends BaseFragment {
     TextView tvOkNum;
 
     private Prod_ScInFragment1 context = this;
-    private static final int SEL_STOCK1 = 10, SEL_STOCK = 11, SEL_STOCKPOS = 12;
+    private static final int SEL_STOCKPOS = 60;
     private static final int SUCC1 = 200, UNSUCC1 = 500, SUCC2 = 201, UNSUCC2 = 501, SUCC3 = 202, UNSUCC3 = 502, PASS = 203, UNPASS = 503;
     private static final int SETFOCUS = 1, RESULT_NUM = 2, SAOMA = 3, WRITE_CODE = 4, DELAYED_CLICK = 5;
     private Prod_ScInFragment1Adapter mAdapter;
     private List<ScanningRecord> checkDatas = new ArrayList<>();
-    private Stock stock1, stock;
-    private StockPosition stockPos;
     private String barcode; // 对应的条码号
     private char curViewFlag = '1'; // 1：仓库，2：库位， 3：车间， 4：物料 ，箱码
     private int curPos; // 当前行
@@ -262,12 +257,11 @@ public class Prod_ScInFragment1 extends BaseFragment {
                 showInputDialog("入库数", showInfo, String.valueOf(useableQty), "0.0", RESULT_NUM);
             }
 
-//            @Override
-//            public void onClick_selStock(View v, ScanningRecord entity, int position) {
-//                curPos = position;
-//                showForResult(Stock_DialogActivity.class, SEL_STOCK, null);
-//            }
-
+            @Override
+            public void onClick_selStock(View v, ScanningRecord entity, int position) {
+                curPos = position;
+                showForResult(Stock_GroupDialogActivity.class, SEL_STOCKPOS, null);
+            }
         });
     }
 
@@ -302,7 +296,7 @@ public class Prod_ScInFragment1 extends BaseFragment {
         mHandler.sendEmptyMessageDelayed(SETFOCUS, 200);
     }
 
-    @OnClick({R.id.btn_scan, R.id.tv_stockSel, R.id.btn_save, R.id.btn_pass, R.id.btn_clone })
+    @OnClick({R.id.btn_scan, R.id.btn_save, R.id.btn_pass, R.id.btn_clone })
     public void onViewClicked(View view) {
         if(isClickButton && view.getId() == R.id.btn_save) {
             isClickButton = false;
@@ -329,10 +323,6 @@ public class Prod_ScInFragment1 extends BaseFragment {
             case R.id.btn_scan: // 调用摄像头扫描（物料）
                 curViewFlag = '1';
                 showForResult(CaptureActivity.class, CAMERA_SCAN, null);
-
-                break;
-            case R.id.tv_stockSel: // 选择仓库
-                showForResult(Stock_DialogActivity.class, SEL_STOCK1, null);
 
                 break;
             case R.id.btn_save: // 保存
@@ -470,8 +460,6 @@ public class Prod_ScInFragment1 extends BaseFragment {
         barcode = null;
         tvNeedNum.setText("0");
         tvOkNum.setText("0");
-        stock1 = null;
-        tvStockSel.setText("");
 
         mAdapter.notifyDataSetChanged();
         mHandler.sendEmptyMessageDelayed(SETFOCUS, 200);
@@ -481,43 +469,14 @@ public class Prod_ScInFragment1 extends BaseFragment {
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         switch (requestCode) {
-            case SEL_STOCK1: //选择仓库	返回
-                if (resultCode == Activity.RESULT_OK) {
-                    stock1 = (Stock) data.getSerializableExtra("obj");
-                    if(checkDatas != null && checkDatas.size() > 0) {
-                        for(int i=0; i<checkDatas.size(); i++) {
-                            ScanningRecord sr2 = checkDatas.get(i);
-                            sr2.setStock(stock1);
-                            sr2.setStockNumber(stock1.getFnumber());
-                            sr2.setStockName(stock1.getFname());
-                            sr2.setStockPositionNumber("");
-                            sr2.setStockPositionName("");
-                        }
-                        mAdapter.notifyDataSetChanged();
-                    }
-                    tvStockSel.setText(stock1.getFname());
-                }
-
-                break;
-            case SEL_STOCK: //行事件选择仓库	返回
-                if (resultCode == Activity.RESULT_OK) {
-                    stock = (Stock) data.getSerializableExtra("obj");
-                    // 启用了库位管理
-                    if (stock.getFisStockMgr() == 1) {
-                        Bundle bundle = new Bundle();
-                        bundle.putInt("fspGroupId", stock.getFspGroupId());
-                        showForResult(StockPos_DialogActivity.class, SEL_STOCKPOS, bundle);
-                    } else {
-                        stockAllFill(false);
-                    }
-                }
-
-                break;
             case SEL_STOCKPOS: //行事件选择库位	返回
                 if (resultCode == Activity.RESULT_OK) {
-                    stockPos = (StockPosition) data.getSerializableExtra("obj");
-                    LogUtil.e("onActivityResult --> SEL_STOCKP", stockPos.getFname());
-                    stockAllFill(true);
+                    Stock stock = (Stock) data.getSerializableExtra("stock");
+                    StockPosition stockPos = null;
+                    if (data.getSerializableExtra("stockPos") != null) {
+                        stockPos = (StockPosition) data.getSerializableExtra("stockPos");
+                    }
+                    stockAllFill(stock, stockPos);
                 }
 
                 break;
@@ -581,40 +540,37 @@ public class Prod_ScInFragment1 extends BaseFragment {
     /**
      * 仓库数据全部填充
      */
-    private void stockAllFill(boolean inStockPosData) {
-        int size = checkDatas.size();
-        boolean isBool = false;
-        for(int i=0; i<size; i++) {
-            ScanningRecord sr = checkDatas.get(i);
-            if(isNULLS(sr.getStockNumber()).length() > 0) {
-                isBool = true;
-                break;
+    private void stockAllFill(Stock stock, StockPosition stockPos) {
+        ScanningRecord sr = checkDatas.get(curPos);
+        sr.setStockId(stock.getFitemId());
+        sr.setStockNumber(stock.getFnumber());
+        sr.setStockName(stock.getFname());
+        sr.setStock(stock);
+        sr.setStockPos(null);
+        sr.setStockPositionNumber("");
+        sr.setStockPositionName("");
+        if(stockPos != null) {
+            sr.setStockPos(stockPos);
+            sr.setStockPositionNumber(stockPos.getFnumber());
+            sr.setStockPositionName(stockPos.getFname());
+        }
+        // 当行仓库没有值，就填充
+        for (ScanningRecord m : checkDatas) {
+            if(isNULLS(m.getStockName()).length() == 0) {
+                m.setStockId(stock.getFitemId());
+                m.setStockNumber(stock.getFnumber());
+                m.setStockName(stock.getFname());
+                m.setStock(stock);
+                m.setStockPos(null);
+                m.setStockPositionNumber("");
+                m.setStockPositionName("");
+                if (stockPos != null) {
+                    m.setStockPos(stockPos);
+                    m.setStockPositionNumber(stockPos.getFnumber());
+                    m.setStockPositionName(stockPos.getFname());
+                }
             }
         }
-//        if(isBool) {
-        ScanningRecord sr2 = checkDatas.get(curPos);
-        sr2.setStockNumber(stock.getFnumber());
-        sr2.setStockName(stock.getFname());
-        sr2.setStock(stock);
-        if(inStockPosData) {
-            sr2.setStockPos(stockPos);
-            sr2.setStockPositionNumber(stockPos.getFnumber());
-            sr2.setStockPositionName(stockPos.getFname());
-        }
-//        } else { // 全部都为空的时候，选择任意全部填充
-//            for (int i = 0; i < size; i++) {
-//                ScanningRecord2 sr2 = checkDatas.get(i);
-//                sr2.setStockId(stock2.getfStockid());
-//                sr2.setStockFnumber(stock2.getfNumber());
-//                sr2.setStockName(stock2.getfName());
-//                sr2.setStock(stock2);
-//                if(inStockPosData) {
-//                    sr2.setStockPos(stockP2);
-//                    sr2.setStockPositionId(stockP2.getId());
-//                    sr2.setStockPName(stockP2.getFname());
-//                }
-//            }
-//        }
         mAdapter.notifyDataSetChanged();
     }
 
@@ -649,15 +605,6 @@ public class Prod_ScInFragment1 extends BaseFragment {
             sr.setStock(stock);
             sr.setStockNumber(stock.getFnumber());
             sr.setStockName(stock.getFname());
-        } else {
-            Stock stock2 = new Stock();
-            stock2.setFitemId(254);
-            stock2.setFnumber("CC.01.01");
-            stock2.setFname("忠诚卫士成品仓");
-
-            sr.setStock(stock2);
-            sr.setStockNumber(stock2.getFnumber());
-            sr.setStockName(stock2.getFname());
         }
         // 默认的仓位
         StockPosition stockPos = icItem.getStockPos();

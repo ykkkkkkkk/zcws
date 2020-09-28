@@ -35,8 +35,8 @@ public class ICInvBackup_Material_DialogAdapter extends BaseArrayRecyclerAdapter
         TextView tv_fname = holder.obtainView(R.id.tv_fname);
         // 赋值
         tv_row.setText(String.valueOf(pos + 1));
-        tv_fnumber.setText(entity.getMtlNumber());
-        tv_fname.setText(entity.getMtlName());
+        tv_fnumber.setText(entity.getIcItem().getFnumber());
+        tv_fname.setText(entity.getIcItem().getFname());
 
         View view = (View) tv_row.getParent();
         if(entity.isCheck()) {

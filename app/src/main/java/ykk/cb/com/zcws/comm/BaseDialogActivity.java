@@ -29,6 +29,8 @@ import butterknife.ButterKnife;
 import butterknife.Unbinder;
 import ykk.cb.com.zcws.R;
 import ykk.cb.com.zcws.basics.PublicInputDialog;
+import ykk.cb.com.zcws.bean.User;
+import ykk.cb.com.zcws.util.JsonUtil;
 import ykk.cb.com.zcws.util.LoadingDialog;
 
 /**
@@ -215,6 +217,60 @@ public abstract class BaseDialogActivity extends AppCompatActivity {
 	 */
 	public void setXmlValues(SharedPreferences spf, String putKey, String putValue) {
 		spf.edit().putString(putKey, putValue).commit();
+	}
+
+	/**
+	 * 把User对象存到本地xml文件中
+	 * @param user
+	 */
+	public void saveUserToXml(User user) {
+		SharedPreferences sp = mContext.getSharedPreferences(getResStr(R.string.saveUser), MODE_PRIVATE);
+		SharedPreferences.Editor editor = sp.edit();
+		String json = JsonUtil.objectToString(user);
+		editor.putString("strUser", json);
+		editor.commit();
+	}
+
+	/**
+	 * 显示xml中User对象
+	 */
+	public User showUserByXml() {
+		SharedPreferences sp = mContext.getSharedPreferences(getResStr(R.string.saveUser), MODE_PRIVATE);
+		String json = sp.getString("strUser", "");
+		if(json.length() == 0) {
+			return null;
+		}
+		return JsonUtil.stringToObject(json, User.class);
+	}
+	/**
+	 * 把对象存到本地xml文件中
+	 * @param object
+	 * @param key
+	 * @param xmlName
+	 */
+	public void saveObjectToXml(Object object, String key, String xmlName) {
+		SharedPreferences sp = mContext.getSharedPreferences(xmlName, MODE_PRIVATE);
+		SharedPreferences.Editor editor = sp.edit();
+		String json = JsonUtil.objectToString(object);
+		editor.putString(key, json);
+		editor.commit();
+	}
+
+	/**
+	 * 显示xml中对象
+	 * @param cls
+	 * @param key
+	 * @param xmlName
+	 * @param <T>
+	 * @return
+	 */
+	public <T> T showObjectByXml(Class<T> cls, String key, String xmlName) {
+		SharedPreferences sp = mContext.getSharedPreferences(xmlName, MODE_PRIVATE);
+		String json = sp.getString(key, "");
+		if(json.length() == 0) {
+			return null;
+		}
+		return JsonUtil.stringToObject(json, cls);
 	}
 
     /**

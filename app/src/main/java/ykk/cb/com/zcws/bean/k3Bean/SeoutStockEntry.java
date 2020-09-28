@@ -4,6 +4,7 @@ import java.io.Serializable;
 import java.util.Date;
 
 import ykk.cb.com.zcws.bean.Stock;
+import ykk.cb.com.zcws.bean.StockPosition;
 
 /**
  * @Description:发货通知单表体
@@ -119,6 +120,7 @@ public class SeoutStockEntry implements Serializable {
 	private SeoutStock seOutStock;
 	private ICItem icItem;
 	private Stock stock; // 仓库
+	private StockPosition stockPos; // 仓位
 
 	// 临时字段，不存表
 	private String mtlNumber; // 物料编码
@@ -598,5 +600,12 @@ public class SeoutStockEntry implements Serializable {
 		this.mtlNumber = mtlNumber;
 	}
 
+	public StockPosition getStockPos() {
+		return stockPos;
+	}
+
+	public void setStockPos(StockPosition stockPos) {
+		this.stockPos = stockPos;
+	}
 
 }

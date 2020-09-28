@@ -25,7 +25,7 @@
                 android:layout_height="@dimen/_60dp"
                 android:layout_centerHorizontal="true"
                 android:scaleType="fitXY"
-                android:src="@drawable/aa_ico1a_1" />
+                android:src="@drawable/upload" />
 
             <TextView
                 android:id="@+id/tvMenu1"
@@ -34,7 +34,7 @@
                 android:layout_below="@+id/imgView1"
                 android:layout_centerHorizontal="true"
                 android:layout_marginTop="@dimen/_3dp"
-                android:text="采购订单"
+                android:text="待上传"
                 android:textColor="@color/black"
                 android:textSize="@dimen/_18sp" />
 
@@ -61,7 +61,7 @@
                 android:layout_below="@+id/imgView2"
                 android:layout_centerHorizontal="true"
                 android:layout_marginTop="@dimen/_3dp"
-                android:text="采购入库"
+                android:text="外购入库"
                 android:textColor="@color/black"
                 android:textSize="@dimen/_18sp" />
 
@@ -82,7 +82,7 @@
                 android:layout_height="@dimen/_60dp"
                 android:layout_centerHorizontal="true"
                 android:scaleType="fitXY"
-                android:src="@drawable/aa_ico5a_1" />
+                android:src="@drawable/aa_ico1a_2" />
 
             <TextView
                 android:id="@+id/tvMenu3"
@@ -91,7 +91,7 @@
                 android:layout_below="@+id/imgView3"
                 android:layout_centerHorizontal="true"
                 android:layout_marginTop="@dimen/_3dp"
-                android:text="生产入库"
+                android:text="外购入库"
                 android:textColor="@color/black"
                 android:textSize="@dimen/_18sp" />
 

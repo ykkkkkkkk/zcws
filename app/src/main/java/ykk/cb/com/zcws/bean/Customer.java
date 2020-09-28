@@ -11,7 +11,7 @@ public class Customer implements Serializable {
 
 	private Integer id;
 	/* 客户K3Id */
-	private int fItemId;
+	private int fitemId;
 	/* 客户名称 */
 	private String fname;
 	/* 客户代码 */
@@ -51,8 +51,8 @@ public class Customer implements Serializable {
 		return id;
 	}
 
-	public int getfItemId() {
-		return fItemId;
+	public int getFitemId() {
+		return fitemId;
 	}
 
 	public String getFname() {
@@ -107,8 +107,8 @@ public class Customer implements Serializable {
 		this.id = id;
 	}
 
-	public void setfItemId(int fItemId) {
-		this.fItemId = fItemId;
+	public void setFitemId(int fItemId) {
+		this.fitemId = fitemId;
 	}
 
 	public void setFname(String fname) {

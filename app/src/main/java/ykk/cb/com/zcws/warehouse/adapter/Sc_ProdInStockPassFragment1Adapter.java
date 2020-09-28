@@ -8,15 +8,15 @@ import java.text.DecimalFormat;
 import java.util.List;
 
 import ykk.cb.com.zcws.R;
-import ykk.cb.com.zcws.bean.k3Bean.Icstockbillentry;
+import ykk.cb.com.zcws.bean.k3Bean.ICStockBillEntry_K3;
 import ykk.cb.com.zcws.util.basehelper.BaseArrayRecyclerAdapter;
 
-public class Sc_ProdInStockPassFragment1Adapter extends BaseArrayRecyclerAdapter<Icstockbillentry> {
+public class Sc_ProdInStockPassFragment1Adapter extends BaseArrayRecyclerAdapter<ICStockBillEntry_K3> {
     private DecimalFormat df = new DecimalFormat("#.######");
     private Activity context;
     private MyCallBack callBack;
 
-    public Sc_ProdInStockPassFragment1Adapter(Activity context, List<Icstockbillentry> datas) {
+    public Sc_ProdInStockPassFragment1Adapter(Activity context, List<ICStockBillEntry_K3> datas) {
         super(datas);
         this.context = context;
     }
@@ -27,7 +27,7 @@ public class Sc_ProdInStockPassFragment1Adapter extends BaseArrayRecyclerAdapter
     }
 
     @Override
-    public void onBindHoder(RecyclerHolder holder, final Icstockbillentry entity, final int pos) {
+    public void onBindHoder(RecyclerHolder holder, final ICStockBillEntry_K3 entity, final int pos) {
         // 初始化id
         TextView tv_row = holder.obtainView(R.id.tv_row);
         TextView tv_orderNo = holder.obtainView(R.id.tv_orderNo);
@@ -86,9 +86,9 @@ public class Sc_ProdInStockPassFragment1Adapter extends BaseArrayRecyclerAdapter
     }
 
     public interface MyCallBack {
-        void onClick_num(View v, Icstockbillentry entity, int position);
+        void onClick_num(View v, ICStockBillEntry_K3 entity, int position);
 
-        void onClick_selStock(View v, Icstockbillentry entity, int position);
+        void onClick_selStock(View v, ICStockBillEntry_K3 entity, int position);
     }
 
     /*之下的方法都是为了方便操作，并不是必须的*/

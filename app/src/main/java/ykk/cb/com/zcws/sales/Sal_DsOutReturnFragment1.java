@@ -47,8 +47,8 @@ import ykk.cb.com.zcws.bean.ScanningRecord;
 import ykk.cb.com.zcws.bean.Stock;
 import ykk.cb.com.zcws.bean.User;
 import ykk.cb.com.zcws.bean.k3Bean.ICItem;
-import ykk.cb.com.zcws.bean.k3Bean.IcStockBill;
-import ykk.cb.com.zcws.bean.k3Bean.Icstockbillentry;
+import ykk.cb.com.zcws.bean.k3Bean.ICStockBill_K3;
+import ykk.cb.com.zcws.bean.k3Bean.ICStockBillEntry_K3;
 import ykk.cb.com.zcws.bean.k3Bean.ReturnReason;
 import ykk.cb.com.zcws.comm.BaseFragment;
 import ykk.cb.com.zcws.comm.Comm;
@@ -162,9 +162,9 @@ public class Sal_DsOutReturnFragment1 extends BaseFragment {
                     case SUCC2: // 扫码成功后进入
                         switch (m.curViewFlag) {
                             case '1': // 快递单
-                                List<Icstockbillentry> list = JsonUtil.strToList(msgObj, Icstockbillentry.class);
-                                Icstockbillentry stockBillEntry = list.get(0);
-                                IcStockBill stockOrder = stockBillEntry.getStockBill();
+                                List<ICStockBillEntry_K3> list = JsonUtil.strToList(msgObj, ICStockBillEntry_K3.class);
+                                ICStockBillEntry_K3 stockBillEntry = list.get(0);
+                                ICStockBill_K3 stockOrder = stockBillEntry.getStockBill();
                                 Organization tempCust = stockOrder.getCust();
                                 // 显示客户
                                 if(m.cust != null && tempCust != null && !(m.cust.getfNumber().equals(tempCust.getfNumber()))) {
@@ -668,11 +668,11 @@ public class Sal_DsOutReturnFragment1 extends BaseFragment {
     /**
      * 得到快递单号扫码的数据
      */
-    private void getScanAfterData_1(Icstockbillentry stockBillEntry) {
+    private void getScanAfterData_1(ICStockBillEntry_K3 stockBillEntry) {
 //        int size = list.size();
 //        for(int i=0; i<size; i++) {
 //            Icstockbillentry stockBillEntry = list.get(i);
-            IcStockBill stockOrder = stockBillEntry.getStockBill();
+            ICStockBill_K3 stockOrder = stockBillEntry.getStockBill();
             ICItem icItem = stockBillEntry.getIcItem();
             ScanningRecord sr = new ScanningRecord();
             sr.setId(stockBillEntry.getScanningRecordId()); // 这个值为了插入到退货记录表中
@@ -759,7 +759,7 @@ public class Sal_DsOutReturnFragment1 extends BaseFragment {
     /**
      * 得到扫码物料 数据
      */
-    private void getMtlAfter(Icstockbillentry stockBillEntry) {
+    private void getMtlAfter(ICStockBillEntry_K3 stockBillEntry) {
         ICItem tmpICItem = stockBillEntry.getIcItem();
 
         int size = checkDatas.size();
