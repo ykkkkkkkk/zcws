@@ -116,14 +116,29 @@ class Transfer_PickingList_Fragment2 : BaseFragment() {
                                 val icEntry = JsonUtil.strToObject(msgObj, ICStockBillEntry::class.java)
                                 if(m.getValues(m.tv_mtlName).length > 0 && m.smICStockBillEntry != null && m.smICStockBillEntry!!.id != icEntry.id) {
                                     if(!m.checkSave()) return
-                                    m.icStockBillEntry.icstockBillId = m.parent!!.fragment1.icStockBill.id
+                                    if (m.icStockBillEntry.fqty != m.icStockBillEntry.fsourceQty) {
+                                        val build = AlertDialog.Builder(m.mContext)
+                                        build.setIcon(R.drawable.caution)
+                                        build.setTitle("系统提示")
+                                        build.setMessage("调拨数不等于源单数，是否保存？")
+                                        build.setPositiveButton("是") { dialog, which ->
+                                            m.icStockBillEntry.icstockBillId = m.parent!!.fragment1.icStockBill.id
+                                            m.autoICStockBillEntry = icEntry // 加到自动保存对象
+                                            m.run_save(null);
+                                        }
+                                        build.setNegativeButton("否", null)
+                                        build.setCancelable(false)
+                                        build.show()
 
-                                    m.autoICStockBillEntry = icEntry // 加到自动保存对象
-                                    m.run_save(null);
-//                                    Comm.showWarnDialog(m.mContext,"请先保存当前数据！")
-                                    return
+                                    } else {
+                                        m.icStockBillEntry.icstockBillId = m.parent!!.fragment1.icStockBill.id
+                                        m.autoICStockBillEntry = icEntry // 加到自动保存对象
+                                        m.run_save(null);
+                                    }
+
+                                } else {
+                                    m.getMaterial(icEntry)
                                 }
-                                m.getMaterial(icEntry)
                             }
                         }
                     }
@@ -313,7 +328,21 @@ class Transfer_PickingList_Fragment2 : BaseFragment() {
             R.id.btn_save -> { // 保存
                 if(!checkSave()) return
                 icStockBillEntry.icstockBillId = parent!!.fragment1.icStockBill.id
-                run_save(null);
+                if (icStockBillEntry.fqty != icStockBillEntry.fsourceQty) {
+                    val build = AlertDialog.Builder(mContext)
+                    build.setIcon(R.drawable.caution)
+                    build.setTitle("系统提示")
+                    build.setMessage("调拨数不等于源单数，是否保存？")
+                    build.setPositiveButton("是") { dialog, which ->
+                        run_save(null);
+                    }
+                    build.setNegativeButton("否", null)
+                    build.setCancelable(false)
+                    build.show()
+
+                } else {
+                    run_save(null);
+                }
             }
             R.id.btn_clone -> { // 重置
                 if (checkSaveHint()) {
@@ -361,10 +390,10 @@ class Transfer_PickingList_Fragment2 : BaseFragment() {
             Comm.showWarnDialog(mContext, "库存不足，不能保存！")
             return false
         }
-        if (icStockBillEntry.fqty > icStockBillEntry.fsourceQty) {
-            Comm.showWarnDialog(mContext, "数量不能大于应发数！")
-            return false
-        }
+//        if (icStockBillEntry.fqty > icStockBillEntry.fsourceQty) {
+//            Comm.showWarnDialog(mContext, "数量不能大于应发数！")
+//            return false
+//        }
 //        if (icStockBillEntry.fprice == 0.0) {
 //            Comm.showWarnDialog(mContext, "请输入单价！")
 //            return false;

@@ -164,7 +164,7 @@ class Stock_GroupDialogActivity : BaseDialogActivity() {
             }
             R.id.btn_stockPosSel -> { // 库位
                 val bundle = Bundle()
-                bundle.putInt("stockId", if(stock != null)stock!!.fspGroupId else 0)
+                bundle.putInt("fspGroupId", if(stock != null)stock!!.fspGroupId else 0)
                 bundle.putString("accountType", "ZH")
                 showForResult(StockPos_DialogActivity::class.java, SEL_STOCKPOS, bundle)
             }

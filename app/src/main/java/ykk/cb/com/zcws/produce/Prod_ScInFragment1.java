@@ -383,6 +383,10 @@ public class Prod_ScInFragment1 extends BaseFragment {
                 Comm.showWarnDialog(mContext,"第" + (i + 1) + "行，请选择（仓库）！");
                 return false;
             }
+            if (sr.getStock().getFisStockMgr() == 1 && sr.getStockPos() == null) {
+                Comm.showWarnDialog(mContext,"第" + (i + 1) + "行，仓库启用了库位，请重新选择仓库！");
+                return false;
+            }
             if (sr.getRealQty() > sr.getUseableQty()) {
                 Comm.showWarnDialog(mContext,"第" + (i + 1) + "行（入库数）不能大于（可用数）！");
                 return false;

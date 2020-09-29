@@ -343,6 +343,10 @@ class Pur_Receive_InStock_Fragment2 : BaseFragment() {
             Comm.showWarnDialog(mContext, "请选择位置！")
             return false
         }
+        if (stock!!.fisStockMgr == 1 && icStockBillEntry.fdcSPId == 0) {
+            Comm.showWarnDialog(mContext, "仓库启用了库位，请重新选择位置！")
+            return false
+        }
 //        if (icStockBillEntry.fprice == 0.0) {
 //            Comm.showWarnDialog(mContext, "请输入单价！")
 //            return false;
@@ -904,9 +908,13 @@ class Pur_Receive_InStock_Fragment2 : BaseFragment() {
             val entry = ICStockBillEntry()
             entry.icstockBillId = parent!!.fragment1.icStockBill.id
             entry.fitemId = it.icItem.fitemid
+            if(it.icItem.stock != null) {
+                entry.fdcStockId = it.icItem.stock.fitemId
+            }
+            if(it.icItem.stock != null && it.icItem.stockPos != null) {
+                entry.fdcSPId = it.icItem.stockPos.fspId
+            }
 //            entry.fentryId = it.fentryid
-            entry.fdcStockId = 0
-            entry.fdcSPId = 0
 //            entry.fqty = it.useableQty
             entry.fprice = it.fprice
             entry.funitId = it.funitid

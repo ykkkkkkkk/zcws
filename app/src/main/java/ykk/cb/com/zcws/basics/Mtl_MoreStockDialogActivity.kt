@@ -1,6 +1,6 @@
-package ykk.cb.com.zcws.warehouse
+package ykk.cb.com.zcws.basics
 
-import android.os.Bundle
+import android.content.Intent
 import android.os.Handler
 import android.os.Message
 import android.support.v7.widget.DividerItemDecoration
@@ -9,47 +9,53 @@ import android.util.Log
 import android.view.KeyEvent
 import android.view.View
 import butterknife.OnClick
-import kotlinx.android.synthetic.main.missionbill_list.*
+import kotlinx.android.synthetic.main.ab_mtl_list_more_stock.*
 import okhttp3.*
 import ykk.cb.com.zcws.R
-import ykk.cb.com.zcws.bean.MissionBill
-import ykk.cb.com.zcws.bean.User
-import ykk.cb.com.zcws.comm.BaseActivity
+import ykk.cb.com.zcws.basics.adapter.Mtl_MoreStockDialogAdapter
+import ykk.cb.com.zcws.bean.k3Bean.ICItem
+import ykk.cb.com.zcws.comm.BaseDialogActivity
 import ykk.cb.com.zcws.comm.Comm
 import ykk.cb.com.zcws.util.JsonUtil
 import ykk.cb.com.zcws.util.basehelper.BaseRecyclerAdapter
 import ykk.cb.com.zcws.util.xrecyclerview.XRecyclerView
-import ykk.cb.com.zcws.warehouse.adapter.MissionBill_List_Adapter
 import java.io.IOException
+import java.io.Serializable
 import java.lang.ref.WeakReference
 import java.util.*
 
 /**
- * 选择任务单dialog
+ * 选择多个物料dialog
  */
-class MissionBillListActivity : BaseActivity(), XRecyclerView.LoadingListener {
+class Mtl_MoreStockDialogActivity : BaseDialogActivity(), XRecyclerView.LoadingListener {
 
     companion object {
-        private val REFRESH = 10
-
         private val SUCC1 = 200
         private val UNSUCC1 = 501
     }
+
     private val context = this
-    private val listDatas = ArrayList<MissionBill>()
-    private var mAdapter: MissionBill_List_Adapter? = null
-    private var user: User? = null
+    private val listDatas = ArrayList<ICItem>()
+    private var mAdapter: Mtl_MoreStockDialogAdapter? = null
     private val okHttpClient = OkHttpClient()
     private var limit = 1
     private var isRefresh: Boolean = false
     private var isLoadMore: Boolean = false
     private var isNextPage: Boolean = false
+    private var accountType = "ZH" // 账号类型
+    private var isICInvBackUp = 0 // 是否查询盘点的物料
+    private var stockId = 0 // 盘点的仓库
+    private var stockAreaId = 0 // 盘点的库区
+    private var storageRackId = 0 // 盘点的货架id
+    private var stockPosId = 0 // 盘点的库位id
+    private var strMtlId: String? = null // 拼接的物料id
+    private var mtlStockIdGt0 = "" // 默认仓库id大于0
 
     // 消息处理
     private val mHandler = MyHandler(this)
 
-    private class MyHandler(activity: MissionBillListActivity) : Handler() {
-        private val mActivity: WeakReference<MissionBillListActivity>
+    private class MyHandler(activity: Mtl_MoreStockDialogActivity) : Handler() {
+        private val mActivity: WeakReference<Mtl_MoreStockDialogActivity>
 
         init {
             mActivity = WeakReference(activity)
@@ -60,9 +66,8 @@ class MissionBillListActivity : BaseActivity(), XRecyclerView.LoadingListener {
             if (m != null) {
                 m.hideLoadDialog()
                 when (msg.what) {
-                    SUCC1 // 成功
-                    -> {
-                        val list = JsonUtil.strToList2(msg.obj as String, MissionBill::class.java)
+                    SUCC1 -> { // 成功
+                        val list = JsonUtil.strToList2(msg.obj as String, ICItem::class.java)
                         m.listDatas.addAll(list!!)
                         m.mAdapter!!.notifyDataSetChanged()
 
@@ -74,8 +79,7 @@ class MissionBillListActivity : BaseActivity(), XRecyclerView.LoadingListener {
 
                         m.xRecyclerView!!.isLoadingMoreEnabled = m.isNextPage
                     }
-                    UNSUCC1 // 数据加载失败！
-                    -> {
+                    UNSUCC1 -> { // 数据加载失败！
                         m.mAdapter!!.notifyDataSetChanged()
                         m.toasts("抱歉，没有加载到数据！")
                     }
@@ -85,58 +89,78 @@ class MissionBillListActivity : BaseActivity(), XRecyclerView.LoadingListener {
     }
 
     override fun setLayoutResID(): Int {
-        return R.layout.missionbill_list
+        return R.layout.ab_mtl_list_more_stock
     }
 
     override fun initView() {
         xRecyclerView!!.addItemDecoration(DividerItemDecoration(this, DividerItemDecoration.VERTICAL))
         xRecyclerView!!.layoutManager = LinearLayoutManager(context)
-        mAdapter = MissionBill_List_Adapter(context, listDatas)
+        mAdapter = Mtl_MoreStockDialogAdapter(context, listDatas)
         xRecyclerView!!.adapter = mAdapter
         xRecyclerView!!.setLoadingListener(context)
 
         xRecyclerView!!.isPullRefreshEnabled = false // 上啦刷新禁用
-        xRecyclerView.setLoadingMoreEnabled(false); // 不显示下拉刷新的view
+        xRecyclerView.isLoadingMoreEnabled = false // 不显示下拉刷新的view
 
         mAdapter!!.onItemClickListener = BaseRecyclerAdapter.OnItemClickListener { adapter, holder, view, pos ->
-
-            val bundle = Bundle()
-            bundle.putSerializable("missionBill", listDatas[pos - 1])
-            when(listDatas[pos-1].missionType) {
-                1 -> showForResult(Transfer_PickingList_MainActivity::class.java, REFRESH, bundle)
+            val m = listDatas[pos - 1]
+            val isCheck = m.isCheck()
+            if (isCheck) {
+                m.isCheck = false
+            } else {
+                m.isCheck = true
             }
+            mAdapter!!.notifyDataSetChanged()
         }
     }
 
     override fun initData() {
-        getUserInfo()
         val bundle = context.intent.extras
         if (bundle != null) {
+            accountType = bundle.getString("accountType", "ZH")
+            mtlStockIdGt0 = bundle.getString("mtlStockIdGt0", "0")
+            isICInvBackUp = bundle.getInt("isICInvBackUp")
+            stockId = bundle.getInt("stockId")
+            stockAreaId = bundle.getInt("stockAreaId")
+            storageRackId = bundle.getInt("storageRackId")
+            stockPosId = bundle.getInt("stockPosId")
+            strMtlId = bundle.getString("strMtlId")
         }
 
-//        initLoadDatas()
-    }
-
-    override fun onResume() {
-        super.onResume()
         initLoadDatas()
     }
 
+
     // 监听事件
-    @OnClick(R.id.btn_close, R.id.btn_refresh, R.id.tv_date, R.id.btn_confirm)
+    @OnClick(R.id.btn_close, R.id.btn_search, R.id.btn_confirm)
     fun onViewClicked(view: View) {
         when (view.id) {
             R.id.btn_close -> {
                 closeHandler(mHandler)
                 context.finish()
             }
-            R.id.btn_refresh -> {
-                initLoadDatas()
-            }
-            R.id.tv_date -> {
-                Comm.showDateDialog(context, tv_date, 0)
-            }
-            R.id.btn_confirm -> { // 确定
+            R.id.btn_search -> initLoadDatas()
+            R.id.btn_confirm -> {// 确认
+                val size = listDatas.size
+                if (size == 0) {
+                    Comm.showWarnDialog(context, "请查询数据！")
+                    return
+                }
+                val listMtl = ArrayList<ICItem>()
+                for (i in 0 until size) {
+                    val mtl = listDatas[i]
+                    if (mtl.isCheck()) {
+                        listMtl.add(mtl)
+                    }
+                }
+                if (listMtl.size == 0) {
+                    Comm.showWarnDialog(context, "请至少选择一行数据！")
+                    return
+                }
+                val intent = Intent()
+                intent.putExtra("obj", listMtl as Serializable)
+                context.setResult(RESULT_OK, intent)
+                context.finish()
             }
         }
     }
@@ -147,20 +171,32 @@ class MissionBillListActivity : BaseActivity(), XRecyclerView.LoadingListener {
         run_okhttpDatas()
     }
 
+    override fun setListener() {
+        cb_stockQtyGt0.setOnCheckedChangeListener { buttonView, isChecked ->
+            initLoadDatas()
+        }
+    }
+
     /**
      * 通过okhttp加载数据
      */
     private fun run_okhttpDatas() {
         val formBody = FormBody.Builder()
-                .add("billNo", getValues(et_purNo).trim ())
-//                .add("missionType", "1") // 任务类型 1代表外购收料任务，21代表销售发货任务
-                .add("missionStatus", "B,D") // 任务状态 A：创建、B：审核、C：业务关闭、D：进行中，E：手工关闭
-                .add("receiveUserId", user!!.id.toString())
+                .add("fNumberAndName", getValues(et_search).trim())
+                .add("mtlStockIdGt0", mtlStockIdGt0)
+                .add("stockQtyGt0", if(cb_stockQtyGt0.isChecked) "1" else "") // 查询库存大于0
+                .add("accountType", accountType)
+                // 查询盘点的物料
+                .add("isICInvBackUp", isICInvBackUp.toString())
+                .add("stockId", stockId.toString())
+                .add("stockPosId", stockPosId.toString())
+                .add("strMtlId", if (strMtlId != null) strMtlId else "")
+
                 .add("limit", limit.toString())
                 .add("pageSize", "30")
                 .build()
         showLoadDialog("加载中...", false)
-        val mUrl = getURL("missionBill/findListByParam")
+        val mUrl = getURL("material/findListByPage2")
 
         val request = Request.Builder()
                 .addHeader("cookie", session)
@@ -210,13 +246,6 @@ class MissionBillListActivity : BaseActivity(), XRecyclerView.LoadingListener {
             context.finish()
         }
         return false
-    }
-
-    /**
-     * 得到用户对象
-     */
-    private fun getUserInfo() {
-        if (user == null) user = showUserByXml()
     }
 
     override fun onDestroy() {

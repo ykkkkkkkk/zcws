@@ -46,7 +46,7 @@ import ykk.cb.com.zcws.util.zxing.android.CaptureActivity;
 import ykk.cb.com.zcws.warehouse.adapter.Sc_ProdInStockPassFragment1Adapter;
 
 /**
- * 销售订单出库
+ * 生产入库审核
  */
 public class Sc_ProdInStockPassFragment1 extends BaseFragment {
 

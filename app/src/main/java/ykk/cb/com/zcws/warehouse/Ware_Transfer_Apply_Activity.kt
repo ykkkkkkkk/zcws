@@ -15,13 +15,10 @@ import butterknife.OnClick
 import kotlinx.android.synthetic.main.ware_transfer_apply.*
 import okhttp3.*
 import ykk.cb.com.zcws.R
-import ykk.cb.com.zcws.basics.Mtl_MoreDialogActivity
+import ykk.cb.com.zcws.basics.Mtl_MoreStockDialogActivity
 import ykk.cb.com.zcws.basics.Stock_DialogActivity
-import ykk.cb.com.zcws.bean.Stock
-import ykk.cb.com.zcws.bean.StockPosition
 import ykk.cb.com.zcws.bean.TransferApplyEntry
 import ykk.cb.com.zcws.bean.User
-import ykk.cb.com.zcws.bean.k3Bean.ICInventory
 import ykk.cb.com.zcws.bean.k3Bean.ICItem
 import ykk.cb.com.zcws.comm.BaseActivity
 import ykk.cb.com.zcws.comm.BaseFragment
@@ -31,13 +28,10 @@ import ykk.cb.com.zcws.util.basehelper.BaseRecyclerAdapter
 import ykk.cb.com.zcws.util.zxing.android.CaptureActivity
 import ykk.cb.com.zcws.warehouse.adapter.Ware_Transfer_Apply_Adapter
 import java.io.IOException
-import java.io.Serializable
 import java.lang.ref.WeakReference
 import java.util.ArrayList
 import java.util.concurrent.TimeUnit
 import kotlin.collections.HashMap
-import kotlin.collections.List
-import kotlin.collections.forEach
 
 /**
  * 选择库存物料dialog
@@ -214,8 +208,10 @@ class Ware_Transfer_Apply_Activity : BaseActivity() {
                 }*/
                 smqFlag = '2'
                 val bundle = Bundle()
+                bundle.putString("mtlStockIdGt0", "1")
                 bundle.putString("accountType", "ZH")
-                showForResult(Mtl_MoreDialogActivity::class.java, SEL_MTL, bundle)
+//                showForResult(Mtl_MoreDialogActivity::class.java, SEL_MTL, bundle)
+                showForResult(Mtl_MoreStockDialogActivity::class.java, SEL_MTL, bundle)
             }
             R.id.btn_positionScan -> { // 调用摄像头扫描（位置）
                 smqFlag = '1'

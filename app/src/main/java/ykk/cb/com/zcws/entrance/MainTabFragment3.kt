@@ -21,18 +21,22 @@ class MainTabFragment3 : BaseFragment() {
     @OnClick(R.id.relative1, R.id.relative2, R.id.relative3, R.id.relative4, R.id.relative5, R.id.relative6)
     fun onViewClicked(view: View) {
         when (view.id) {
-            R.id.relative1 // （电商）电商出库
-            -> show(Sal_DsOutMainActivity::class.java, null)
-            R.id.relative2 // （生产）销售出库
-            -> show(Sal_ScOutMainActivity::class.java, null)
-            R.id.relative3 // （电商）销售退货
-            -> show(Sal_DsOutReturnMainActivity::class.java, null)
-            R.id.relative4 // （内销）销售退货
-            -> show(Sal_NxOutReturnMainActivity::class.java, null)
-            R.id.relative5 // 电商退生产
-            -> show(Sal_DsBToRFromPurchaseInStockMainActivity::class.java, null)
-            R.id.relative6 // 销售装箱
-            -> {
+            R.id.relative1 -> { // （电商）电商出库
+                show(Sal_DsOutMainActivity::class.java, null)
+            }
+            R.id.relative2 -> { // （生产）销售出库
+                show(Sal_ScOutMainActivity::class.java, null)
+            }
+            R.id.relative3 -> { // （电商）销售退货
+                show(Sal_DsOutReturnMainActivity::class.java, null)
+            }
+            R.id.relative4 -> { // （内销）销售退货
+                show(Sal_NxOutReturnMainActivity::class.java, null)
+            }
+            R.id.relative5 -> { // 电商退生产
+                show(Sal_DsBToRFromPurchaseInStockMainActivity::class.java, null)
+            }
+            R.id.relative6 -> { // 销售装箱
             }
         }//                show(Sal_BoxActivity.class, null);
     }

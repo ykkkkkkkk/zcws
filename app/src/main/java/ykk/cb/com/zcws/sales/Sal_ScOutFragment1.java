@@ -164,7 +164,7 @@ public class Sal_ScOutFragment1 extends BaseFragment {
                         break;
                     case UNPASS: // 审核失败 返回
                         errMsg = JsonUtil.strToString(msgObj);
-                        if(m.isNULLS(errMsg).length() == 0) errMsg = "审核失败！";
+                        if(m.isNULLS(errMsg).length() == 0) errMsg = "已经保存单据到金蝶，但是未审核，可能原因库存不足！";
                         Comm.showWarnDialog(m.mContext, errMsg);
 
                         break;

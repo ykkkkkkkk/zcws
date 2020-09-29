@@ -24,31 +24,33 @@ class MainTabFragment4 : BaseFragment() {
     fun onViewClicked(view: View) {
         var bundle: Bundle? = null
         when (view.id) {
-            R.id.relative1 // 生产入库审核
-            -> show(Sc_ProdInStockPassMainActivity::class.java, null)
-            R.id.relative2 // 电商入库审核
-            -> show(Ds_PurInStockPassMainActivity::class.java, null)
-            R.id.relative3 // 盘点
-            ->
+            R.id.relative1 -> { // 生产入库审核
+                show(Sc_ProdInStockPassMainActivity::class.java, null)
+            }
+            R.id.relative2 -> { // 电商入库审核
+                show(Ds_PurInStockPassMainActivity::class.java, null)
+            }
+            R.id.relative3 -> { // 盘点
                 //                show(ICInvBackupMainActivity.class, null);
                 show(ICInvBackup_MainActivity::class.java, null)
-            R.id.relative4 // 调拨
-            -> show(StockTransferMainActivity::class.java, null)
-            R.id.relative5 // 其他入库
-            -> {
             }
-            R.id.relative6 // 其他出库
-            -> {
+            R.id.relative4 -> { // 调拨
+                show(StockTransferMainActivity::class.java, null)
             }
-            R.id.relative7 // 调拨申请
-            -> show(Ware_Transfer_Apply_Activity::class.java, null)
-            R.id.relative8 // 调拨任务
-            -> show(MissionBillListActivity::class.java, null)
-            R.id.relative9 -> { // 待上传
+            R.id.relative5 -> { // 其他入库
+            }
+            R.id.relative6 -> { // 其他出库
+            }
+            R.id.relative7 -> { // 调拨任务
+                show(MissionBillListActivity::class.java, null)
+            }
+            R.id.relative8 -> { // 待上传
                 bundle = Bundle()
                 bundle.putInt("pageId", 0)
                 bundle.putString("billType", "ZH_DBD")
                 show(OutInStock_Search_MainActivity::class.java, bundle)
+            }
+            R.id.relative9 -> { // 待上传
             }
         }
     }

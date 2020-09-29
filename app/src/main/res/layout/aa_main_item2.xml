@@ -122,7 +122,7 @@
         android:layout_alignParentBottom="true"
         android:layout_marginTop="20dp"
         android:orientation="horizontal"
-        android:visibility="gone">
+        >
 
         <RelativeLayout
             android:id="@+id/relative4"
@@ -136,7 +136,7 @@
                 android:layout_width="@dimen/_60dp"
                 android:layout_height="@dimen/_60dp"
                 android:layout_centerHorizontal="true"
-                android:background="@drawable/aa_ico2a_4" />
+                android:background="@drawable/aa_ico4a_2" />
 
             <TextView
                 android:id="@+id/tab4"
@@ -145,7 +145,7 @@
                 android:layout_below="@+id/tvImg4"
                 android:layout_centerHorizontal="true"
                 android:layout_marginTop="@dimen/_3dp"
-                android:text="工序汇报"
+                android:text="调拨申请"
                 android:textColor="@color/black"
                 android:textSize="@dimen/_18sp" />
 

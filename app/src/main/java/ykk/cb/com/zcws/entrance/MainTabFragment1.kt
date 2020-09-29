@@ -141,11 +141,9 @@ class MainTabFragment1 : BaseFragment(), IDownloadContract.View {
 //                show(Pur_ScInMainActivity::class.java, null)
                 show(Pur_Receive_InStock_MainActivity::class.java, null)
             }
-            R.id.relative3 // 外购入库
-            -> {
+            R.id.relative3 -> { // 外购入库
             }
-            R.id.relative4 // 生产装箱
-            -> {
+            R.id.relative4 -> { // 生产装箱
             }
         }//                show(Pur_OrderSearchActivity.class, null);
         //                show(Pur_InStockMainActivity.class,null);

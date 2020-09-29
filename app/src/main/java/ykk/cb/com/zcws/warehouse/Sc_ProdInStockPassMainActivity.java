@@ -47,6 +47,9 @@ import static android.hardware.usb.UsbManager.ACTION_USB_DEVICE_DETACHED;
 import static ykk.cb.com.zcws.util.blueTooth.Constant.MESSAGE_UPDATE_PARAMETER;
 import static ykk.cb.com.zcws.util.blueTooth.DeviceConnFactoryManager.CONN_STATE_FAILED;
 
+/**
+ * 生产入库审核
+ */
 public class Sc_ProdInStockPassMainActivity extends BaseActivity {
 
     @BindView(R.id.viewRadio1)

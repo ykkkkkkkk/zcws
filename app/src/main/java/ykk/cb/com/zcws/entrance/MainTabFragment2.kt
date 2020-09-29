@@ -11,6 +11,7 @@ import ykk.cb.com.zcws.comm.BaseFragment
 import ykk.cb.com.zcws.produce.Mtl_SmSearchMainActivity
 import ykk.cb.com.zcws.produce.Prod_ScInMainActivity
 import ykk.cb.com.zcws.produce.Prod_ScInOtherMainActivity
+import ykk.cb.com.zcws.warehouse.Ware_Transfer_Apply_Activity
 
 /**
  * 生产
@@ -24,15 +25,18 @@ class MainTabFragment2 : BaseFragment() {
     @OnClick(R.id.relative1, R.id.relative2, R.id.relative3, R.id.relative4)
     fun onViewClicked(view: View) {
         when (view.id) {
-            R.id.relative1 // 生产入库
-            -> show(Prod_ScInMainActivity::class.java, null)
-            R.id.relative2 // 生产入库
-            -> show(Prod_ScInOtherMainActivity::class.java, null)
-            R.id.relative3 // 工艺查看
-            -> show(Mtl_SmSearchMainActivity::class.java, null)
-            R.id.relative4 // 工序汇报
-            -> {
+            R.id.relative1 -> { // 生产入库
+                show(Prod_ScInMainActivity::class.java, null)
             }
-        }//                show(Prod_ProcedureReportActivity.class,null);
+            R.id.relative2 -> { // 生产入库
+                show(Prod_ScInOtherMainActivity::class.java, null)
+            }
+            R.id.relative3 -> { // 工艺查看
+                show(Mtl_SmSearchMainActivity::class.java, null)
+            }
+            R.id.relative4 -> { // 调拨申请
+                show(Ware_Transfer_Apply_Activity::class.java, null)
+            }
+        }
     }
 }
