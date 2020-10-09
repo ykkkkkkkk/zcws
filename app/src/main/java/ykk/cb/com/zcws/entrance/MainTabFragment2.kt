@@ -12,6 +12,7 @@ import ykk.cb.com.zcws.produce.Mtl_SmSearchMainActivity
 import ykk.cb.com.zcws.produce.Prod_ScInMainActivity
 import ykk.cb.com.zcws.produce.Prod_ScInOtherMainActivity
 import ykk.cb.com.zcws.warehouse.Ware_Transfer_Apply_Activity
+import ykk.cb.com.zcws.warehouse.Ware_Transfer_Apply_SearchActivity
 
 /**
  * 生产
@@ -22,7 +23,7 @@ class MainTabFragment2 : BaseFragment() {
         return inflater.inflate(R.layout.aa_main_item2, container, false)
     }
 
-    @OnClick(R.id.relative1, R.id.relative2, R.id.relative3, R.id.relative4)
+    @OnClick(R.id.relative1, R.id.relative2, R.id.relative3, R.id.relative4, R.id.relative5)
     fun onViewClicked(view: View) {
         when (view.id) {
             R.id.relative1 -> { // 生产入库
@@ -36,6 +37,9 @@ class MainTabFragment2 : BaseFragment() {
             }
             R.id.relative4 -> { // 调拨申请
                 show(Ware_Transfer_Apply_Activity::class.java, null)
+            }
+            R.id.relative5 -> { // 申请列表
+                show(Ware_Transfer_Apply_SearchActivity::class.java, null)
             }
         }
     }

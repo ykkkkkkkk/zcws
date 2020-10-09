@@ -13,11 +13,15 @@ public class TransferApply implements Serializable {
 	private int id;
 	private String billNo;			// 唯一单号
 	private int stockId;			//
-	private int status;				// 状态
-	private int createUserId;
-	private String createDate;
+	private int status;				// 状态，1：创建，2，部分拣货，3，拣货完成
+	private int createUserId;		// 创建人id
+	private String createDate;		// 创建日期
 
-	private Stock stock;	// 对应的仓库
+	private Stock stock;			// 对应的仓库
+	private User createUser;		// 对应的创建用户对象
+
+	// 临时对象，不存表
+	private int mtlCount;			// 物料个数
 
 	public TransferApply() {
 		super();
@@ -78,7 +82,23 @@ public class TransferApply implements Serializable {
 	public void setStock(Stock stock) {
 		this.stock = stock;
 	}
-	
-	
+
+	public User getCreateUser() {
+		return createUser;
+	}
+
+	public void setCreateUser(User createUser) {
+		this.createUser = createUser;
+	}
+
+	public int getMtlCount() {
+		return mtlCount;
+	}
+
+	public void setMtlCount(int mtlCount) {
+		this.mtlCount = mtlCount;
+	}
+
+
 	
 }

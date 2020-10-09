@@ -27,6 +27,7 @@ import ykk.cb.com.zcws.util.JsonUtil
 import ykk.cb.com.zcws.util.basehelper.BaseRecyclerAdapter
 import ykk.cb.com.zcws.util.zxing.android.CaptureActivity
 import ykk.cb.com.zcws.warehouse.adapter.Ware_Transfer_Apply_Adapter
+import ykk.cb.com.zcws.warehouse.adapter.Ware_Transfer_Apply_SearchAdapter
 import java.io.IOException
 import java.lang.ref.WeakReference
 import java.util.ArrayList
@@ -34,7 +35,7 @@ import java.util.concurrent.TimeUnit
 import kotlin.collections.HashMap
 
 /**
- * 选择库存物料dialog
+ * 调拨申请
  */
 class Ware_Transfer_Apply_Activity : BaseActivity() {
 
@@ -190,12 +191,15 @@ class Ware_Transfer_Apply_Activity : BaseActivity() {
 
 
     // 监听事件
-    @OnClick(R.id.btn_close, R.id.btn_positionSel, R.id.btn_mtlSel, R.id.btn_positionScan, R.id.btn_scan, R.id.tv_positionName, R.id.tv_icItemName, R.id.btn_save)
+    @OnClick(R.id.btn_close, R.id.btn_search, R.id.btn_positionSel, R.id.btn_mtlSel, R.id.btn_positionScan, R.id.btn_scan, R.id.tv_positionName, R.id.tv_icItemName, R.id.btn_save)
     fun onViewClicked(view: View) {
         when (view.id) {
             R.id.btn_close -> {
                 closeHandler(mHandler)
                 context.finish()
+            }
+            R.id.btn_search -> {
+                show(Ware_Transfer_Apply_SearchActivity::class.java,null)
             }
             R.id.btn_positionSel -> { // 选择仓库
                 smqFlag = '1'

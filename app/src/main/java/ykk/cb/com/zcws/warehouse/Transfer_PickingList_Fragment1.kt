@@ -452,7 +452,7 @@ class Transfer_PickingList_Fragment1 : BaseFragment() {
      */
     private fun run_transferPickingListList(transferApplyId: Int) {
         showLoadDialog("保存中...", false)
-        val mUrl = getURL("transferApply/findListByParam")
+        val mUrl = getURL("transferApply/findEntryList")
 
         val formBody = FormBody.Builder()
                 .add("transferApplyId", transferApplyId.toString())

@@ -149,8 +149,15 @@
             android:name=".warehouse.OutInStockSearchMainActivity"
             android:windowSoftInputMode="stateHidden|adjustResize" />
         <activity
-        android:name=".warehouse.Ware_Transfer_Apply_Activity"
-        android:windowSoftInputMode="stateHidden|adjustResize" />
+            android:name=".warehouse.Ware_Transfer_Apply_Activity"
+            android:windowSoftInputMode="stateHidden|adjustResize" />
+        <activity
+            android:name=".warehouse.Ware_Transfer_Apply_SearchActivity"
+            android:windowSoftInputMode="stateHidden|adjustResize" />
+        <activity
+            android:name=".warehouse.Ware_Transfer_Apply_SearchDetailActivity"
+            android:theme="@style/dialogStyle"
+            android:windowSoftInputMode="stateHidden|adjustResize" />
         <activity
             android:name=".warehouse.MissionBillListActivity"
             android:windowSoftInputMode="stateHidden|adjustResize" />

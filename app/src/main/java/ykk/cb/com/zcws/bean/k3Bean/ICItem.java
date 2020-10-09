@@ -64,6 +64,9 @@ public class ICItem implements Serializable{
 	private String unitName;
 	/* 计量单位代码，不存库 */
 	private String unitNumber;
+	private int stockId;	// 物料默认仓库
+	private int stockPosId;	// 物料默认库位
+
 	private Stock stock; // 仓库
 	private StockPosition stockPos; // 库位
 
@@ -312,6 +315,20 @@ public class ICItem implements Serializable{
 		this.smSnCode = smSnCode;
 	}
 
+	public int getStockId() {
+		return stockId;
+	}
 
+	public void setStockId(int stockId) {
+		this.stockId = stockId;
+	}
+
+	public int getStockPosId() {
+		return stockPosId;
+	}
+
+	public void setStockPosId(int stockPosId) {
+		this.stockPosId = stockPosId;
+	}
 
 }
